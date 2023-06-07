@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务</title>
+
+    <link rel="stylesheet" href="todo.css">
+</head>
+
+<body>
+    <div class="main">
+
+
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" href="/editor.html">
+            <div class="c3-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24"
+                    viewBox="0 0 24 24" width="24">
+                    <path d="M18.984 12.984h-6v6h-1.969v-6h-6v-1.969h6v-6h1.969v6h6v1.969z"></path>
+                </svg>
+            </div>
+            <div class="pivot-bar-item-title">新建</div>
+        </div>
+    </div>
+
+    <div class="dialog-container" style="display: none;">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h2 class="dialog-title">
+                    任务
+                </h2>
+            </div>
+            <div class="dialog-body">
+                <input class="dialog-input" type="text">
+                <textarea class="dialog-textarea"></textarea>
+            </div>
+            <div class="dialog-buttons">
+                <div class="dialog-button" id="off">取消</div>
+                <div class="dialog-button" id="on">确认</div>
+            </div>
+        </div>
+        <div class="dialog-overlay"></div>
+    </div>
+
+    <script src="custom-toast.js"></script>
+    <custom-toast id="toast"></custom-toast>
+    <script src="todo.js"></script>
+</body>
+
+</html>

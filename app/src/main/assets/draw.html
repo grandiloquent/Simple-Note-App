@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script>
+        const canvas = document.querySelector('#canvas');
+        const contxt = canvas.getContext('2d');
+        contxt.textAlign = "center";
+        contxt.textBaseline = "middle"
+        contxt.font = "120px 汉仪秀英体简";
+        function drawText(text, name) {
+            contxt.clearRect(0, 0, canvas.width, canvas.height);
+            contxt.fillText(text, canvas.width / 2, canvas.height / 2);
+            const link = document.createElement("a");
+            link.download = name + ".png"
+            link.href = canvas.toDataURL();
+            link.click();
+            link.remove();
+        }
+        "你好呀".split('')
+            .forEach((x, i) => drawText(x, i));
+    </script>
+</body>
+
+</html>

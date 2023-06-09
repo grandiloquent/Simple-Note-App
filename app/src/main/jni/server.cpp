@@ -314,6 +314,22 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    }
                    res.set_content(doc.dump(), "application/json");
                });
+    server.Post("/file/delete", [](const httplib::Request &req, httplib::Response &res,
+                                   const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        for (int i = 0; i < doc.size(); ++i) {
+            fs::remove_all(doc[i]);
+        }
+    });
+
+
     server.listen(host, port);
 }
 

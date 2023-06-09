@@ -11,7 +11,7 @@ function deleteFile(path) {
     div.textContent = `您确定要删除 ${substringAfterLast(path, "/")} 吗？`;
     dialog.appendChild(div);
     dialog.addEventListener('submit', async () => {
-        const res = await fetch(`${baseUri}/api/file/delete`, {
+        const res = await fetch(`${baseUri}/file/delete`, {
             method: 'POST',
             body: JSON.stringify([path])
         });
@@ -123,7 +123,7 @@ function onDelete() {
         });
     });
     dialog.addEventListener('submit', async () => {
-        const res = await fetch(`${baseUri}/api/file/delete`, {
+        const res = await fetch(`${baseUri}/file/delete`, {
             method: 'POST',
             body: JSON.stringify(obj)
         });
@@ -170,7 +170,7 @@ async function render(path) {
         .map(x => {
             return `<div class="item" data-path="${x.path}" data-isdirectory=${x.isDirectory}>
             <div class="item-icon ${x.isDirectory ? 'item-directory' : 'item-file'}" 
-            ${imageRe.test(x.path) ? `style="background-repeat:no-repeat;background-size:contain;background-position:50% 50%;background-image:url(${baseUri}/api/file?path=${x.path})"` : ''}
+            ${imageRe.test(x.path) ? `style="background-repeat:no-repeat;background-size:contain;background-position:50% 50%;background-image:url(${baseUri}/file?path=${x.path})"` : ''}
             ></div>
           <div class="item-title">
           <div>${substringAfterLast(x.path, "/")}</div>
@@ -404,7 +404,7 @@ function showImage(path) {
     const div = document.createElement('div');
     div.className = 'photo-viewer';
     const img = document.createElement('img');
-    img.src = `${baseUri}/api/file?path=${encodeURIComponent(path)}`
+    img.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
     div.appendChild(img);
     document.body.appendChild(div);
     img.addEventListener('click', () => {

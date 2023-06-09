@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.MimeTypeMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,10 +45,8 @@ public class WebAppInterface {
 
     public static Intent buildSharedIntent(Context context, File imageFile) {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        if (imageFile.getName().endsWith(".mp3"))
-            sharingIntent.setType("*/*");
-        else
-            sharingIntent.setType("video/mp4");
+        // https://android.googlesource.com/platform/frameworks/base/+/61ae88e/core/java/android/webkit/MimeTypeMap.java
+        sharingIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(imageFile.getName(),".")));
         Uri uri = PublicFileProvider.getUriForFile(context, "psycho.euphoria.plane.files", imageFile);
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return sharingIntent;

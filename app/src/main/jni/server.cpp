@@ -327,23 +327,18 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             return true;
         });
         nlohmann::json doc = nlohmann::json::parse(body);
-        for (int i = 0; i < doc.size(); ++i) {
-            fs::remove_all(doc[i]);
+        for (const auto & i : doc) {
+            fs::remove_all(i);
         }
     });
 
     server.Post("/upload", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
-        // auto size = req.files.size();
-        //auto ret = req.has_file("images");
-        //const auto &file = req.get_file_value("file");
-        LOGE("%s---------", req.has_file("path"));
-        // std::string f{req.get_file_value("path").name};
-
-//        std::ofstream ofs(f, std::ios::binary);
-//        ofs << file.content;
-//        res.set_content(SubstringAfterLast(image, "/"), "text/plain");
+        std::string f{req.get_file_value("path").content};
+        std::ofstream ofs(f, std::ios::binary);
+        ofs << req.get_file_value("file").content;
+        res.set_content("Success", "text/plain");
     });
     server.listen(host, port);
 }

@@ -213,9 +213,9 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::string s{"su -c "};
         FILE *pipeFP = popen((s + cmd).c_str(), "r");
         std::string buffer;
-        if (pipeFP != NULL) {
+        if (pipeFP != nullptr) {
             char buf[BUFSIZ];
-            while (fgets(buf, BUFSIZ, pipeFP) != NULL) {
+            while (fgets(buf, BUFSIZ, pipeFP) != nullptr) {
                 buffer += buf;
             }
             pclose(pipeFP);

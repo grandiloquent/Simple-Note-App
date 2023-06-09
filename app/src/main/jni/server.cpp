@@ -283,6 +283,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                [&t](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
+
+                   std::string value{"attachment; filename=\""};
+                   value.append(SubstringAfterLast(path, "/"));
+                   value.append("\"");
+                   res.set_header("Content-Disposition", value);
+
                    std::filesystem::path p(httplib::detail::decode_url(path, true));
                    serveFile(p, res, t);
                });

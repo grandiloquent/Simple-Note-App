@@ -253,10 +253,62 @@ function upload(baseUri) {
         input.click();
     }
 }
+function formatComments(textarea) {
+    const s = textarea.value;
+    let start = textarea.selectionStart;
+    while (start > 0 && s[start - 1] !== '\n') {
+        start--;
+    }
+    let length = textarea.value.length;
+    let end = textarea.selectionEnd;
+    while (end < length && s[end + 1] !== '\n') {
+        end++;
+    }
+
+    if (end + 2 >= length) {
+        textarea.setRangeText(`${prefix} ${textarea.value.slice(start, end + 1)}`, start, end + 2);
+        return;
+    }
+    let endIndex = end + 1;
+    let regex = new RegExp(/\s/);
+
+    while (endIndex < length && regex.test(s[endIndex + 1])) {
+        endIndex++;
+    }
+    let spaces = s.slice(end + 1, endIndex + 1).replace(/^[\r\n]+/g, '');
+    let contents = textarea.value.slice(start, end + 1).trim();
+    let array = [];
+    let count = 0;
+    let buf = [];
+    regex = new RegExp(/[\s\u4E00-\u9FA5]/);
+    for (let index = 0; index < contents.length; index++) {
+        const element = contents[index];
+        buf.push(element);
+        if (count >= 32 - spaces.length) {
+            if (regex.test(element)) {
+                array.push(buf.join(''));
+                buf = [];
+                count = 0;
+            }
+        }
+        count++;
+    }
+
+    if (buf.length > 0) {
+        array.push(buf.join(''));
+    }
+    let strings = array.map(x => `${spaces}${prefix} ${x}`).join('\n');
+    //     if (/\.(?:wxml|html|htm)$/.test(path)) {
+    //         strings = `${spaces}<!--${strings}
+    // ${spaces}-->`
+    //     }
+    textarea.setRangeText(strings, start, end + 1);
+
+}
 ///////////////////////////////
 const textarea = document.querySelector('textarea');
 const id = new URL(window.location).searchParams.get('id');
-
+let prefix="//";
 const openLink = document.querySelector('#open-link');
 openLink.addEventListener('click', async evt => {
     const s = textarea.value;
@@ -330,14 +382,14 @@ document.querySelector('#format-code').addEventListener('click', evt => {
 
 });
 document.querySelector('#code').addEventListener('click', evt => {
-    findCodeBlock((start, end, str) => {
-        const prefix = /^\s+/.exec(str)[0];
-        console.log(prefix, start, end);
-        textarea.setRangeText(str.split('\n')
-            .map(x => x.replace(prefix, ''))
-            .join('\n')
-            , start, end);
-    })
+    // findCodeBlock((start, end, str) => {
+    //     const prefix = /^\s+/.exec(str)[0];
+    //     textarea.setRangeText(str.split('\n')
+    //         .map(x => x.replace(prefix, ''))
+    //         .join('\n')
+    //         , start, end);
+    // });
+    formatComments(textarea);
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
     copyLine(textarea);
@@ -416,6 +468,9 @@ ${await readText()}
         } else if (evt.key === 'u') {
             evt.preventDefault();
             upload(baseUri);
+        }else if (evt.key === 'd') {
+            evt.preventDefault();
+            formatComments(textarea);
         }
     }
 });

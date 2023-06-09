@@ -115,13 +115,15 @@ function initialize() {
 
     const searchParams = new URL(window.location).searchParams;
     const path = searchParams.get('path');
-    const baseUri = searchParams.get('baseUri');
+    let baseUri = searchParams.get('baseUri');
     baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
     const timeFirst = document.querySelector('#time-first');
     const timeSecond = document.querySelector('#time-second');
     const video = document.querySelector('#video');
     const progressBarPlayed = document.querySelector('#progress-bar-played');
     const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
+    const toast = document.getElementById('toast');
+
     playVideo(baseUri, video, path);
 
     video.addEventListener('durationchange', evt => {
@@ -172,20 +174,25 @@ function initialize() {
         bottomWrapper.style.display = 'block';
         scheduleHide();
     });
-
     const videoList = document.querySelector('#video-list');
     videoList.addEventListener('click', evt => {
         showVideoList(baseUri, path, video);
     });
     const fullscreen = document.querySelector('#fullscreen');
-    fullscreen.addEventListener('click', evt => {
+    fullscreen.addEventListener('click', async evt => {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
+            await document.documentElement.requestFullscreen();
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
         }
+
+    });
+    window.addEventListener("resize", evt => {
+        const w = Math.min(window.outerWidth, window.innerWidth);
+        const h = Math.min(window.outerHeight, window.innerHeight);
+        toast.setAttribute('message', `${w}x${h}`);
         adjustSize(video);
     });
     document.addEventListener('visibilitychange', evt => {
@@ -196,7 +203,7 @@ function initialize() {
         obj[path] = video.currentTime;
         localStorage.setItem('bookmark', JSON.stringify(obj));
     }
-   
+
 
 
 }

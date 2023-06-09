@@ -1,8 +1,8 @@
-const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:3000" : "";
+const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
 const path = new URL(window.location).searchParams.get("path") || "%2Fstorage%2Femulated%2F0%2FMusics%2FMP3%2F%E9%98%BF%E6%82%A0%E6%82%A0-%E4%B8%80%E6%9B%B2%E7%9B%B8%E6%80%9D.mp3";
 async function loadMusicFiles() {
     let dir = substringBeforeLast(decodeURIComponent(path), "/");
-    const res = await fetch(`${baseUri}/api/files?path=${encodeURIComponent(dir)}`);
+    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(dir)}`);
     return res.json();
 }
 function getRandomInt(min, max) {
@@ -69,7 +69,7 @@ async function bindPlayEvent() {
     })
 
     searchIndex(path);
-    audio.src = `${baseUri}/api/file?path=${path}`;
+    audio.src = `${baseUri}/file?path=${path}`;
     title.textContent = substringAfterLast(decodeURIComponent(path), "/");
 
     document.querySelectorAll('.item-wrapper').forEach(itemWrapper => {
@@ -110,7 +110,7 @@ async function bindPlayEvent() {
 
 }
 async function playMusic(path, text) {
-    audio.src = `${baseUri}/api/file?path=${path
+    audio.src = `${baseUri}/file?path=${path
         }`
     title.textContent = text;
     audio.play();
@@ -134,6 +134,14 @@ const playPauseButton = document.querySelector('.play-pause-button');
 const nextButton = document.querySelector('.next-button');
 const audio = document.querySelector('audio');
 const previousButton = document.querySelector('.previous-button');
+const progressContainer = document.querySelector('.progress-container');
+const rect = progressContainer.getBoundingClientRect();
+progressContainer.addEventListener('click', evt => {
+   
+    audio.currentTime = audio.duration * evt.pageX /
+        progressContainer.getBoundingClientRect().width
+});
+
 
 
 render();

@@ -2,7 +2,7 @@ const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55
 const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp)$/);
 const binaryRe = new RegExp(/\.(?:pdf|epub|apk)$/);
 const audioRe = new RegExp(/\.(?:mp3|wav|m4a)$/);
-const videoRe = new RegExp(/\.(?:mp4|v)$/);
+const videoRe = new RegExp(/\.(?:mp4|v)$/,'i');
 const zipRe = new RegExp(/\.(?:zip|gzip)$/);
 
 const toast = document.querySelector('.toast');
@@ -22,16 +22,16 @@ function onItemClick(evt) {
         return;
     }
     if (audioRe.test(path)) {
-        window.location = `/music/music.html?path=${encodeURIComponent(path)}`
+        window.location = `/music.html?path=${encodeURIComponent(path)}`
         return;
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/video/video.html?path=${path}`
+        window.location = `/video.html?path=${path}`
         return;
     }
-    if (path.endsWith(".srt")) {
-        window.location = `/srt?path=${encodeURIComponent(path)}`
-    }
+    // if (path.endsWith(".srt")) {
+    //     window.location = `/srt?path=${encodeURIComponent(path)}`
+    // }
     // else if (evt.detail.path.endsWith(".md")) {
     //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
     // }

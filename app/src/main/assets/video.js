@@ -24,17 +24,7 @@ function formatDuration(ms) {
         .map(val => (val[1] + '').padStart(2, '0'))
         .join(':');
 }
-function appendSubtitle(video) {
-    document.querySelectorAll('track').forEach(x => x.remove())
-    const track = document.createElement('track');
-    var tracks = video.textTracks;
-    var numTracks = tracks.length;
-    for (var i = numTracks - 1; i >= 0; i--)
-        video.textTracks[i].mode = "disabled";
-    track.src = substringBeforeLast(video.src, ".") + ".srt";
-    track.default = true;
-    video.appendChild(track);
-}
+
 function substringBeforeLast(string, delimiter, missingDelimiterValue) {
     const index = string.lastIndexOf(delimiter);
     if (index === -1) {
@@ -47,8 +37,7 @@ function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
-    appendSubtitle(video);
-    transformSrtTracks(video);
+
 }
 async function showVideoList(baseUri, path, video) {
     const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
@@ -105,7 +94,7 @@ function jumpToBookmark(video) {
 }
 
 ////////////////////////////////
-import { transformSrtTracks } from './main.js';
+
 const searchParams = new URL(window.location).searchParams;
 const path = searchParams.get('path');
 
@@ -114,6 +103,7 @@ function initialize() {
     const topWrapper = document.querySelector('#top-wrapper');
     const middleWrapper = document.querySelector('#middle-wrapper');
     const bottomWrapper = document.querySelector('#bottom-wrapper');
+
 
     let baseUri = searchParams.get('baseUri');
     baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
@@ -203,8 +193,47 @@ function initialize() {
         obj[path] = video.currentTime;
         localStorage.setItem('bookmark', JSON.stringify(obj));
     }
-    
-
+    var last_media_time, last_frame_num, fps;
+    var fps_rounder = [];
+    var frame_not_seeked = true;
+    function ticker(useless, metadata) {
+        var media_time_diff = Math.abs(metadata.mediaTime - last_media_time);
+        var frame_num_diff = Math.abs(metadata.presentedFrames - last_frame_num);
+        var diff = media_time_diff / frame_num_diff;
+        if (
+            diff &&
+            diff < 1 &&
+            frame_not_seeked &&
+            fps_rounder.length < 50 &&
+            video.playbackRate === 1 &&
+            document.hasFocus()
+        ) {
+            fps_rounder.push(diff);
+            fps = Math.round(1 / get_fps_average());
+        }
+        frame_not_seeked = true;
+        last_media_time = metadata.mediaTime;
+        last_frame_num = metadata.presentedFrames;
+        if (fps_rounder.length < 50)
+            video.requestVideoFrameCallback(ticker);
+    }
+    video.requestVideoFrameCallback(ticker);
+    video.addEventListener("seeked", function () {
+        fps_rounder.pop();
+        frame_not_seeked = false;
+    });
+    function get_fps_average() {
+        return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
+    }
+    const next = document.querySelector('#next');
+    next.addEventListener('click', evt => {
+        scheduleHide();
+        video.currentTime += 1 / fps;
+    });
+    const previous = document.querySelector('#previous');
+    previous.addEventListener('click', evt => {
+        scheduleHide();
+        video.currentTime -= 1 / fps;
+    });
 }
 initialize();
-// https://stackoverflow.com/questions/72997777/how-do-i-get-the-frame-rate-of-an-html-video-with-javascript

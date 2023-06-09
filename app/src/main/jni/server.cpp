@@ -215,7 +215,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::string buffer;
         if (pipeFP != nullptr) {
             char buf[BUFSIZ];
-            while (fgets(buf, BUFSIZ, pipeFP) != nullptr) {
+            while (fgets(buf, BUFSIZ, pipeFP) !=
+            nullptr) {
                 buffer += buf;
             }
             pclose(pipeFP);

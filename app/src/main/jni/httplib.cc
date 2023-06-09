@@ -1169,7 +1169,7 @@ namespace httplib {
                 case "wasm"_t:
                     return "application/wasm";
             }
-            return "application/octet-stream";
+
         }
 
         const char *status_message(int status) {

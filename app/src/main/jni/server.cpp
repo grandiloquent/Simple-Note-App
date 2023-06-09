@@ -20,6 +20,9 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
     fs->seekg(0);
     std::map<std::string, std::string> file_extension_and_mimetype_map;
     auto contentType = httplib::detail::find_content_type(p, t);
+    if (contentType == nullptr) {
+        contentType = "application/octet-stream";
+    }
     res.set_content_provider(static_cast<size_t>(end),
                              contentType,
                              [fs](uint64_t offset,
@@ -329,7 +332,19 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         }
     });
 
+    server.Post("/upload", [&](const auto &req, auto &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
 
+        // auto size = req.files.size();
+        //auto ret = req.has_file("images");
+        //const auto &file = req.get_file_value("file");
+        LOGE("%s---------", req.has_file("path"));
+        // std::string f{req.get_file_value("path").name};
+
+//        std::ofstream ofs(f, std::ios::binary);
+//        ofs << file.content;
+//        res.set_content(SubstringAfterLast(image, "/"), "text/plain");
+    });
     server.listen(host, port);
 }
 

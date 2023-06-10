@@ -155,16 +155,16 @@ async function render(path) {
     const res = await loadData(path, searchParams.get("size"));
     this.wrapper.innerHTML = res.sort((x, y) => {
         if (x.isDirectory !== y.isDirectory) if (x.isDirectory) return -1; else return 1;
-        if (y.length && x.length) {
-            const dif = y.length - x.length;
-            if (dif > 0) {
-                return 1;
-            } else if (dif < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
+        // if (y.length && x.length) {
+        //     const dif = y.length - x.length;
+        //     if (dif > 0) {
+        //         return 1;
+        //     } else if (dif < 0) {
+        //         return -1;
+        //     } else {
+        //         return 0;
+        //     }
+        // }
         return x.path.localeCompare(y.path)
     })
         .map(x => {

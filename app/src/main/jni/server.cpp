@@ -50,7 +50,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     std::map<std::string, std::string> m{};
     std::map<std::string, std::string> t{};
     httplib::Server server;
-    server.Get(R"(/(.+\.(?:js|css|html|png))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|png|jpg|jpeg|gif|svg))?)",
                [&m, &t, mgr](const httplib::Request &req, httplib::Response &res) {
                    if (!req.get_header_value("Referer").empty()) {
                        auto referer = req.get_header_value("Referer");

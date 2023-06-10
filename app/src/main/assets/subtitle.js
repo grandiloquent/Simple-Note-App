@@ -45,22 +45,16 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
 }
 function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
+    toast.setAttribute('message',document.title);
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
     appendSubtitle(video);
     transformSrtTracks(video);
+    video.play();
+
 }
 async function showVideoList(baseUri, path, video) {
-    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
-        substringBeforeLast(path, "/")
-    )}`);
-    const videos = (await res.json())
-        .filter(video => {
-            return !video.isDirectory && (
-                video.path.endsWith(".mp4") ||
-                video.path.endsWith(".v")
-            )
-        });
+
 
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', '视频列表');
@@ -108,8 +102,8 @@ function jumpToBookmark(video) {
 import { transformSrtTracks } from './main.js';
 const searchParams = new URL(window.location).searchParams;
 const path = searchParams.get('path');
-
-function initialize() {
+let videos;
+async function initialize() {
     let timer;
     const topWrapper = document.querySelector('#top-wrapper');
     const middleWrapper = document.querySelector('#middle-wrapper');
@@ -123,7 +117,22 @@ function initialize() {
     const progressBarPlayed = document.querySelector('#progress-bar-played');
     const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
+    const progressBar = document.querySelector('#progress-bar');
+    progressBar.addEventListener('click', evt => {
+        video.currentTime =
+            video.duration * (evt.offsetX / progressBar.getBoundingClientRect().width);
+    });
 
+    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
+        substringBeforeLast(path, "/")
+    )}`);
+    videos = (await res.json())
+        .filter(video => {
+            return !video.isDirectory && (
+                video.path.endsWith(".mp4") ||
+                video.path.endsWith(".v")
+            )
+        });
     playVideo(baseUri, video, path);
 
     video.addEventListener('durationchange', evt => {
@@ -149,6 +158,22 @@ function initialize() {
         playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
     });
 
+    video.addEventListener('ended', evt => {
+        const url = new URL(video.src);
+        const path = url.searchParams.get('path');
+        let next = 0;
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].path === path) {
+                next = i;
+            }
+        }
+        if (next + 1 < videos.length) {
+            next = next + 1;
+        } else {
+            next = 0;
+        }
+        playVideo(baseUri, video, videos[next].path);
+    });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {
         if (video.paused) {
@@ -203,7 +228,7 @@ function initialize() {
         obj[path] = video.currentTime;
         localStorage.setItem('bookmark', JSON.stringify(obj));
     }
-    
+
 
 }
 initialize();

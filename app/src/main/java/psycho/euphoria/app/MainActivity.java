@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
         Intent intent = getIntent();
         String address = getIntent().getStringExtra(KEY_ADDRESS);
         if (address != null) {
-            mWebView.loadUrl( address + "/index.html");
+            mWebView.loadUrl(address + "/index.html");
 
         }
     }
@@ -156,6 +156,8 @@ public class MainActivity extends Activity {
         menu.add(0, 3, 0, "保存页面");
         menu.add(0, 6, 0, "首页");
         menu.add(0, 7, 0, "复制");
+        menu.add(0, 8, 0, "文件管理器");
+        menu.add(0, 9, 0, "字幕");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
@@ -173,6 +175,12 @@ public class MainActivity extends Activity {
                 break;
             case 6:
                 mWebView.loadUrl(mUrl);
+                break;
+            case 8:
+                Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/files.html");
+                break;
+            case 9:
+                Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/subtitle.html?path=");
                 break;
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).

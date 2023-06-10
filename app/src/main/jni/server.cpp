@@ -50,8 +50,21 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     std::map<std::string, std::string> m{};
     std::map<std::string, std::string> t{};
     httplib::Server server;
-    server.Get(R"(/([a-zA-Z0-9-]+.(?:js|css|html))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|png))?)",
                [&m, &t, mgr](const httplib::Request &req, httplib::Response &res) {
+                   if (!req.get_header_value("Referer").empty()) {
+                       auto referer = req.get_header_value("Referer");
+                       std::filesystem::path p(
+                               SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
+                       p = p.parent_path();
+                       LOGE("req.path.substr(1) %s", req.path.substr(1).c_str());
+                       p = p.append(req.path.substr(1));
+                       LOGE("req.path.substr(1) %s %s", req.path.substr(1).c_str(), p.c_str());
+                       if (fs::exists(p)) {
+                           serveFile(p, res, t);
+                           return;
+                       }
+                   }
 
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
                    auto str = m[p];
@@ -216,7 +229,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (pipeFP != nullptr) {
             char buf[BUFSIZ];
             while (fgets(buf, BUFSIZ, pipeFP) !=
-            nullptr) {
+                   nullptr) {
                 buffer += buf;
             }
             pclose(pipeFP);
@@ -288,10 +301,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
 
-                   std::string value{"attachment; filename=\""};
-                   value.append(SubstringAfterLast(path, "/"));
-                   value.append("\"");
-                   res.set_header("Content-Disposition", value);
+                   if (!path.ends_with(".html")) {
+                       std::string value{"attachment; filename=\""};
+                       value.append(SubstringAfterLast(path, "/"));
+                       value.append("\"");
+                       res.set_header("Content-Disposition", value);
+                   }
 
                    std::filesystem::path p(httplib::detail::decode_url(path, true));
                    serveFile(p, res, t);
@@ -328,7 +343,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             return true;
         });
         nlohmann::json doc = nlohmann::json::parse(body);
-        for (const auto & i : doc) {
+        for (const auto &i: doc) {
             fs::remove_all(i);
         }
     });

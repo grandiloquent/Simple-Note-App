@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -46,7 +47,7 @@ public class WebAppInterface {
     public static Intent buildSharedIntent(Context context, File imageFile) {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         // https://android.googlesource.com/platform/frameworks/base/+/61ae88e/core/java/android/webkit/MimeTypeMap.java
-        sharingIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(imageFile.getName(),".")));
+        sharingIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(imageFile.getName(), ".")));
         Uri uri = PublicFileProvider.getUriForFile(context, "psycho.euphoria.plane.files", imageFile);
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return sharingIntent;
@@ -200,5 +201,16 @@ public class WebAppInterface {
         clipboard.setPrimaryClip(clip);
     }
 
-
+    @JavascriptInterface
+    public void scanFile(String fileName) {
+        MediaScannerConnection.scanFile(
+                mContext, new String[]{
+                        fileName
+                }, new String[]{
+                        MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                                Shared.substringAfterLast(fileName, ".")
+                        )
+                }, null
+        );
+    }
 }

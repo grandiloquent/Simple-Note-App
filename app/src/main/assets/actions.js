@@ -269,6 +269,12 @@ function showContextMenu(evt) {
                 NativeAndroid.share(path);
             }
         });
+        addContextMenuItem(bottomSheet, '扫描', () => {
+            bottomSheet.remove();
+            if (typeof NativeAndroid !== 'undefined') {
+                NativeAndroid.scaleFile(path);
+            }
+        });
     }
     document.body.appendChild(bottomSheet);
 }

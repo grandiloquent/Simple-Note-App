@@ -97,17 +97,19 @@ let videos;
 
 async function initialize() {
 
-    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
-        substringBeforeLast(path, "/")
-    )}`);
-    videos = (await res.json())
-        .filter(video => {
-            return !video.isDirectory && (
-                video.path.endsWith(".mp4") ||
-                video.path.endsWith(".v")
-            )
-        });
-
+    async function loadVideoList() {
+        const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
+            substringBeforeLast(path, "/")
+        )}`);
+        videos = (await res.json())
+            .filter(video => {
+                return !video.isDirectory && (
+                    video.path.endsWith(".mp4") ||
+                    video.path.endsWith(".v")
+                )
+            });
+    }
+    await loadVideoList();
     let timer;
     const topWrapper = document.querySelector('#top-wrapper');
     const middleWrapper = document.querySelector('#middle-wrapper');
@@ -146,6 +148,22 @@ async function initialize() {
         playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
     });
 
+    video.addEventListener('ended', evt => {
+        const url = new URL(video.src);
+        const path = url.searchParams.get('path');
+        let next = 0;
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].path === path) {
+                next = i;
+            }
+        }
+        if (next + 1 < videos.length) {
+            next = next + 1;
+        } else {
+            next = 0;
+        }
+        playVideo(baseUri, video, videos[next].path);
+    });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {
         if (video.paused) {
@@ -242,8 +260,7 @@ async function initialize() {
         scheduleHide();
         video.currentTime -= 1 / fps;
     });
-    window.addEventListener('keydown', evt => {
-        console.log(evt.key);
+    window.addEventListener('keydown', async evt => {
         if (evt.key === 'ArrowLeft') {
             evt.preventDefault();
             video.currentTime -= 10;
@@ -255,6 +272,21 @@ async function initialize() {
             playVideo(baseUri, video,
                 videos[getRandomInt(0, videos.length)].path
             )
+        } else if (evt.key === '0') {
+            evt.preventDefault();
+            video.pause();
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            const res = await fetch(`${baseUri}/recycle?path=${encodeURIComponent(path)}`)
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            await loadVideoList();
+            next = Math.min(next, videos.length - 1);
+            playVideo(baseUri, video, videos[next].path)
         }
     });
 }

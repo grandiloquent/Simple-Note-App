@@ -262,6 +262,11 @@ function showContextMenu(evt) {
                 let imgPath = `${substringBeforeLast(path, "/")}/.images/${substringAfterLast(path, "/")}`;
                 showImage(imgPath)
             });
+        } else if (path.endsWith('.srt')) {
+            addContextMenuItem(bottomSheet, '播放视频', () => {
+                bottomSheet.remove();
+                window.location = `/subtitle.html?path=${encodeURIComponent(substringBeforeLast(path, ".") + ".mp4")}`
+            });
         }
         addContextMenuItem(bottomSheet, '分享', () => {
             bottomSheet.remove();
@@ -327,7 +332,7 @@ function onMenu(evt) {
         bottomSheet.remove();
         if (typeof NativeAndroid !== 'undefined') {
             const url = new URL(window.location);
-            const path=url.searchParams.get('path');
+            const path = url.searchParams.get('path');
             NativeAndroid.combineImages(path, 400, null)
         }
     });

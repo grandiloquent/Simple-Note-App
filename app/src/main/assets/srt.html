@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        async function loadData() {
+            const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
+            const searchParams = new URL(window.location).searchParams;
+            const path = searchParams.get('path');
+            document.title = path;
+            let res;
+            try {
+                res = await fetch(`${baseUri}/file?path=${encodeURIComponent(path)}`);
+                if (res.status !== 200) {
+                    throw new Error();
+                }
+                let s = await res.text();
+                s = s.replaceAll(/\d+\s*\d{2}:\d{2}:\d{2}\,\d{3} --> \d{2}:\d{2}:\d{2}\,\d{3}[\s]+/g, ' ');
+                let strings = [];
+                const buf = s.split(/[.?]/);
+                let line = "";
+                for (let i = 0; i < buf.length; i++) {
+                    if (line.length + buf[i].length > 800) {
+                        strings.push(line);
+                        line = "";
+                    }
+                    line += buf[i] + ".";
+                }
+                if (line.length > 0)
+                    strings.push(line);
+                return strings
+            } catch (error) {
+            }
+        }
+        async function initialize() {
+            const lines = await loadData();
+            console.log(lines);
+            document.body.insertAdjacentHTML('afterbegin',
+                lines.map(x => `<p>${x}</p>`).join(''));
+        }
+        initialize() 
+    </script>
+</body>
+
+</html>

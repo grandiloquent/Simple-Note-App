@@ -57,9 +57,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                        std::filesystem::path p(
                                SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
                        p = p.parent_path();
-                       LOGE("req.path.substr(1) %s", req.path.substr(1).c_str());
                        p = p.append(req.path.substr(1));
-                       LOGE("req.path.substr(1) %s %s", req.path.substr(1).c_str(), p.c_str());
                        if (fs::exists(p)) {
                            serveFile(p, res, t);
                            return;

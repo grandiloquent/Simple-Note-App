@@ -272,7 +272,7 @@ function showContextMenu(evt) {
         addContextMenuItem(bottomSheet, '扫描', () => {
             bottomSheet.remove();
             if (typeof NativeAndroid !== 'undefined') {
-                NativeAndroid.scaleFile(path);
+                NativeAndroid.scanFile(path);
             }
         });
     }

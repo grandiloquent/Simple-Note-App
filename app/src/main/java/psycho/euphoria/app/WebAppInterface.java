@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
+import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -48,7 +49,7 @@ public class WebAppInterface {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         // https://android.googlesource.com/platform/frameworks/base/+/61ae88e/core/java/android/webkit/MimeTypeMap.java
         sharingIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(imageFile.getName(), ".")));
-        Uri uri = PublicFileProvider.getUriForFile(context, "psycho.euphoria.plane.files", imageFile);
+        Uri uri = PublicFileProvider.getUriForFile(context, "psycho.euphoria.app.files", imageFile);
         sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
         return sharingIntent;
 
@@ -210,7 +211,17 @@ public class WebAppInterface {
                         MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                                 Shared.substringAfterLast(fileName, ".")
                         )
-                }, null
+                }, new MediaScannerConnectionClient() {
+                    @Override
+                    public void onMediaScannerConnected() {
+                        Log.e("B5aOx2", String.format("onMediaScannerConnected, %s", ""));
+                    }
+
+                    @Override
+                    public void onScanCompleted(String s, Uri uri) {
+
+                    }
+                }
         );
     }
 }

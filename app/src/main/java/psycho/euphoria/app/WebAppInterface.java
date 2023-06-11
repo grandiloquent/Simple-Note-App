@@ -56,22 +56,10 @@ public class WebAppInterface {
 
     }
 
-    public void check(String uri) {
-        try {
-            HttpURLConnection c = (HttpURLConnection) new URL(uri).openConnection();
-            c.addRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36");
-            c.addRequestProperty("Referer", "https://www.ixigua.com/embed/?group_id=7187727505476977210&autoplay=0&wid_try=1");
-            c.addRequestProperty("Cookie", "MONITOR_WEB_ID=08ba8ce2-7ae9-4ca7-b286-768b36bb67bb; ttwid=1%7C4Sq4ClTk2TuXZrHMYMak2LaZIKO4AfMX6UQ1Bt071zg%7C1614514848%7C163163a1f5ccaec792b69a9525fb9c1e993f07db8963d4e5a515711478920169; ixigua-a-s=0; SEARCH_CARD_MODE=6934288451864888839_1");
-        } catch (Exception ignored) {
-        }
-    }
 
 
     @JavascriptInterface
     public void downloadFile(String fileName, String uri) {
-        new Thread(() -> {
-            check(uri);
-        }).start();
         try {
             DownloadManager dm = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
             Request request = new Request(Uri.parse(uri));

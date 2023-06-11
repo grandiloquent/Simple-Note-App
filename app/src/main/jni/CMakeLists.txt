@@ -31,12 +31,14 @@ add_library(shared SHARED shared.cpp)
 target_link_libraries(shared android log)
 add_library(extractor SHARED extractor.cpp)
 target_link_libraries(extractor httplib nlohmann_json::nlohmann_json shared)
+
 add_subdirectory(zipper)
 add_library(server SHARED server.cpp)
+
 target_link_libraries(server httplib shared android sqlite3 nlohmann_json::nlohmann_json extractor Zipper)
 target_include_directories(server PRIVATE zipper/zipper)
+
 target_link_libraries(nativelib
         android
-
         mbedtls
         server)

@@ -37,19 +37,9 @@ function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
-
+    video.play();
 }
 async function showVideoList(baseUri, path, video) {
-    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
-        substringBeforeLast(path, "/")
-    )}`);
-    const videos = (await res.json())
-        .filter(video => {
-            return !video.isDirectory && (
-                video.path.endsWith(".mp4") ||
-                video.path.endsWith(".v")
-            )
-        });
 
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', '视频列表');
@@ -92,21 +82,38 @@ function jumpToBookmark(video) {
         video.currentTime = currentTime;
     }
 }
-
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
 ////////////////////////////////
 
 const searchParams = new URL(window.location).searchParams;
 const path = searchParams.get('path');
+let baseUri = searchParams.get('baseUri');
+baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
+let videos;
 
-function initialize() {
+async function initialize() {
+
+    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
+        substringBeforeLast(path, "/")
+    )}`);
+    videos = (await res.json())
+        .filter(video => {
+            return !video.isDirectory && (
+                video.path.endsWith(".mp4") ||
+                video.path.endsWith(".v")
+            )
+        });
+
     let timer;
     const topWrapper = document.querySelector('#top-wrapper');
     const middleWrapper = document.querySelector('#middle-wrapper');
     const bottomWrapper = document.querySelector('#bottom-wrapper');
 
 
-    let baseUri = searchParams.get('baseUri');
-    baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
     const timeFirst = document.querySelector('#time-first');
     const timeSecond = document.querySelector('#time-second');
     const video = document.querySelector('#video');
@@ -234,6 +241,21 @@ function initialize() {
     previous.addEventListener('click', evt => {
         scheduleHide();
         video.currentTime -= 1 / fps;
+    });
+    window.addEventListener('keydown', evt => {
+        console.log(evt.key);
+        if (evt.key === 'ArrowLeft') {
+            evt.preventDefault();
+            video.currentTime -= 10;
+        } else if (evt.key === 'ArrowRight') {
+            evt.preventDefault();
+            video.currentTime += 10;
+        } else if (evt.key === '1') {
+            evt.preventDefault();
+            playVideo(baseUri, video,
+                videos[getRandomInt(0, videos.length)].path
+            )
+        }
     });
 }
 initialize();

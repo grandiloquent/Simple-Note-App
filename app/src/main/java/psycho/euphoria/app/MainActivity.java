@@ -177,7 +177,9 @@ public class MainActivity extends Activity {
                 mWebView.loadUrl(mUrl);
                 break;
             case 8:
-                Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/files.html");
+                String url=Shared.substringBeforeLast(mUrl, "/") + "/files.html";
+                Shared.setText(this, url);
+                mWebView.loadUrl(url);
                 break;
             case 9:
                 Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/subtitle.html?path=");

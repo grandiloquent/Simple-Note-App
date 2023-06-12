@@ -10,17 +10,86 @@
         body {
             margin: 8px;
             font-size: 16px;
+            padding: 0 0 64px 0
+        }
+
+        .btn {
+            position: fixed;
+            left: 50%;
+            right: 0;
+            bottom: 32px;
+            transform: translateX(-50%);
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+            border-radius: 24px;
+            height: 32px;
+            color: rgb(60, 64, 67);
+            background-color: #fff;
+            font-size: 12px;
+            width: 50vw;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 1;
+            overflow: hidden;
+            line-height: 32px;
+            text-overflow: ellipsis;
+            text-align: center;
+            padding: 0 8px;
         }
     </style>
+    <script src="shared.js"></script>
 </head>
 
 <body>
+    <div class="btn">
+
+    </div>
     <script>
+        const btn = document.querySelector('.btn');
+        let files;
+        async function loadFiles(baseUri, path) {
+            let res;
+            try {
+                res = await fetch(`${baseUri}/files?path=${encodeURIComponent(path)}`);
+                if (res.status !== 200) {
+                    throw new Error();
+                }
+                const obj = await res.json();
+                files = obj.filter(x => x.path.endsWith(".srt"))
+                    .map(x => x.path);
+            } catch (error) {
+                console.log(error);
+            }
+        }
         async function loadData() {
             const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
             const searchParams = new URL(window.location).searchParams;
             const path = searchParams.get('path');
-            document.title = path;
+            btn.textContent = substringAfterLast(path, "/");
+            document.title = substringAfterLast(path, "/");
+            await loadFiles(baseUri, substringBeforeLast(path, "/"));
+            const width = btn.getBoundingClientRect().width;
+            btn.addEventListener('click', evt => {
+                let i = 0;
+                for (let index = 0; index < files.length; index++) {
+                    const element = files[index];
+                    if (element === path) {
+                        i = index;
+                        break;
+                    }
+                }
+                if (evt.offsetX <= width / 2) {
+                    i--;
+                } else {
+                    i++;
+                }
+                if (i < 0) {
+                    i = 0;
+                } else if (i >= files.length) {
+                    i = files.length - 1;
+                }
+                window.location = `?path=${files[i]}`
+            });
             let res;
             try {
                 res = await fetch(`${baseUri}/file?path=${encodeURIComponent(path)}`);
@@ -47,10 +116,10 @@
         }
         async function initialize() {
             const lines = await loadData();
-            console.log(lines);
             document.body.insertAdjacentHTML('afterbegin',
                 lines.map(x => `<p>${x}</p>`).join(''));
         }
+
         initialize() 
     </script>
 </body>

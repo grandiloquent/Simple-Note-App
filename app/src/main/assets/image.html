@@ -67,9 +67,10 @@
                     height = element.height;
                 }
                 if (left <= right) {
+
                     contxt.drawImage(element,
                         0, 0, element.width, element.height,
-                        (halfWidth - width) / 2, ly,
+                        (halfWidth - width) / 2 + 32, ly,
                         width,
                         height
                     );
@@ -78,10 +79,11 @@
                 } else {
                     contxt.drawImage(element,
                         0, 0, element.width, element.height,
-                        (halfWidth - width) / 2 + halfWidth, ry,
+                        (halfWidth - width) / 2 + canvas.width / 2 +  16, ry,
                         width,
                         height
                     );
+                    console.log(width, halfWidth, (halfWidth - width) / 2 + halfWidth + 32 + 16);
                     ry += height + 32;
                     right += height + 32;
                 }

@@ -421,7 +421,7 @@ ${await executeSqlStatement(getBaseUri(), str.trim())}
             });
         } if (evt.key === 'l') {
             evt.preventDefault();
-            textarea.setRangeText(`\`\`\`
+            textarea.setRangeText(`\`\`\`html
 ${await readText()}   
 \`\`\`        
                             `, textarea.selectionStart, textarea.selectionEnd);

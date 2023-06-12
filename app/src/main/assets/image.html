@@ -9,6 +9,9 @@
 </head>
 
 <body>
+    <div id="createPNGButton">
+        <button onclick="putImage()">Save as Image</button>
+    </div>
     <input id="input" type="file" multiple accept="image/*" />
     <canvas id="canvas"></canvas>
     <script>
@@ -29,7 +32,7 @@
         const input = document.querySelector('#input');
         input.addEventListener('change', async evt => {
             const images = await Promise.all([...input.files].map(x => loadImage(x)));
-            images.sort((x, y) => y.width - x.width);
+            //images.sort((x, y) => y.width - x.width);
             canvas.width = Math.min(images[0].width * 2 + 32 * 3, 1280);
             const heights = images.map(x => {
                 const width = canvas.width / 2 - 32 * 1.5;
@@ -86,7 +89,19 @@
             }
         });
 
-
+        function putImage() {
+            var link = document.createElement("a");
+            document.body.appendChild(link);
+            link.setAttribute('download', (new Date().getTime() / 1000 | 0) + '.png');
+            link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+            link.click();
+            link.remove();
+        }
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
     </script>
 </body>
 

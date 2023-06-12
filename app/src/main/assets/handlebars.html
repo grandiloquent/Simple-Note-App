@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            -ms-flex: 0 1 auto
+        }
+
+        html {
+            word-wrap: break-word;
+            color: #0f0f0f;
+            background-color: #fff;
+            -webkit-text-size-adjust: 100%
+        }
+
+        input,
+        textarea {
+            background-color: transparent;
+            padding-bottom: 4px;
+            outline: none;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 1px;
+            font: inherit;
+            color: #0f0f0f
+        }
+
+        input::-webkit-input-placeholder,
+        textarea::-webkit-input-placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 8.4rem;
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px
+        }
+
+        input {
+            border-bottom: 1px solid #737373;
+            text-overflow: ellipsis
+        }
+
+        input:focus {
+            margin-bottom: 0;
+            border-bottom-width: 2px;
+            border-bottom-color: #0f0f0f
+        }
+
+        form {
+            margin: 0
+        }
+
+        a {
+            color: currentColor;
+            text-decoration: none
+        }
+
+        strong,
+        b {
+            font-weight: 500
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0 0 3px
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            font-weight: normal
+        }
+
+        h2 {
+            font-size: 1.8rem
+        }
+
+        h3 {
+            font-size: 1.4rem
+        }
+
+        h4 {
+            font-size: 1.3rem
+        }
+
+
+        img {
+            min-width: 1px;
+            min-height: 1px;
+            -webkit-filter: none;
+            filter: none
+        }
+
+        img:not([src]) {
+            visibility: hidden
+        }
+
+        :focus {
+            outline: none
+        }
+
+        p {
+            margin: 8px 0;
+            line-height: 1.25
+        }
+
+        html {
+            color: #0f0f0f;
+            background-color: #fff;
+            font-size: 10px;
+            font-family: Roboto, Arial, sans-serif
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            font-size: 1.2rem;
+            overflow-x: hidden
+        }
+
+        [hidden][hidden] {
+            display: none;
+            visibility: hidden
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-areas:
+                "main nav"
+                "foot nav";
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+        }
+
+        .wrapper>nav {
+            grid-area: nav;
+        }
+
+        .wrapper>main {
+            grid-area: main;
+        }
+
+        .wrapper>footer {
+            grid-area: foot;
+        }
+
+        textarea {
+
+            height: 100%;
+            width: 100%;
+            resize: none;
+            font-family: Consolas;
+        }
+    </style>
+    <script src="https://fastly.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <main>
+            <textarea id="template"></textarea>
+        </main>
+        <footer>
+            <textarea id="data"></textarea>
+        </footer>
+        <nav> <textarea id="output"></textarea></nav>
+    </div>
+    <script>
+        /*
+绑定元素和事件
+例如：<div bind="div" @click="click"></div>
+执行下列代码后，即可通过 this.div 访问该元素
+在全局下编写click函数，即可自动绑定到该元素的click事件
+*/
+        function bind(elememnt) {
+            (elememnt || document).querySelectorAll('[bind]').forEach(element => {
+                if (element.getAttribute('bind')) {
+                    window[element.getAttribute('bind')] = element;
+                }
+                [...element.attributes].filter(attr => attr.nodeName.startsWith('@')).forEach(attr => {
+                    if (!attr.value) return;
+                    element.addEventListener(attr.nodeName.slice(1), evt => {
+                        if (window[attr.value])
+                            window[attr.value](evt);
+                        else {
+                            window['actions'][attr.value](evt);
+                        }
+                    });
+                });
+            })
+        }
+
+        function camel(string) {
+            return string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
+        }
+
+        function collectElements() {
+
+            console.log(JSON.stringify([...document.querySelectorAll(".bar-renderer [id]")]
+                .map((x, i) => {
+                    const obj = {
+                        id: i + 1,
+                        d: x.querySelector('path').getAttribute('d'),
+                        title: x.querySelector('.bar-item-title').textContent.trim(),
+                        attr: x.id
+                    };
+                    return obj;
+                })));
+
+        }
+
+        function humanFileSize(size) {
+            if (size === 0) return '0';
+            var i = Math.floor(Math.log(size) / Math.log(1024));
+            return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+        }
+
+        async function readText() {
+            // const textarea = document.createElement("textarea");
+            // textarea.style.position = 'fixed';
+            // textarea.style.right = '100%';
+            // document.body.appendChild(textarea);
+            // textarea.value = message;
+            // textarea.select();
+            // document.execCommand('paste');
+            // return textarea.value;
+            let strings;
+            if (typeof NativeAndroid !== 'undefined') {
+                strings = NativeAndroid.readText()
+            } else {
+                strings = await navigator.clipboard.readText()
+            }
+            return strings
+        }
+
+        function snake(string) {
+            return string.replaceAll(/(?<=[a-z])[A-Z]/g, m => `_${m}`).toLowerCase()
+                .replaceAll(/[ -]([a-z])/g, m => `_${m[1]}`)
+        }
+
+        function substring(strings, prefix, suffix) {
+            let start = strings.indexOf(prefix);
+            if (start === -1) {
+                return [0, 0]
+            }
+            start += prefix.length;
+            let end = strings.indexOf(suffix, start);
+            if (end === -1) {
+                return [0, 0]
+            }
+            return [start, end]
+        }
+
+        function substringAfter(string, delimiter, missingDelimiterValue) {
+            const index = string.indexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(index + delimiter.length);
+            }
+        }
+
+        function substringAfterLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(index + delimiter.length);
+            }
+        }
+
+        function substringBefore(string, delimiter, missingDelimiterValue) {
+            const index = string.indexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(0, index);
+            }
+        }
+
+        function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(0, index);
+            }
+        }
+
+        function substringNearest(string, index, start, end) {
+            let j = index;
+            while (j > -1) {
+                if (start.indexOf(string[j]) !== -1) {
+                    j++
+                    break;
+                }
+                j--;
+            }
+            let k = index;
+            while (k < string.length) {
+                if (end.indexOf(string[k]) !== -1) {
+                    break;
+                }
+                k++;
+            }
+            return string.substring(j, k);
+        }
+
+        function upperCamel(string) {
+            string = camel(string);
+            return string.slice(0, 1).toUpperCase() + string.slice(1);
+        }
+
+        function writeText(message) {
+            const textarea = document.createElement("textarea");
+            textarea.style.position = 'fixed';
+            textarea.style.right = '100%';
+            document.body.appendChild(textarea);
+            textarea.value = message;
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+        }
+    </script>
+    <script>
+        Handlebars.registerHelper('lookupOrDefault', function (object, propertyName, defaultValue, options) {
+            var result = options.lookupProperty(object, propertyName)
+            if (result != null) {
+                return result
+            }
+            return defaultValue
+        });
+        /*
+{{#each (split this) }} 
+{{this}}
+ {{/each}}
+
+ {{#each (range 4) }} 
+const line{{inc this }}="";
+ {{/each}}
+        */
+        Handlebars.registerHelper('split', function (object) {
+            return object.split(',');
+        });
+        Handlebars.registerHelper('range', function (object) {
+            return [...new Array(object).keys()]
+        });
+        Handlebars.registerHelper("inc", function (value, options) {
+            return parseInt(value) + 1;
+        });
+        const template = document.querySelector('#template');
+        template.value = localStorage.getItem('template');
+        template.addEventListener('change', evt => {
+            buildTemplate();
+        });
+        template.addEventListener('keydown', evt => {
+            if (evt.key === 'F1') {
+                evt.preventDefault();
+                const s = template.value.substring(
+                    template.selectionStart, template.selectionEnd
+                ).trim();
+
+                if (/[a-zA-Z]+\d+/.test(s)) {
+                    template.value = template.value.replaceAll(
+                        s, `${/[a-zA-Z]+/.exec(s)[0]}{{inc this }}`
+                    )
+                }
+            }
+        });
+
+        const data = document.querySelector('#data');
+        data.value = localStorage.getItem('data')
+        data.addEventListener('input', evt => {
+            buildTemplate();
+        });
+
+        const output = document.querySelector('#output');
+        output.addEventListener('keydown', evt => {
+            if (evt.key === 'F1') {
+                evt.preventDefault();
+                let s = output.value.trim();
+                const first = substringBefore(s, '\n');
+                s = substringAfter(s, '\n');
+                const second = substringBefore(s, "\n");
+                s = substringAfter(s, '\n');
+                console.log(first);
+                output.value = s.replaceAll(
+                    new RegExp("\\b" + first + "\\b", 'g')
+                    , second)
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            localStorage.setItem('template', template.value);
+            localStorage.setItem('data', data.value);
+        })
+        // https://handlebarsjs.com/guide/builtin-helpers.html
+        // https://handlebarsjs.com/api-reference/data-variables.html
+        function buildTemplate() {
+            const t = Handlebars.compile(template.value);
+            let obj;
+            try {
+                obj = JSON.parse(data.value);
+            } catch (error) {
+                obj = data.value;
+            }
+            output.value = t(obj);
+        }
+    </script>
+</body>
+
+</html>

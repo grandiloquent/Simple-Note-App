@@ -35,6 +35,7 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
 }
 function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
+    toast.setAttribute('message',document.title);
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
     video.play();

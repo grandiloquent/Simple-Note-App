@@ -363,7 +363,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    for (const fs::directory_entry &dir_entry:
                            fs::recursive_directory_iterator(parent)) {
                        if (dir_entry.is_regular_file() && (dir_entry.path().extension() == ".mp4" ||
-                                                           dir_entry.path().extension() == ".MP4")) {
+                                                           dir_entry.path().extension() == ".mov" ||
+                                                           dir_entry.path().extension() == ".MOV" ||
+                                                           dir_entry.path().extension() ==
+                                                           ".MP4")) {
                            std::filesystem::path s = dir_entry.path();
                            fs::rename(dir_entry.path(), s.replace_extension("v"));
                        }

@@ -46,6 +46,15 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
 }
 
 void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int port) {
+    static const char table[]
+            = R"(CREATE TABLE IF NOT EXISTS "favorite" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"path"	TEXT NOT NULL UNIQUE,
+	"create_at"	INTEGER,
+	"update_at"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+))";
+    db::query<table>();
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     std::map<std::string, std::string> m{};
     std::map<std::string, std::string> t{};
@@ -95,6 +104,19 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
             };
             doc.push_back(j);
+        }
+        res.set_content(doc.dump(), "application/json");
+    });
+    server.Get("/fav/list", [](const httplib::Request &req, httplib::Response &res) {
+
+        static const char query[]
+                = R"(SELECT path FROM favorite ORDER BY path)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view path;
+
+        nlohmann::json doc = nlohmann::json::array();
+        while (fetch_row(path)) {
+            doc.push_back(path);
         }
         res.set_content(doc.dump(), "application/json");
     });
@@ -211,6 +233,30 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         }
+    });
+
+    server.Get("/fav/insert", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+
+        static const char query[]
+                = R"(insert into favorite (path,create_at,update_at) values(?1,?2,?3))";
+        db::QueryResult fetch_row = db::query<query>(path,
+                                                     GetTimeStamp(),
+                                                     GetTimeStamp()
+        );
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+    });
+    server.Get("/fav/delete", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+
+        static const char query[]
+                = R"(delete from favorite where path = ?1)";
+        db::QueryResult fetch_row = db::query<query>(path);
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
     });
     server.Get("/extract", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");

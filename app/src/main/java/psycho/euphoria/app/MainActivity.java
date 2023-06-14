@@ -17,6 +17,7 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -158,6 +159,7 @@ public class MainActivity extends Activity {
         menu.add(0, 7, 0, "复制");
         menu.add(0, 8, 0, "文件管理器");
         menu.add(0, 9, 0, "字幕");
+        menu.add(0, 10, 0, "输入法");
         menu.add(0, 5, 0, "退出");
         return super.onCreateOptionsMenu(menu);
     }
@@ -177,7 +179,7 @@ public class MainActivity extends Activity {
                 mWebView.loadUrl(mUrl);
                 break;
             case 8:
-                String url=Shared.substringBeforeLast(mUrl, "/") + "/files.html";
+                String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
                 Shared.setText(this, url);
                 mWebView.loadUrl(url);
                 break;
@@ -187,6 +189,10 @@ public class MainActivity extends Activity {
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).
                         setPrimaryClip(ClipData.newPlainText(null, mWebView.getUrl()));
+                break;
+            case 10:
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .showInputMethodPicker();
                 break;
 
         }

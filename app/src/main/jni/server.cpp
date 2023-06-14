@@ -350,9 +350,19 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto path = req.get_param_value("path");
         auto dst = req.get_param_value("dst");
         fs::rename(path, dst);
-
     });
-
+    server.Get("/file/new_file", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        if (!fs::exists(path))
+            std::ofstream f(path);
+    });
+    server.Get("/file/new_dir", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        if (!fs::exists(path))
+            fs::create_directory(path);
+    });
     server.Post("/upload", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
 

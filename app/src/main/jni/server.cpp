@@ -345,6 +345,23 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             fs::remove_all(i);
         }
     });
+    server.Post("/file/move", [](const httplib::Request &req, httplib::Response &res,
+                                 const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        auto dst = req.get_param_value("dst");
+        for (const auto &i: doc) {
+            fs::path d{dst};
+            d = d.append(SubstringAfterLast(i, "/"));
+            fs::rename(i, d);
+        }
+    });
     server.Get("/file/rename", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto path = req.get_param_value("path");

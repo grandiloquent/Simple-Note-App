@@ -345,6 +345,13 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             fs::remove_all(i);
         }
     });
+    server.Get("/file/rename", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        auto dst = req.get_param_value("dst");
+        fs::rename(path, dst);
+
+    });
 
     server.Post("/upload", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");

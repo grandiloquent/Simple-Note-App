@@ -78,7 +78,7 @@ function newFile() {
     dialog.addEventListener('submit', async () => {
         let path = new URL(window.location).searchParams.get("path")
             || '/storage/emulated/0';
-        const res = await fetch(`${baseUri}/api/file/new_file?path=${encodeURIComponent(path + "/" + input.value.trim())}`);
+        const res = await fetch(`${baseUri}/file/new_file?path=${encodeURIComponent(path + "/" + input.value.trim())}`);
         window.location.reload();
     });
     document.body.appendChild(dialog);
@@ -92,7 +92,7 @@ function newDirectory() {
     dialog.addEventListener('submit', async () => {
         let path = new URL(window.location).searchParams.get("path")
             || '/storage/emulated/0';
-        const res = await fetch(`${baseUri}/api/file/new_dir?path=${encodeURIComponent(path + "/" + input.value.trim())}`);
+        const res = await fetch(`${baseUri}/file/new_dir?path=${encodeURIComponent(path + "/" + input.value.trim())}`);
         window.location.reload();
     });
     document.body.appendChild(dialog);
@@ -143,7 +143,7 @@ function renameFile(path) {
     input.value = substringAfterLast(path, "/");
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-        const res = await fetch(`${baseUri}/api/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(substringBeforeLast(path, "/") + "/" + input.value.trim())}`);
+        const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(substringBeforeLast(path, "/") + "/" + input.value.trim())}`);
         window.location.reload();
     });
     document.body.appendChild(dialog);
@@ -310,7 +310,7 @@ function onMove() {
     let path = new URL(window.location).searchParams.get("path")
         || '/storage/emulated/0';
     dialog.addEventListener('submit', async () => {
-        const res = await fetch(`${baseUri}/api/file/move?dst=${encodeURIComponent(path)}`, {
+        const res = await fetch(`${baseUri}/file/move?dst=${encodeURIComponent(path)}`, {
             method: 'POST',
             body: JSON.stringify(obj)
         });

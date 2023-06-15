@@ -142,7 +142,7 @@ function renameFile(path) {
     input.type = 'text';
     input.value = substringAfterLast(path, "/");
     if (/[(（]/.test(input.value)) {
-        writeText(`${input.value.split('/[(（]/')[0]}.${substringAfterLast(input.value, ".")}`)
+        writeText(`${input.value.split(/[(（]/)[0]}.${substringAfterLast(input.value, ".")}`)
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {

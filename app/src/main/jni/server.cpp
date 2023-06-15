@@ -345,7 +345,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
 
-                   if (!path.ends_with(".html")) {
+                   if (!path.ends_with(".html") && !path.ends_with(".xhtml")) {
                        std::string value{"attachment; filename=\""};
                        value.append(SubstringAfterLast(path, "/"));
                        value.append("\"");

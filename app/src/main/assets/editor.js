@@ -462,7 +462,7 @@ ${await readText()}
             textarea.value = textarea.value.replaceAll(
                 string.substring(0, first),
                 string.substring(first + 1, second));
-        } else if (evt.key === 't') {
+        } else if (evt.key === 'q') {
             evt.preventDefault();
             insertLinkWithTitle();
         } else if (evt.key === 'u') {

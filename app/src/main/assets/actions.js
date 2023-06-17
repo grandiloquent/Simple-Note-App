@@ -142,7 +142,7 @@ function renameFile(path) {
     input.type = 'text';
     input.value = substringAfterLast(path, "/");
     if (/[(（]/.test(input.value)) {
-        writeText(`${input.value.split(/[(（]/)[0]}.${substringAfterLast(input.value, ".")}`)
+        writeText(`${input.value.split(/[(（]/)[0]}.${substringAfterLast(input.value, ".")}`.trim())
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
@@ -194,6 +194,18 @@ async function render(path) {
     document.querySelectorAll('.item-more').forEach(item => {
         item.addEventListener('click', showContextMenu);
     })
+    document.querySelectorAll('.item-icon').forEach(item => {
+
+        item.addEventListener('click', evt => {
+            evt.stopPropagation();
+            const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+            if (buf.indexOf(item.parentNode.dataset.path) === -1)
+                buf.push(item.parentNode.dataset.path);
+            localStorage.setItem("paths", JSON.stringify(buf));
+        });
+    })
+
+
 }
 function selectSameType(path, isDirectory) {
     const extension = getExtension(path);

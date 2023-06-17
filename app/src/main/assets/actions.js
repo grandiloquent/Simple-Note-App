@@ -145,9 +145,12 @@ function renameFile(path) {
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-
-        const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(substringBeforeLast(path, "/") + "/" + input.value.trim())}`);
-        window.location.reload();
+        const filename = substringBeforeLast(path, "/") + "/" + input.value.trim();
+        const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
+        let item = queryElementByPath(path);
+        item.querySelector('.item-title div').textContent = substringAfterLast(filename,"/");
+        item.dataset.path =filename;
+        //window.location.reload();
     });
     document.body.appendChild(dialog);
 }

@@ -138,11 +138,10 @@ function queryElementByPath(path) {
 function renameFile(path) {
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
-    const input = document.createElement('input');
-    input.type = 'text';
+    const input = document.createElement('textarea');
     input.value = substringAfterLast(path, "/");
     if (/[(（]/.test(input.value)) {
-        writeText(`${input.value.split(/[(（]/)[0]}.${substringAfterLast(input.value, ".")}`.trim())
+        writeText(`${input.value.split(/[(（]/)[0].trim()}.${substringAfterLast(input.value, ".")}`)
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {

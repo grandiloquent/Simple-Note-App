@@ -148,8 +148,8 @@ function renameFile(path) {
         const filename = substringBeforeLast(path, "/") + "/" + input.value.trim();
         const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(path);
-        item.querySelector('.item-title div').textContent = substringAfterLast(filename,"/");
-        item.dataset.path =filename;
+        item.querySelector('.item-title div').textContent = substringAfterLast(filename, "/");
+        item.dataset.path = filename;
         //window.location.reload();
     });
     document.body.appendChild(dialog);
@@ -200,10 +200,11 @@ async function render(path) {
 
         item.addEventListener('click', evt => {
             evt.stopPropagation();
-            const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
-            if (buf.indexOf(item.parentNode.dataset.path) === -1)
-                buf.push(item.parentNode.dataset.path);
-            localStorage.setItem("paths", JSON.stringify(buf));
+            deleteFile(item.parentNode.dataset.path);
+            // const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+            // if (buf.indexOf(item.parentNode.dataset.path) === -1)
+            //     buf.push(item.parentNode.dataset.path);
+            // localStorage.setItem("paths", JSON.stringify(buf));
         });
     })
 

@@ -75,7 +75,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    }
 
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
-                   auto str = m[p];
+                   auto str = std::string{}; //m[p];
 
                    if (str.empty()) {
                        unsigned char *data;

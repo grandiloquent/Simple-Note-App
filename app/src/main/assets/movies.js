@@ -33,15 +33,15 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
         return string.substring(0, index);
     }
 }
-function playVideo(baseUri, video, path) {
-    document.title = substringAfterLast(path, "/");
+function playVideo(baseUri, video, v) {
+    document.title = v.title;
     toast.setAttribute('message', document.title);
     video.load();
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = path;
+        video.src = v.path;
     } else if (Hls.isSupported()) {
         var hls = new Hls();
-        hls.loadSource(path);
+        hls.loadSource(v.path);
         hls.attachMedia(video);
     }
     video.play();
@@ -59,11 +59,11 @@ async function showVideoList(baseUri, path, video) {
         div.style.display = "flex";
         div.style.padding = "8px 0";
         div.style.borderTop = "1px solid rgb(218,220,224)";
-        div.setAttribute("data-src", v);
+        div.setAttribute("data-src", v.path);
         d.appendChild(div);
-        div.textContent = k;
+        div.textContent = v.title;
         div.addEventListener('click', evt => {
-            playVideo(baseUri, video, evt.currentTarget.dataset.src);
+            playVideo(baseUri, video, videos.filter(x => x.path === evt.currentTarget.dataset.src)[0]);
             video.play();
             jumpToBookmark(video);
             dialog.remove();
@@ -95,16 +95,16 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
 ////////////////////////////////
-let n = 1502;
 const searchParams = new URL(window.location).searchParams;
-let path;
+let n = (searchParams.get('n') && parseInt(searchParams.get('n'))) || 0;
+let s = searchParams.get('s') || "labixiaoxin.json";
 let baseUri = searchParams.get('baseUri');
 baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
 let videos;
 async function initialize() {
 
     async function loadVideoList() {
-        const res = await fetch(`labixiaoxin.json`);
+        const res = await fetch(s);
         videos = (await res.json());
     }
     await loadVideoList();
@@ -120,8 +120,12 @@ async function initialize() {
     const progressBarPlayed = document.querySelector('#progress-bar-played');
     const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
-    path = videos[n];
-    playVideo(baseUri, video, path);
+    const progressBar = document.querySelector('#progress-bar');
+    progressBar.addEventListener('click', evt => {
+        video.currentTime =
+            video.duration * (evt.offsetX / progressBar.getBoundingClientRect().width);
+    });
+    playVideo(baseUri, video, videos[n]);
 
     video.addEventListener('durationchange', evt => {
         if (video.duration) {
@@ -260,7 +264,7 @@ async function initialize() {
         } else if (evt.key === '1') {
             evt.preventDefault();
             playVideo(baseUri, video,
-                videos[getRandomInt(0, videos.length)].path
+                videos[getRandomInt(0, videos.length)]
             )
         } else if (evt.key === '0') {
             evt.preventDefault();
@@ -276,7 +280,7 @@ async function initialize() {
             }
             await loadVideoList();
             next = Math.min(next, videos.length - 1);
-            playVideo(baseUri, video, videos[next].path)
+            playVideo(baseUri, video, videos[next])
         }
     });
 }

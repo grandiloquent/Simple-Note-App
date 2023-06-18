@@ -104,7 +104,8 @@ let videos;
 async function initialize() {
 
     async function loadVideoList() {
-        const res = await fetch(s);
+        console.log(`${baseUri}/${s}`);
+        const res = await fetch(`${baseUri}/${s}`);
         videos = (await res.json());
     }
     await loadVideoList();

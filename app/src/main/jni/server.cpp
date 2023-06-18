@@ -56,11 +56,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 ))";
     db::query<table>();
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-    std::map<std::string, std::string> m{};
     std::map<std::string, std::string> t{};
     httplib::Server server;
-    server.Get(R"(/(.+\.(?:js|css|html|png|jpg|jpeg|gif|svg))?)",
-               [&m, &t, mgr](const httplib::Request &req, httplib::Response &res) {
+    server.Get(R"(/(.+\.(?:js|css|html|png|jpg|jpeg|gif|json|svg))?)",
+               [&t, mgr](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+
                    if (!req.get_header_value("Referer").empty()) {
                        auto referer = req.get_header_value("Referer");
                        std::filesystem::path p(
@@ -82,7 +83,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                        ReadBytesAsset(mgr, p,
                                       &data, &len);
                        str = std::string(reinterpret_cast<const char *>(data), len);
-                       m[p] = str;
+                       //m[p] = str;
                    }
                    auto content_type = httplib::detail::find_content_type(p, t);
                    res.set_content(str, content_type);

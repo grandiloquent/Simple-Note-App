@@ -51,7 +51,7 @@ async function showVideoList(baseUri, path, video) {
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', '视频列表');
     const d = document.createElement('div');
-    videos.forEach((v,k) => {
+    videos.forEach((v, k) => {
         const div = document.createElement('div');
         div.style.alignItems = "center";
         div.style.boxSizing = "border-box";
@@ -95,13 +95,12 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
 ////////////////////////////////
-
+let n = 1502;
 const searchParams = new URL(window.location).searchParams;
 let path;
 let baseUri = searchParams.get('baseUri');
 baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
 let videos;
-
 async function initialize() {
 
     async function loadVideoList() {
@@ -121,8 +120,7 @@ async function initialize() {
     const progressBarPlayed = document.querySelector('#progress-bar-played');
     const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
-
-    path = videos[1500];
+    path = videos[n];
     playVideo(baseUri, video, path);
 
     video.addEventListener('durationchange', evt => {
@@ -149,19 +147,12 @@ async function initialize() {
     });
 
     video.addEventListener('ended', evt => {
-        
-        let next = 0;
-        for (let i = 0; i < videos.length; i++) {
-            if (videos[i] === video.src) {
-                next = i;
-            }
-        }
-        if (next + 1 < videos.length) {
-            next = next + 1;
+        if (n + 1 < videos.length) {
+            n++;
         } else {
-            next = 0;
+            n = 0;
         }
-        playVideo(baseUri, video, videos[next]);
+        playVideo(baseUri, video, videos[n]);
     });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {

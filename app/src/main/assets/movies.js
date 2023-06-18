@@ -34,6 +34,7 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
     }
 }
 function playVideo(baseUri, video, v) {
+    path = v.path;
     document.title = v.title;
     toast.setAttribute('message', document.title);
     video.load();
@@ -98,13 +99,13 @@ function getRandomInt(min, max) {
 const searchParams = new URL(window.location).searchParams;
 let n = (searchParams.get('n') && parseInt(searchParams.get('n'))) || 0;
 let s = searchParams.get('s') || "labixiaoxin.json";
+let path;
 let baseUri = searchParams.get('baseUri');
 baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
 let videos;
 async function initialize() {
 
     async function loadVideoList() {
-        console.log(`${baseUri}/${s}`);
         const res = await fetch(`${baseUri}/${s}`);
         videos = (await res.json());
     }

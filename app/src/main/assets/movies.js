@@ -51,7 +51,7 @@ async function showVideoList(baseUri, path, video) {
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', '视频列表');
     const d = document.createElement('div');
-    videos.forEach(v => {
+    videos.forEach((v,k) => {
         const div = document.createElement('div');
         div.style.alignItems = "center";
         div.style.boxSizing = "border-box";
@@ -59,9 +59,9 @@ async function showVideoList(baseUri, path, video) {
         div.style.display = "flex";
         div.style.padding = "8px 0";
         div.style.borderTop = "1px solid rgb(218,220,224)";
-        div.setAttribute("data-src", v.path);
+        div.setAttribute("data-src", v);
         d.appendChild(div);
-        div.textContent = substringAfterLast(v.path, "/");
+        div.textContent = k;
         div.addEventListener('click', evt => {
             playVideo(baseUri, video, evt.currentTarget.dataset.src);
             video.play();
@@ -122,7 +122,7 @@ async function initialize() {
     const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
 
-    path = videos[0];
+    path = videos[1500];
     playVideo(baseUri, video, path);
 
     video.addEventListener('durationchange', evt => {
@@ -149,11 +149,10 @@ async function initialize() {
     });
 
     video.addEventListener('ended', evt => {
-        const url = new URL(video.src);
-        const path = url.searchParams.get('path');
+        
         let next = 0;
         for (let i = 0; i < videos.length; i++) {
-            if (videos[i].path === path) {
+            if (videos[i] === video.src) {
                 next = i;
             }
         }
@@ -162,7 +161,7 @@ async function initialize() {
         } else {
             next = 0;
         }
-        playVideo(baseUri, video, videos[next].path);
+        playVideo(baseUri, video, videos[next]);
     });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {

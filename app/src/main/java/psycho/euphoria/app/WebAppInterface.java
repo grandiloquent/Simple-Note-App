@@ -111,6 +111,9 @@ public class WebAppInterface {
         mContext.runOnUiThread(() -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.fromFile(new File(path)));
+            intent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    Shared.substringAfterLast(path,".")
+            ));
             mContext.startActivity(Intent.createChooser(intent, "打开"));
         });
     }

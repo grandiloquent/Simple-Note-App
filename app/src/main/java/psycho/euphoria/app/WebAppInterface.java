@@ -110,10 +110,10 @@ public class WebAppInterface {
     public void openFile(String path) {
         mContext.runOnUiThread(() -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.fromFile(new File(path)));
-            intent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    Shared.substringAfterLast(path,".")
-            ));
+            intent.setDataAndType(Uri.fromFile(new File(path)),
+                    MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                            Shared.substringAfterLast(path,".")
+                    )  );
             mContext.startActivity(Intent.createChooser(intent, "打开"));
         });
     }

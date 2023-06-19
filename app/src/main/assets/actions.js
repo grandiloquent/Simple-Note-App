@@ -1,4 +1,4 @@
-const pathSeperator = "\\";
+const pathSeperator = "/";
 
 function addContextMenuItem(bottomSheet, title, handler) {
     const item = document.createElement('div');

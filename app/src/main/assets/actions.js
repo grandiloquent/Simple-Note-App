@@ -1,3 +1,5 @@
+const pathSeperator = "\\";
+
 function addContextMenuItem(bottomSheet, title, handler) {
     const item = document.createElement('div');
     item.className = 'menu-item';
@@ -136,19 +138,28 @@ function queryElementByPath(path) {
     return document.querySelector(`[data-path="${path}"]`);
 }
 function renameFile(path) {
+
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
     const input = document.createElement('textarea');
-    input.value = substringAfterLast(path, "/");
-    if (/[(（]/.test(input.value)) {
-        writeText(`${input.value.split(/[(（]/)[0].trim()}.${substringAfterLast(input.value, ".")}`)
+    input.value = substringAfterLast(path, pathSeperator);
+    const re = /[(（]/;
+    if (re.test(input.value)
+    ) {
+        let filename = `${input.value.split(re)[0].trim()}.${substringAfterLast(input.value, ".")}`;
+        if (filename.indexOf("《") !== -1 && filename.indexOf("》") !== -1) {
+            filename = substringAfterLast(filename, "《")
+            filename = substringBeforeLast(filename, "》") + "." + substringAfterLast(filename, ".")
+        }
+        input.value = filename;
+
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-        const filename = substringBeforeLast(path, "/") + "/" + input.value.trim();
+        const filename = substringBeforeLast(path, pathSeperator) + pathSeperator + input.value.trim();
         const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(path);
-        item.querySelector('.item-title div').textContent = substringAfterLast(filename, "/");
+        item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);
         item.dataset.path = filename;
         //window.location.reload();
     });

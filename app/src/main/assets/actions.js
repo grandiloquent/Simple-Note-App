@@ -295,7 +295,7 @@ function showContextMenu(evt) {
         } else if (path.endsWith('.srt')) {
             addContextMenuItem(bottomSheet, '播放视频', () => {
                 bottomSheet.remove();
-                window.location = `/subtitle.html?path=${encodeURIComponent(substringBeforeLast(path, ".") + ".mp4")}`
+                window.open(`/srt.html?path=${encodeURIComponent(path)}`);
             });
         }
         addContextMenuItem(bottomSheet, '分享', () => {

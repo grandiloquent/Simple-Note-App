@@ -45,7 +45,7 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
 }
 function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
-    toast.setAttribute('message',document.title);
+    toast.setAttribute('message', document.title);
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
     appendSubtitle(video);
@@ -114,13 +114,18 @@ async function initialize() {
     const timeFirst = document.querySelector('#time-first');
     const timeSecond = document.querySelector('#time-second');
     const video = document.querySelector('#video');
-    const progressBarPlayed = document.querySelector('#progress-bar-played');
-    const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
-    const progressBar = document.querySelector('#progress-bar');
-    progressBar.addEventListener('click', evt => {
-        video.currentTime =
-            video.duration * (evt.offsetX / progressBar.getBoundingClientRect().width);
+
+    const customSeekbar = document.querySelector('#custom-seekbar');
+    customSeekbar.addEventListener("seekbarClicked", function () {
+        scheduleHide();
+        video.pause();
+    });
+    customSeekbar.addEventListener("seekbarInput", evt => {
+        console.log(evt.detail);
+        scheduleHide();
+        var time = video.duration * evt.detail;
+        video.currentTime = time;
     });
 
     const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(
@@ -145,9 +150,7 @@ async function initialize() {
     video.addEventListener('timeupdate', evt => {
         if (video.currentTime) {
             timeFirst.textContent = formatDuration(video.currentTime);
-            const ratio = video.currentTime / video.duration;
-            progressBarPlayed.style.width = `${ratio * 100}%`;
-            progressBarPlayheadWrapper.style.marginLeft = `${ratio * 100}%`;
+            customSeekbar.value = (100 / video.duration) * video.currentTime;
         }
     });
     video.addEventListener('play', evt => {

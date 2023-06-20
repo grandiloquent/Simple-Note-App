@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频</title>
     <link rel="stylesheet" href="subtitle.css">
-
+    <script src="custom_seekbar.js"></script>
 </head>
 
 <body>
@@ -42,7 +42,10 @@
                 <div id="time-second">00:00</div>
                 <div style="flex-grow: 1;"></div>
                 <div id="video-list">
-                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" style="pointer-events: none; display: block; width: 100%; height: 100%;"><path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path></svg>
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path>
+                    </svg>
                 </div>
                 <div id="fullscreen">
                     <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
@@ -52,13 +55,7 @@
                     </svg>
                 </div>
             </div>
-            <div id="progress-bar">
-                <div id="progress-bar-background">
-                </div>
-                <div id="progress-bar-played">
-                </div>
-                <div id="progress-bar-playhead-wrapper"></div>
-            </div>
+            <custom-seekbar id="custom-seekbar"></custom-seekbar>
         </div>
     </div>
     <script src="custom-toast.js"></script>

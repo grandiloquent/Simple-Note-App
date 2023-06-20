@@ -30,7 +30,8 @@ function onItemClick(evt) {
         return;
     }
     if (path.endsWith(".srt")) {
-        window.open(`/srt.html?path=${encodeURIComponent(path)}`);
+        window.location = `/subtitle.html?path=${encodeURIComponent(substringBeforeLast(path, ".") + ".mp4")}`
+
     }
     // else if (evt.detail.path.endsWith(".md")) {
     //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`

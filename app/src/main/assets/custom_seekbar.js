@@ -26,6 +26,7 @@
         outline: none;
         width: 100%;
         padding: 0;
+       
       }
       
       input[type=range]:focus {

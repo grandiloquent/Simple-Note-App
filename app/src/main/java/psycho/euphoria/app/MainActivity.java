@@ -17,9 +17,11 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 
 import psycho.euphoria.app.CustomWebChromeClient;
@@ -179,12 +181,11 @@ public class MainActivity extends Activity {
                 mWebView.loadUrl(mUrl);
                 break;
             case 8:
-                String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
-                Shared.setText(this, url);
-                mWebView.loadUrl(url);
+                openFilePage();
                 break;
             case 9:
-                Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/subtitle.html?path=");
+                //Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/subtitle.html?path=");
+                openIndexPage();
                 break;
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).
@@ -197,5 +198,31 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openIndexPage() {
+
+        if (mUrl != null) {
+            openWithChrome(this, mUrl);
+        } else {
+            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openFilePage() {
+        if (mUrl != null) {
+            String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
+            openWithChrome(this, url);
+        } else {
+            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private static void openWithChrome(Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        intent.setPackage("com.android.chrome");
+        context.startActivity(intent);
     }
 }

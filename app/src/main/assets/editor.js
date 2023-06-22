@@ -308,7 +308,7 @@ function formatComments(textarea) {
 ///////////////////////////////
 const textarea = document.querySelector('textarea');
 const id = new URL(window.location).searchParams.get('id');
-let prefix="//";
+let prefix = "//";
 const openLink = document.querySelector('#open-link');
 openLink.addEventListener('click', async evt => {
     const s = textarea.value;
@@ -468,10 +468,18 @@ ${await readText()}
         } else if (evt.key === 'u') {
             evt.preventDefault();
             upload(baseUri);
-        }else if (evt.key === 'd') {
+        } else if (evt.key === 'd') {
             evt.preventDefault();
             formatComments(textarea);
         }
+    } else if (evt.key === 'F1') {
+        evt.preventDefault();
+        const str = (await readText()).replaceAll(/[\n\r]+/g, '');
+        const res = await fetch(`${baseUri}/trans?q=${encodeURIComponent(str)}&to=zh`);
+        const obj = await res.json();
+        const contents = obj["sentences"].map(x => x["trans"]).join(" ");
+        textarea.setRangeText(contents, textarea.selectionStart,
+            textarea.selectionEnd, 'end');
     }
 });
 

@@ -341,6 +341,13 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto s = Title(q);
         res.set_content(s, "text/plain");
     });
+    server.Get("/trans", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto q = req.get_param_value("q");
+        auto to = req.get_param_value("to");
+        auto s = Trans(q, to);
+        res.set_content(s, "application/json");
+    });
     server.Get("/file",
                [&t](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");

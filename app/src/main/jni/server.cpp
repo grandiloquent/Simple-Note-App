@@ -44,6 +44,98 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
                                  return true;
                              });
 }
+std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+        token = s.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back(token);
+    }
+
+    res.push_back(s.substr(pos_start));
+    return res;
+}
+
+std::string join(const std::vector<std::string> &lst, const std::string &delim) {
+    std::string ret;
+    for (const auto &s: lst) {
+        if (!ret.empty())
+            ret += delim;
+        ret += s;
+    }
+    return ret;
+}
+
+void mergeSubtitles(const std::string &dir) {
+    std::regex re("\\.(?:srt)$");
+    std::regex find(R"(\s*\d+[\r\n]+(\d{2}:){2}\d{2},\d{3} --> (\d{2}:){2}\d{2},\d{3}[\r\n]+)");
+    std::vector<std::string> fileBuf;
+
+    std::vector<std::string> tocBuf;
+    auto index = 0;
+    for (auto const &dir_entry: std::filesystem::directory_iterator{dir}) {
+        if (dir_entry.is_regular_file() && std::regex_search(dir_entry.path().filename().string().c_str(), re)) {
+            std::cout << dir_entry.path() << '\n';
+            std::ifstream in(dir_entry.path());
+            std::string content((std::istreambuf_iterator<char>(in)),
+                                (std::istreambuf_iterator<char>()));
+            content = std::regex_replace(content, find, "");
+            std::vector<std::string> v = split(content, ".");
+            std::vector<std::string> buf;
+            std::stringstream ss;
+            ss << "<h2 ";
+            ss << "id=\"index";
+            ss << index;
+            ss << "\">";
+            ss << dir_entry.path().stem().string();
+            ss << "</h2>";
+            buf.push_back(ss.str());
+            ss = std::stringstream();
+            ss << "<li><a ";
+            ss << "href=\"#index";
+            ss << index++;
+            ss << "\">";
+            ss << dir_entry.path().stem().string();
+            ss << "</a></li>";
+            tocBuf.push_back(ss.str());
+            ss = std::stringstream();
+            for (const auto &i: v) {
+                ss << "<div>";
+                ss << i;
+                ss << ".</div>";
+                buf.push_back(ss.str());
+                ss = std::stringstream();
+            }
+            buf.emplace_back("</div>");
+            fileBuf.push_back(join(buf, ""));
+        }
+    }
+
+
+    std::ofstream out(R"(C:\Users\Administrator\Desktop\source.html)", std::ios::out | std::ios::trunc);
+    out << R"(<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档</title>
+</head>
+
+<body>
+<ul>
+)";
+    out << join(tocBuf, "");
+    out << "</ul>";
+    out << join(fileBuf, "");
+    out << R"(</body>
+</html>)";
+    out.close();
+}
 
 void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int port) {
     static const char table[]
@@ -341,13 +433,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto s = Title(q);
         res.set_content(s, "text/plain");
     });
-    server.Get("/trans", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto q = req.get_param_value("q");
-        auto to = req.get_param_value("to");
-        auto s = Trans(q, to);
-        res.set_content(s, "application/json");
-    });
+    
     server.Get("/file",
                [&t](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");

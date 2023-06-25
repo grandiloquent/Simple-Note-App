@@ -68,7 +68,7 @@ function initializeDropZone() {
     });
 }
 async function loadData(path, size) {
-    const res = await fetch(`${baseUri}/files?path=${path || ''}&size=${size || 'false'}`);
+    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(path || '')}&size=${size || 'false'}`);
     return res.json();
 }
 function newFile() {

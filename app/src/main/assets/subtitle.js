@@ -101,7 +101,7 @@ function jumpToBookmark(video) {
 ////////////////////////////////
 import { transformSrtTracks } from './main.js';
 const searchParams = new URL(window.location).searchParams;
-const path = searchParams.get('path');
+let path = searchParams.get('path');
 let videos;
 async function initialize() {
     let timer;
@@ -115,6 +115,17 @@ async function initialize() {
     const timeSecond = document.querySelector('#time-second');
     const video = document.querySelector('#video');
     const toast = document.getElementById('toast');
+    const previous = document.querySelector('#previous');
+    previous.addEventListener('click', evt => {
+        scheduleHide();
+        video.currentTime -= 1;
+    });
+    const next = document.querySelector('#next');
+    next.addEventListener('click', evt => {
+        scheduleHide();
+        video.currentTime += 1;
+    });
+
 
     const customSeekbar = document.querySelector('#custom-seekbar');
     customSeekbar.addEventListener("seekbarClicked", function () {
@@ -160,7 +171,9 @@ async function initialize() {
     video.addEventListener('pause', evt => {
         playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
     });
-
+    video.addEventListener('seeked', evt => {
+        saveBookmark();
+    });
     video.addEventListener('ended', evt => {
         const url = new URL(video.src);
         const path = url.searchParams.get('path');
@@ -175,7 +188,8 @@ async function initialize() {
         } else {
             next = 0;
         }
-        playVideo(baseUri, video, videos[next].path);
+        path = videos[next].path;
+        playVideo(baseUri, video, path);
     });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {

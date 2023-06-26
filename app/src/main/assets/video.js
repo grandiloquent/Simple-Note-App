@@ -208,6 +208,7 @@ async function initialize() {
         }
 
     });
+    
     window.addEventListener("resize", evt => {
         const w = Math.min(window.outerWidth, window.innerWidth);
         const h = Math.min(window.outerHeight, window.innerHeight);

@@ -102,6 +102,7 @@ function jumpToBookmark(video) {
 import { transformSrtTracks } from './main.js';
 const searchParams = new URL(window.location).searchParams;
 let path = searchParams.get('path');
+const t = searchParams.get('t');
 let videos;
 async function initialize() {
     let timer;
@@ -150,7 +151,12 @@ async function initialize() {
             )
         });
     playVideo(baseUri, video, path);
-
+    if (t) {
+        const m = /(\d+)m(\d+)s/.exec(t);
+        if (m) {
+            video.currentTime = parseFloat(m[1]) * 60 + parseFloat(m[2]);
+        }
+    }
     video.addEventListener('durationchange', evt => {
         if (video.duration) {
             timeSecond.textContent = formatDuration(video.duration);
@@ -245,7 +251,15 @@ async function initialize() {
         obj[path] = video.currentTime;
         localStorage.setItem('bookmark', JSON.stringify(obj));
     }
-
+    window.addEventListener('keydown', async evt => {
+        if (evt.key === 'ArrowLeft') {
+            evt.preventDefault();
+            video.currentTime -= 1;
+        } else if (evt.key === 'ArrowRight') {
+            evt.preventDefault();
+            video.currentTime += 1;
+        }
+    });
 
 }
 initialize();

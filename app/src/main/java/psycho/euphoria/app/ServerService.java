@@ -51,7 +51,7 @@ public class ServerService extends Service {
         PendingIntent piDismiss = getPendingIntentDismiss(context);
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainActivity.KEY_ADDRESS, address);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         Notification notification = new Notification.Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记").setSmallIcon(android.R.drawable.stat_sys_download).addAction(getAction(piDismiss)).setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }

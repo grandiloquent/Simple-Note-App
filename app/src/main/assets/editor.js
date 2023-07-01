@@ -172,7 +172,7 @@ async function insertLinkWithTitle() {
     let res;
     try {
         const str = await readText();
-        res = await fetch(`${getBaseUri()}/title?path=${str}`);
+        res = await fetch(`${getBaseUri()}/title?path=${encodeURIComponent(str)}`);
         if (res.status !== 200) {
             throw new Error();
         }

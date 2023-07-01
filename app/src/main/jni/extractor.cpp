@@ -41,15 +41,33 @@ std::string Trans(const std::string &q, const std::string &to) {
 std::string Title(const std::string &q) {
     auto host = Substring(q, "://", "/");
     auto query = SubstringAfterLast(q, host);
-
     httplib::SSLClient cli(host, 443);
     cli.enable_server_certificate_verification(false);
     if (auto res = cli.Get(
             query,
             {
-                    {"User-Agent",
-                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                     "(KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}})) {
+
+                    {"accept",                            R"(text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9)"},
+                    {"accept-language",                   R"(en)"},
+                    {"cache-control",                     R"(no-cache)"},
+                    {"pragma",                            R"(no-cache)"},
+                    {"sec-ch-ua",                         R"("Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99")"},
+                    {"sec-ch-ua-arch",                    R"("x86")"},
+                    {"sec-ch-ua-bitness",                 R"("64")"},
+                    {"sec-ch-ua-full-version",            R"("95.0.4638.69")"},
+                    {"sec-ch-ua-mobile",                  R"(?0)"},
+                    {"sec-ch-ua-model",                   R"("")"},
+                    {"sec-ch-ua-platform",                R"("Windows")"},
+                    {"sec-ch-ua-platform-version",        R"("10.0.0")"},
+                    {"sec-fetch-dest",                    R"(document)"},
+                    {"sec-fetch-mode",                    R"(navigate)"},
+                    {"sec-fetch-site",                    R"(none)"},
+                    {"sec-fetch-user",                    R"(?1)"},
+                    {"service-worker-navigation-preload", R"(true)"},
+                    {"upgrade-insecure-requests",         R"(1)"},
+                    {"user-agent",                        R"(Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36)"}
+
+            })) {
         auto s = res->body;
         s = Substring(s, "<title>", "</title>");
         return s;

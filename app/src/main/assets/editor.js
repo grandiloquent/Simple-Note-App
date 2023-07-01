@@ -177,7 +177,7 @@ async function insertLinkWithTitle() {
             throw new Error();
         }
 
-        textarea.setRangeText(`[${(await res.text()).trim()}](${str})`, textarea.selectionStart, textarea.selectionEnd);
+        textarea.setRangeText(`- [${(await res.text()).trim()}](${str})`, textarea.selectionStart, textarea.selectionEnd);
     } catch (error) {
         console.log(error);
         toast.setAttribute('message', '错误');

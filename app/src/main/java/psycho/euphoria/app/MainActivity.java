@@ -96,6 +96,18 @@ public class MainActivity extends Activity {
         settings.setSupportZoom(false);
     }
 
+    private static void openWithChrome(Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        intent.setPackage("com.android.chrome");
+        context.startActivity(intent);
+    }
+
+    private int checkStatus() throws Exception {
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(mUrl).openConnection();
+        return httpURLConnection.getResponseCode();
+    }
+
     private void initialize() {
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
@@ -108,8 +120,55 @@ public class MainActivity extends Activity {
 //            mWebView.loadUrl(address + "/index.html");
 //
 //        }
-        mUrl = String.format("http://%s:8500", Shared.getDeviceIP(this));
+        mUrl = String.format("http://%s:8500/index.html", Shared.getDeviceIP(this));
         openIndex();
+    }
+
+    private void openFilePage() {
+        if (mUrl != null) {
+            String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
+            openWithChrome(this, url);
+        } else {
+            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void openIndex() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                int max = 10;
+                while (max > -1) {
+                    try {
+                        if (checkStatus() == 200) {
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    max--;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWebView.loadUrl(mUrl );
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void openIndexPage() {
+        if (mUrl != null) {
+            openWithChrome(this, mUrl);
+        } else {
+            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void stopService() {
@@ -202,66 +261,5 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void openIndexPage() {
-        if (mUrl != null) {
-            openWithChrome(this, mUrl);
-        } else {
-            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void openFilePage() {
-        if (mUrl != null) {
-            String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
-            openWithChrome(this, url);
-        } else {
-            Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    private static void openWithChrome(Context context, String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        intent.setPackage("com.android.chrome");
-        context.startActivity(intent);
-    }
-
-    private int checkStatus() throws Exception {
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(mUrl + "/index.html").openConnection();
-        return httpURLConnection.getResponseCode();
-    }
-
-
-    private void openIndex() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                int max = 10;
-                while (max > -1) {
-                    try {
-                        if (checkStatus() == 200) {
-                            break;
-                        }
-                    } catch (Exception ignored) {
-
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                    }
-                    max--;
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                     mWebView.loadUrl(mUrl + "/index.html");
-                    }
-                });
-            }
-        }).start();
     }
 }

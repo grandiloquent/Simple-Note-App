@@ -2,6 +2,7 @@ package psycho.euphoria.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,6 +14,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Process;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.view.Menu;
@@ -23,6 +25,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import psycho.euphoria.app.CustomWebChromeClient;
 import psycho.euphoria.app.CustomWebViewClient;
@@ -38,7 +43,7 @@ public class MainActivity extends Activity {
     public static final String KEY_ADDRESS = "psycho.euphoria.notes.address";
     private static final String USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
     private WebView mWebView;
-    private BroadcastReceiver mBroadcastReceiver;
+    //    private BroadcastReceiver mBroadcastReceiver;
     private String mUrl;
 
     public static void aroundFileUriExposedException() {
@@ -97,12 +102,14 @@ public class MainActivity extends Activity {
         mWebView = initializeWebView(this);
         setWebView(mWebView);
         launchServer(this);
-        Intent intent = getIntent();
-        String address = getIntent().getStringExtra(KEY_ADDRESS);
-        if (address != null) {
-            mWebView.loadUrl(address + "/index.html");
-
-        }
+//        Intent intent = getIntent();
+//        String address = getIntent().getStringExtra(KEY_ADDRESS);
+//        if (address != null) {
+//            mWebView.loadUrl(address + "/index.html");
+//
+//        }
+        mUrl = String.format("http://%s:8500", Shared.getDeviceIP(this));
+        openIndex();
     }
 
     private void stopService() {
@@ -120,28 +127,25 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        mBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mUrl = intent.getStringExtra(KEY_ADDRESS) + "/index.html";
-                mWebView.loadUrl(mUrl);
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(START_SERVER_ACTION);
-        registerReceiver(mBroadcastReceiver, intentFilter);
-
-
+//        mBroadcastReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                mUrl = intent.getStringExtra(KEY_ADDRESS) + "/index.html";
+//                mWebView.loadUrl(mUrl);
+//            }
+//        };
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(START_SERVER_ACTION);
+//        registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mBroadcastReceiver != null) {
-            unregisterReceiver(mBroadcastReceiver);
-            mBroadcastReceiver = null;
-        }
-
+//        if (mBroadcastReceiver != null) {
+//            unregisterReceiver(mBroadcastReceiver);
+//            mBroadcastReceiver = null;
+//        }
     }
 
     @Override
@@ -201,7 +205,6 @@ public class MainActivity extends Activity {
     }
 
     private void openIndexPage() {
-
         if (mUrl != null) {
             openWithChrome(this, mUrl);
         } else {
@@ -224,5 +227,41 @@ public class MainActivity extends Activity {
         intent.setData(Uri.parse(url));
         intent.setPackage("com.android.chrome");
         context.startActivity(intent);
+    }
+
+    private int checkStatus() throws Exception {
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(mUrl + "/index.html").openConnection();
+        return httpURLConnection.getResponseCode();
+    }
+
+
+    private void openIndex() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                int max = 10;
+                while (max > -1) {
+                    try {
+                        if (checkStatus() == 200) {
+                            break;
+                        }
+                    } catch (Exception ignored) {
+
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    max--;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                     mWebView.loadUrl(mUrl + "/index.html");
+                    }
+                });
+            }
+        }).start();
     }
 }

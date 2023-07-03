@@ -182,10 +182,10 @@ async function initialize() {
     });
     video.addEventListener('ended', evt => {
         const url = new URL(video.src);
-        const path = url.searchParams.get('path');
+        const vpath = url.searchParams.get('path');
         let next = 0;
         for (let i = 0; i < videos.length; i++) {
-            if (videos[i].path === path) {
+            if (videos[i].path === vpath) {
                 next = i;
             }
         }

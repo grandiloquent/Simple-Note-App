@@ -319,7 +319,6 @@ async function initialize() {
         const dialog = document.createElement('custom-dialog');
         dialog.setAttribute('title', '剪切');
         const d = document.createElement('textarea');
-        d.value = localStorage.getItem('trim') || '';
         dialog.addEventListener('submit', () => {
             const r = new RegExp("([0-9.]+) {1,}([0-9.]+)");
             const m = r.exec(d.value);

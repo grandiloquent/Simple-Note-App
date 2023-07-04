@@ -23,6 +23,37 @@ path {
     fill: #fff;
 }
 
+
+input,textarea {
+    background-color: transparent;
+    padding-bottom: 4px;
+    outline: none;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 1px;
+    font: inherit;
+    color: #0f0f0f
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    color: #606060;
+    opacity: 1
+}
+
+input::placeholder,textarea::placeholder {
+    color: #606060;
+    opacity: 1
+}
+
+textarea {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 8.4rem;
+    width: 100%;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 8px
+}
 .wrapper {
     position: fixed;
     left: 0;
@@ -44,6 +75,12 @@ path {
     margin: 0 60px;
     width: 56px;
     height: 56px;
+}
+
+#top-wrapper {
+    color: #fff;
+    z-index: 1;
+    width: 100%;
 }
 
 #middle-wrapper {

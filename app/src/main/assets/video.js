@@ -35,7 +35,7 @@ function substringBeforeLast(string, delimiter, missingDelimiterValue) {
 }
 function playVideo(baseUri, video, path) {
     document.title = substringAfterLast(path, "/");
-    toast.setAttribute('message',document.title);
+    toast.setAttribute('message', document.title);
     video.load();
     video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
     video.play();
@@ -92,6 +92,7 @@ function getRandomInt(min, max) {
 
 const searchParams = new URL(window.location).searchParams;
 const path = searchParams.get('path');
+const seek = searchParams.get('seek');
 let baseUri = searchParams.get('baseUri');
 baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
 let videos;
@@ -106,12 +107,15 @@ async function initialize() {
             .filter(video => {
                 return !video.isDirectory && (
                     video.path.endsWith(".mp4") ||
-                    video.path.endsWith(".v")||
+                    video.path.endsWith(".v") ||
                     video.path.endsWith(".MP4") ||
-                    video.path.endsWith(".MOV")||
-                   video.path.endsWith(".mov")
+                    video.path.endsWith(".MOV") ||
+                    video.path.endsWith(".mov")
                 )
             });
+        videos = videos.sort((v1, v2) => {
+            return v2.length - v1.length
+        })
     }
     await loadVideoList();
     let timer;
@@ -123,12 +127,35 @@ async function initialize() {
     const timeFirst = document.querySelector('#time-first');
     const timeSecond = document.querySelector('#time-second');
     const video = document.querySelector('#video');
-    const progressBarPlayed = document.querySelector('#progress-bar-played');
-    const progressBarPlayheadWrapper = document.querySelector('#progress-bar-playhead-wrapper');
     const toast = document.getElementById('toast');
+    const recycle = document.querySelector('#recycle');
+    const message = document.querySelector('#message');
+    const timer1 = document.querySelector('#timer');
+    const split = document.querySelector('#split');
+
+
+
+    timer1.addEventListener('click', evt => {
+        message.textContent = video.currentTime;
+        writeText(video.currentTime);
+    });
+    const customSeekbar = document.querySelector('#custom-seekbar');
+    customSeekbar.addEventListener("seekbarClicked", function () {
+        scheduleHide();
+        video.pause();
+    });
+    customSeekbar.addEventListener("seekbarInput", evt => {
+        console.log(evt.detail);
+        scheduleHide();
+        var time = video.duration * evt.detail;
+        video.currentTime = time;
+    });
+
 
     playVideo(baseUri, video, path);
 
+    video.loop = true;
+    video.muted = true;
     video.addEventListener('durationchange', evt => {
         if (video.duration) {
             timeSecond.textContent = formatDuration(video.duration);
@@ -140,8 +167,7 @@ async function initialize() {
         if (video.currentTime) {
             timeFirst.textContent = formatDuration(video.currentTime);
             const ratio = video.currentTime / video.duration;
-            progressBarPlayed.style.width = `${ratio * 100}%`;
-            progressBarPlayheadWrapper.style.marginLeft = `${ratio * 100}%`;
+            customSeekbar.value = (100 / video.duration) * video.currentTime;
         }
     });
     video.addEventListener('play', evt => {
@@ -152,22 +178,22 @@ async function initialize() {
         playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
     });
 
-    video.addEventListener('ended', evt => {
-        const url = new URL(video.src);
-        const path = url.searchParams.get('path');
-        let next = 0;
-        for (let i = 0; i < videos.length; i++) {
-            if (videos[i].path === path) {
-                next = i;
-            }
-        }
-        if (next + 1 < videos.length) {
-            next = next + 1;
-        } else {
-            next = 0;
-        }
-        playVideo(baseUri, video, videos[next].path);
-    });
+    // video.addEventListener('ended', evt => {
+    //     const url = new URL(video.src);
+    //     const path = url.searchParams.get('path');
+    //     let next = 0;
+    //     for (let i = 0; i < videos.length; i++) {
+    //         if (videos[i].path === path) {
+    //             next = i;
+    //         }
+    //     }
+    //     if (next + 1 < videos.length) {
+    //         next = next + 1;
+    //     } else {
+    //         next = 0;
+    //     }
+    //     playVideo(baseUri, video, videos[next].path);
+    // });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {
         if (video.paused) {
@@ -208,7 +234,7 @@ async function initialize() {
         }
 
     });
-    
+
     window.addEventListener("resize", evt => {
         const w = Math.min(window.outerWidth, window.innerWidth);
         const h = Math.min(window.outerHeight, window.innerHeight);
@@ -258,12 +284,58 @@ async function initialize() {
     const next = document.querySelector('#next');
     next.addEventListener('click', evt => {
         scheduleHide();
-        video.currentTime += 1 / fps;
+        if (seek) {
+            video.currentTime += 1 / fps;
+        } else
+            video.currentTime += 1;// / fps;
     });
     const previous = document.querySelector('#previous');
     previous.addEventListener('click', evt => {
         scheduleHide();
-        video.currentTime -= 1 / fps;
+        if (seek) {
+            video.currentTime -= 1 / fps;
+        } else
+            video.currentTime -= 1 /// fps;
+    });
+    recycle.addEventListener('click', evt => {
+        recyclingVideo();
+    });
+    async function recyclingVideo() {
+        video.pause();
+        const url = new URL(video.src);
+        const path = url.searchParams.get('path');
+        const res = await fetch(`${baseUri}/recycle?path=${encodeURIComponent(path)}`)
+        let next = 0;
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].path === path) {
+                next = i;
+            }
+        }
+        await loadVideoList();
+        next = Math.min(next, videos.length - 1);
+        playVideo(baseUri, video, videos[next].path)
+    }
+    split.addEventListener('click', evt => {
+        const dialog = document.createElement('custom-dialog');
+        dialog.setAttribute('title', '剪切');
+        const d = document.createElement('textarea');
+        d.value = localStorage.getItem('trim') || '';
+        dialog.addEventListener('submit', () => {
+            const r = new RegExp("([0-9.]+) {1,}([0-9.]+)");
+            const m = r.exec(d.value);
+            if (m) {
+                const url = new URL(video.src);
+                const path = url.searchParams.get('path');
+                const src =path;
+                const dst=`${substringBeforeLast(path,".")}_${m[1]}_${m[2]}.${substringAfterLast(path,".")}`;
+                if (typeof NativeAndroid !== 'undefined') {
+                    trimVideo(src,dst,parseFloat(m[1]),parseFloat(m[2]))
+                }
+            }
+
+        });
+        dialog.appendChild(d);
+        document.body.appendChild(dialog);
     });
     window.addEventListener('keydown', async evt => {
         if (evt.key === 'ArrowLeft') {
@@ -279,19 +351,7 @@ async function initialize() {
             )
         } else if (evt.key === '0') {
             evt.preventDefault();
-            video.pause();
-            const url = new URL(video.src);
-            const path = url.searchParams.get('path');
-            const res = await fetch(`${baseUri}/recycle?path=${encodeURIComponent(path)}`)
-            let next = 0;
-            for (let i = 0; i < videos.length; i++) {
-                if (videos[i].path === path) {
-                    next = i;
-                }
-            }
-            await loadVideoList();
-            next = Math.min(next, videos.length - 1);
-            playVideo(baseUri, video, videos[next].path)
+            recyclingVideo();
         }
     });
 }

@@ -7,14 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频</title>
     <link rel="stylesheet" href="video.css">
-
+    <script src="shared.js"></script>
+    <script src="custom_seekbar.js"></script>
 </head>
 
 <body>
 
     <div class="wrapper">
         <video id="video"></video>
-        <div id="top-wrapper"></div>
+        <div id="top-wrapper">
+            <div id="message"></div>
+        </div>
         <div id="middle-wrapper">
             <div id="previous">
                 <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
@@ -42,7 +45,29 @@
                 <div id="time-second">00:00</div>
                 <div style="flex-grow: 1;"></div>
                 <div id="video-list">
-                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" style="pointer-events: none; display: block; width: 100%; height: 100%;"><path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path></svg>
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path>
+                    </svg>
+                </div>
+                <div id="recycle">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path
+                            d="M15.516 3.984h3.469v2.016h-13.969v-2.016h3.469l1.031-0.984h4.969zM8.016 9v9.984h7.969v-9.984h-7.969zM6 18.984v-12h12v12q0 0.797-0.609 1.406t-1.406 0.609h-7.969q-0.797 0-1.406-0.609t-0.609-1.406z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="timer">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path
+                            d="M12 20.016q2.906 0 4.945-2.063t2.039-4.969-2.039-4.945-4.945-2.039-4.945 2.039-2.039 4.945 2.039 4.969 4.945 2.063zM19.031 7.406q0.797 1.031 1.383 2.648t0.586 2.93q0 3.703-2.625 6.352t-6.375 2.648-6.375-2.648-2.625-6.352 2.625-6.352 6.375-2.648q1.266 0 2.93 0.609t2.695 1.406l1.406-1.453q0.75 0.609 1.406 1.406zM11.016 14.016v-6h1.969v6h-1.969zM15 0.984v2.016h-6v-2.016h6z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="split">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path d="M18.984 3h3v0.984l-6.984 7.031-2.016-2.016zM12 12.516q0.516 0 0.516-0.516t-0.516-0.516-0.516 0.516 0.516 0.516zM6 20.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM6 8.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM9.656 7.641l12.328 12.375v0.984h-3l-6.984-6.984-2.344 2.344q0.328 0.703 0.328 1.641 0 1.641-1.172 2.813t-2.813 1.172-2.813-1.172-1.172-2.813 1.172-2.813 2.813-1.172q0.938 0 1.641 0.328l2.344-2.344-2.344-2.344q-0.703 0.328-1.641 0.328-1.641 0-2.813-1.172t-1.172-2.813 1.172-2.813 2.813-1.172 2.813 1.172 1.172 2.813q0 0.938-0.328 1.641z"></path>
+                    </svg>
                 </div>
                 <div id="fullscreen">
                     <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
@@ -52,13 +77,7 @@
                     </svg>
                 </div>
             </div>
-            <div id="progress-bar">
-                <div id="progress-bar-background">
-                </div>
-                <div id="progress-bar-played">
-                </div>
-                <div id="progress-bar-playhead-wrapper"></div>
-            </div>
+            <custom-seekbar id="custom-seekbar"></custom-seekbar>
         </div>
     </div>
     <script src="custom-toast.js"></script>

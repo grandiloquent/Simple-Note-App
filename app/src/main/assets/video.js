@@ -94,6 +94,7 @@ const searchParams = new URL(window.location).searchParams;
 const path = searchParams.get('path');
 const seek = searchParams.get('seek');
 let baseUri = searchParams.get('baseUri');
+let seeking = false;
 baseUri = baseUri || (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
 let videos;
 
@@ -132,9 +133,67 @@ async function initialize() {
     const message = document.querySelector('#message');
     const timer1 = document.querySelector('#timer');
     const split = document.querySelector('#split');
-
-
-
+    function bindNext() {
+        const next = document.getElementById('next');
+        let lastTime = 0;
+        let stop = false;
+        next.addEventListener('touchstart', evt => {
+            if (timer) clearTimeout(timer);
+            while (true) {
+                const now = Date.now();
+                if (now - lastTime > 1000) {
+                    if (!seeking) {
+                        video.currentTime += 1;
+                    }
+                    lastTime = now;
+                }
+                if (stop) break;
+            }
+        });
+        next.addEventListener('touchend', evt => {
+            stop = true;
+        });
+        next.addEventListener('touchcancel', evt => {
+            stop = true;
+        });
+    }
+    function bindRandomPlay() {
+        // const randomPlay =document.getElementById('random-play');
+        document.getElementById('random-play').addEventListener('click', evt => {
+            let next = getRandomInt(0, videos.length);
+            playVideo(baseUri, video, videos[next].path)
+        });
+    }
+    function bindPlayNext() {
+        // const playNext =document.getElementById('play-next');
+        document.getElementById('play-next').addEventListener('click', evt => {
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            if (next + 1 < videos.length) {
+                next = next + 1;
+            } else {
+                next = 0;
+            }
+            playVideo(baseUri, video, videos[next].path);
+        });
+    }
+    function bindNextFrame() {
+        // const nextFrame =document.getElementById('next-frame');
+        document.getElementById('next-frame').addEventListener('click', evt => {
+            scheduleHide();
+            video.currentTime += 1 / fps;
+        });
+    }
+    bindRandomPlay();
+    bindPlayNext();
+    bindNext();
+    bindNextFrame()
     timer1.addEventListener('click', async evt => {
         message.textContent = video.currentTime;
         let start = await readText();
@@ -182,22 +241,29 @@ async function initialize() {
     video.addEventListener('pause', evt => {
         playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
     });
-
+    video.addEventListener('seeking', evt => {
+        seeking = true;
+        scheduleHide();
+    })
+    video.addEventListener('seeked', evt => {
+        seeking = false;
+        scheduleHide();
+    })
     // video.addEventListener('ended', evt => {
-    //     const url = new URL(video.src);
-    //     const path = url.searchParams.get('path');
-    //     let next = 0;
-    //     for (let i = 0; i < videos.length; i++) {
-    //         if (videos[i].path === path) {
-    //             next = i;
-    //         }
+    // const url = new URL(video.src);
+    // const path = url.searchParams.get('path');
+    // let next = 0;
+    // for (let i = 0; i < videos.length; i++) {
+    //     if (videos[i].path === path) {
+    //         next = i;
     //     }
-    //     if (next + 1 < videos.length) {
-    //         next = next + 1;
-    //     } else {
-    //         next = 0;
-    //     }
-    //     playVideo(baseUri, video, videos[next].path);
+    // }
+    // if (next + 1 < videos.length) {
+    //     next = next + 1;
+    // } else {
+    //     next = 0;
+    // }
+    // playVideo(baseUri, video, videos[next].path);
     // });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {
@@ -286,14 +352,7 @@ async function initialize() {
     function get_fps_average() {
         return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
     }
-    const next = document.querySelector('#next');
-    next.addEventListener('click', evt => {
-        scheduleHide();
-        if (seek) {
-            video.currentTime += 1 / fps;
-        } else
-            video.currentTime += 1;// / fps;
-    });
+
     const previous = document.querySelector('#previous');
     previous.addEventListener('click', evt => {
         scheduleHide();

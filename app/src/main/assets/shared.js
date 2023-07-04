@@ -153,3 +153,6 @@ function writeText(message) {
     document.execCommand('copy');
     textarea.remove();
 }
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+  }

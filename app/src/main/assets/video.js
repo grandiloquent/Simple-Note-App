@@ -135,25 +135,28 @@ async function initialize() {
     const split = document.querySelector('#split');
     function bindNext() {
         const next = document.getElementById('next');
-        let lastTime = 0;
         let stop = false;
-        next.addEventListener('touchstart', evt => {
+        next.addEventListener('touchstart', async evt => {
+            evt.stopPropagation();
             if (timer) clearTimeout(timer);
             while (true) {
-                const now = Date.now();
-                if (now - lastTime > 1000) {
-                    if (!seeking) {
-                        video.currentTime += 1;
-                    }
-                    lastTime = now;
+                await delay(500);
+                if (!seeking) {
+                    video.currentTime += 1;
                 }
+
                 if (stop) break;
             }
         });
         next.addEventListener('touchend', evt => {
+            
+            evt.stopPropagation();
+            scheduleHide();
             stop = true;
         });
         next.addEventListener('touchcancel', evt => {
+            evt.stopPropagation();
+            scheduleHide();
             stop = true;
         });
     }

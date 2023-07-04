@@ -141,16 +141,16 @@ async function initialize() {
             stop = false;
             if (timer) clearTimeout(timer);
             while (true) {
-                await delay(500);
+                await delay(50);
                 if (!seeking) {
                     video.currentTime += 1;
                 }
 
                 if (stop) break;
             }
-        },true);
+        }, true);
         nextv.addEventListener('touchend', evt => {
-            
+
             evt.stopPropagation();
             scheduleHide();
             stop = true;
@@ -223,7 +223,7 @@ async function initialize() {
     playVideo(baseUri, video, path);
 
     video.loop = true;
-    video.muted = true;
+    //video.muted = true;
     video.addEventListener('durationchange', evt => {
         if (video.duration) {
             timeSecond.textContent = formatDuration(video.duration);
@@ -421,5 +421,24 @@ async function initialize() {
             recyclingVideo();
         }
     });
+    function bindJumpSepcifyTime() {
+        // const jumpSepcifyTime =document.getElementById('jump-sepcify-time');
+        document.getElementById('jump-sepcify-time').addEventListener('click', evt => {
+            const dialog = document.createElement('custom-dialog');
+            dialog.setAttribute('title', '跳转');
+            const d = document.createElement('textarea');
+            dialog.addEventListener('submit', () => {
+                const m = /(\d+)m(\d+)s/.exec(d.value);
+                console.log(m,parseFloat(m[1]) * 60 + parseFloat(m[2]))
+                if (m) {
+                    video.currentTime = parseFloat(m[1]) * 60 + parseFloat(m[2]);
+                }
+    
+            });
+            dialog.appendChild(d);
+            document.body.appendChild(dialog);
+        });
+    }
+    bindJumpSepcifyTime() ;
 }
 initialize();

@@ -138,7 +138,7 @@ async function initialize() {
     timer1.addEventListener('click', async evt => {
         message.textContent = video.currentTime;
         let start = await readText();
-        if (start && /[0-9.]+/.test(start)) {
+        if (start && /^[0-9.]+$/.test(start)) {
             writeText(start + " " + video.currentTime);
         } else {
             writeText(video.currentTime);

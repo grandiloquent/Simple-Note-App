@@ -135,9 +135,14 @@ async function initialize() {
 
 
 
-    timer1.addEventListener('click', evt => {
+    timer1.addEventListener('click', async evt => {
         message.textContent = video.currentTime;
-        writeText(video.currentTime);
+        let start = await readText();
+        if (start && /[0-9.]+/.test(start)) {
+            writeText(start + " " + video.currentTime);
+        } else {
+            writeText(video.currentTime);
+        }
     });
     const customSeekbar = document.querySelector('#custom-seekbar');
     customSeekbar.addEventListener("seekbarClicked", function () {
@@ -325,10 +330,10 @@ async function initialize() {
             if (m) {
                 const url = new URL(video.src);
                 const path = url.searchParams.get('path');
-                const src =path;
-                const dst=`${substringBeforeLast(path,".")}_${m[1]}_${m[2]}.${substringAfterLast(path,".")}`;
+                const src = path;
+                const dst = `${substringBeforeLast(path, ".")}_${m[1]}_${m[2]}.${substringAfterLast(path, ".")}`;
                 if (typeof NativeAndroid !== 'undefined') {
-                    trimVideo(src,dst,parseFloat(m[1]),parseFloat(m[2]))
+                    NativeAndroid.trimVideo(src, dst, parseFloat(m[1]), parseFloat(m[2]))
                 }
             }
 

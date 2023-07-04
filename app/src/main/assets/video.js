@@ -134,11 +134,11 @@ async function initialize() {
     const timer1 = document.querySelector('#timer');
     const split = document.querySelector('#split');
     function bindNext() {
-        const next = document.getElementById('next');
+        const nextv = document.getElementById('next');
         let stop = false;
-        next.addEventListener('touchstart', async evt => {
+        nextv.addEventListener('touchstart', async evt => {
             evt.stopPropagation();
-            console.log('touchstart');
+            stop = false;
             if (timer) clearTimeout(timer);
             while (true) {
                 await delay(500);
@@ -148,14 +148,14 @@ async function initialize() {
 
                 if (stop) break;
             }
-        });
-        next.addEventListener('touchend', evt => {
+        },true);
+        nextv.addEventListener('touchend', evt => {
             
             evt.stopPropagation();
             scheduleHide();
             stop = true;
         });
-        next.addEventListener('touchcancel', evt => {
+        nextv.addEventListener('touchcancel', evt => {
             evt.stopPropagation();
             scheduleHide();
             stop = true;

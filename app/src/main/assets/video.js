@@ -138,6 +138,7 @@ async function initialize() {
         let stop = false;
         next.addEventListener('touchstart', async evt => {
             evt.stopPropagation();
+            console.log('touchstart');
             if (timer) clearTimeout(timer);
             while (true) {
                 await delay(500);

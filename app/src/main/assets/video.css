@@ -24,7 +24,8 @@ path {
 }
 
 
-input,textarea {
+input,
+textarea {
     background-color: transparent;
     padding-bottom: 4px;
     outline: none;
@@ -36,12 +37,14 @@ input,textarea {
     color: #0f0f0f
 }
 
-input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
     color: #606060;
     opacity: 1
 }
 
-input::placeholder,textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
     color: #606060;
     opacity: 1
 }
@@ -51,9 +54,10 @@ textarea {
     appearance: none;
     min-height: 8.4rem;
     width: 100%;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     padding: 8px
 }
+
 .wrapper {
     position: fixed;
     left: 0;
@@ -88,6 +92,10 @@ textarea {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
+}
+
+#bottom-wrapper {
     z-index: 1;
 }
 

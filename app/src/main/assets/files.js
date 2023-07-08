@@ -37,8 +37,12 @@ function onItemClick(evt) {
     //     window.location = `/markdown?path=${encodeURIComponent(evt.detail.path)}`
     // }
     else {
-        if (binaryRe.test(path) && (typeof NativeAndroid !== 'undefined')) {
-            NativeAndroid.openFile(path);
+        if (binaryRe.test(path)) {
+            if (typeof NativeAndroid !== 'undefined') {
+                NativeAndroid.openFile(path)
+            }else{
+                window.open(`intent://${path}#Intent;package=org.readera;scheme=file;end;`)
+            }
             return
         }
         window.location = `${baseUri}/file?path=${encodeURIComponent(path)}`

@@ -42,7 +42,7 @@ function onItemClick(evt) {
                 NativeAndroid.openFile(path)
             } else {
                 const a = document.createElement('a');
-                a.href = `/su?cmd=${`am start -n org.readera/org.readera.MainActivity -d file://${path}`}`;
+                a.href = `/su?cmd=${`am start -n org.readera/org.readera.read.ReadActivity -d file://${path}`}`;
 
                 //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`
                 document.body.appendChild(a);

@@ -40,8 +40,14 @@ function onItemClick(evt) {
         if (binaryRe.test(path)) {
             if (typeof NativeAndroid !== 'undefined') {
                 NativeAndroid.openFile(path)
-            }else{
-                window.open(`intent://${path}#Intent;package=org.readera;scheme=file;end;`)
+            } else {
+                const a = document.createElement('a');
+                a.href = `/su?cmd=${`am start -n org.readera/org.readera.MainActivity -d file://${path}`}`;
+
+                //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
             }
             return
         }

@@ -22,7 +22,30 @@ public class CustomWebViewClient extends WebViewClient {
 //        if (url.startsWith("https://www.xvideos.com/") && (cookie = CookieManager.getInstance().getCookie(url)) != null) {
 //            mContext.setString(MainActivity.KEY_XVIDEOS_COOKIE, cookie);
 //        }
-        //view.evaluateJavascript(mJsCode, null);
+        view.evaluateJavascript("(() => {\n" +
+                "    function deleteRedundantItems() {\n" +
+                "        const elements = [...document.querySelectorAll('.search_prolist_item')];\n" +
+                "        elements.forEach(element => {\n" +
+                "            const searchProlistAd = element.querySelector('.search_prolist_ad');\n" +
+                "            if (searchProlistAd) {\n" +
+                "\n" +
+                "\n" +
+                "                element.remove();\n" +
+                "            }\n" +
+                "            const searchProlistOther = element.querySelector('.search_prolist_other img');\n" +
+                "            if (!searchProlistOther || !searchProlistOther.src.endsWith('c5ab4d78f8bf4d90.png')) {\n" +
+                "                element.remove();\n" +
+                "            }\n" +
+                "\n" +
+                "        });\n" +
+                "    }\n" +
+                "    if (window.location.host.endsWith('m.jd.com')) {\n" +
+                "        deleteRedundantItems();\n" +
+                "        window.addEventListener('scroll', evt => {\n" +
+                "            deleteRedundantItems()\n" +
+                "        })\n" +
+                "    }\n" +
+                "})();", null);
     }
 
 

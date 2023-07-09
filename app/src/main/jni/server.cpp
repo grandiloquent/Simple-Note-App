@@ -427,6 +427,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto s = Trans(q, to);
         res.set_content(s, "application/json");
     });
+
     server.Get("/title", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto q = req.get_param_value("path");

@@ -41,13 +41,11 @@ function onItemClick(evt) {
             if (typeof NativeAndroid !== 'undefined') {
                 NativeAndroid.openFile(path)
             } else {
-                const a = document.createElement('a');
-                a.href = `/su?cmd=${`am start -n org.readera/org.readera.read.ReadActivity -d file://${path}`}`;
+                 window.open(`/su?cmd="${`am start -n com.duokan.readex/com.duokan.readex.DkReaderActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
+//      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
 
                 //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+    
             }
             return
         }

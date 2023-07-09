@@ -41,7 +41,10 @@ function onItemClick(evt) {
             if (typeof NativeAndroid !== 'undefined') {
                 NativeAndroid.openFile(path)
             } else {
-                 window.open(`/su?cmd="${`am start -n com.duokan.readex/com.duokan.readex.DkReaderActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
+                
+                // 使用多看阅读器打开电子书
+                // fetch 发送请求可以避免打开新的页面
+                 fetch(`/su?cmd="${`am start -n com.duokan.readex/com.duokan.readex.DkReaderActivity -d 'file://${encodeURI(path)}'"`}`)
 //      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
 
                 //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`

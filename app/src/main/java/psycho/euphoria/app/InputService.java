@@ -179,8 +179,14 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
             json.append(line);
             line = in.readLine();
         }
+        if (json.indexOf("\"shortdef\"") == -1) {
+            return null;
+        }
         JSONArray jsonArray = new JSONArray(String.valueOf(json));
         JSONObject jsonObject = jsonArray.getJSONObject(0);
+        if (jsonObject == null) {
+            return null;
+        }
         JSONArray shortdefarray = jsonObject.getJSONArray("shortdef");
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < shortdefarray.length(); i++) {
@@ -242,11 +248,11 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                         String response = "";
                         try {
                             response = mCurrentString.contains(" ") ? translate("zh", mCurrentString) : translateWord(mCurrentString, mDatabase);
-                            if (response.length() == 0) {
+                            if (response == null) {
                                 response = translateCollegiate(mCurrentString, mDatabase);
                             }
+
                         } catch (Exception e) {
-                            e.printStackTrace();
                         }
                         String finalResponse = response;
                         Shared.postOnMainThread(() -> {

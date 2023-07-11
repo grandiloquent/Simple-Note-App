@@ -252,8 +252,7 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
 
 
     @Override
-    public void onKey(int primaryCode, int[] keyCodes)
-    {
+    public void onKey(int primaryCode, int[] keyCodes) {
         InputConnection ic = getCurrentInputConnection();
         switch (primaryCode) {
             case Keyboard.KEYCODE_DELETE:

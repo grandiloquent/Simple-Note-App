@@ -40,7 +40,12 @@ public class CustomWebViewClient extends WebViewClient {
                 "        });\n" +
                 "    }\n" +
                 "    if (window.location.host.endsWith('m.jd.com')) {\n" +
-                "        deleteRedundantItems();\n" +
+                "        //" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "deleteRedundantItems();\n" +
                 "        window.addEventListener('scroll', evt => {\n" +
                 "            deleteRedundantItems()\n" +
                 "        })\n" +

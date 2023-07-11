@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -19,11 +20,18 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.storage.StorageManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -54,6 +62,10 @@ import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -73,6 +85,7 @@ public class Shared {
     private static final String TIME_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(TIME_DATE_PATTERN, new Locale("en"));
     private static final Object sLock = new Object();
+    private static volatile ExecutorService sThreadExecutor;
     private static Handler sUiThreadHandler;
 
     public static Intent buildSharedIntent(Context context, File imageFile) {
@@ -394,7 +407,6 @@ public class Shared {
         return null;
     }
 
-
     public static void hideSystemUI(Activity activity) {
 //        mRoot.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
 //                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
@@ -499,6 +511,22 @@ public class Shared {
                 .create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
+    }
+
+    /**
+     * Posts callable in background using shared background thread pool.
+     *
+     * @Return A future of the task that can be monitored for updates or cancelled.
+     */
+    public static Future postOnBackgroundThread(Callable callable) {
+        return getThreadExecutor().submit(callable);
+    }
+
+    /**
+     * Posts the runnable on the main thread.
+     */
+    public static void postOnMainThread(Runnable runnable) {
+        getUiThreadHandler().post(runnable);
     }
 
     public static String readAssetAsString(Context context, String assetName) {
@@ -692,13 +720,84 @@ public class Shared {
         return config;
     }
 
+    private static synchronized ExecutorService getThreadExecutor() {
+        if (sThreadExecutor == null) {
+            sThreadExecutor = Executors.newFixedThreadPool(
+                    Runtime.getRuntime().availableProcessors());
+        }
+        return sThreadExecutor;
+    }
+
     /*
 https://android.googlesource.com/platform/tools/tradefederation/+/ae241fc/src/com/android/tradefed/util/StreamUtil.java
      */
     public interface Listener {
         void onSuccess(String value);
     }
-
+    public static void createFloatView(Context context, String s) {
+        final WindowManager.LayoutParams params;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        } else {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        }
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        //获取屏幕的高度
+        DisplayMetrics dm = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+        //设置window type
+        //设置图片格式，效果为背景透明
+        params.format = PixelFormat.RGBA_8888;
+        //设置浮动窗口不可聚焦（实现操作除浮动窗口外的其他可见窗口的操作）
+        //调整悬浮窗显示的停靠位置为右侧侧置顶，方便实现触摸滑动
+        params.gravity = Gravity.LEFT | Gravity.TOP;
+        // 以屏幕左上角为原点，设置x、y初始值
+//        params.width = width;
+//        params.x = width / 6 / 2;
+//        params.height = height;
+//        params.y = height / 3 / 2;
+        //设置悬浮窗口长宽数据
+        LayoutInflater inflater = LayoutInflater.from(context);
+        //获取浮动窗口视图所在布局
+        View layout = inflater.inflate(R.layout.float_layout, null);
+//        int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+//        int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+//        layout.measure(w, h);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        int margin = max(width, height) / 8; //dpToPx(context, 30);
+        if (width > height)
+            layoutParams.setMargins(margin << 1, margin, margin << 1, margin);
+        else
+            layoutParams.setMargins(margin >> 1, margin << 1, margin >> 1, margin << 1);
+        layout.findViewById(R.id.layout).setLayoutParams(layoutParams);
+        //添加mFloatLayout
+        windowManager.addView(layout, params);
+        ((TextView) layout.findViewById(R.id.dst)).setText(s);
+        layout.findViewById(R.id.layout)
+                .setOnClickListener(v -> {
+                    ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    manager.setPrimaryClip(ClipData.newPlainText(null, s));
+                    Toast.makeText(context, "已复制到剪切板", Toast.LENGTH_SHORT).show();
+                });
+        layout.setOnClickListener(v -> windowManager.removeView(layout));
+//        int w = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+//        int h = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+//        //设置layout大小
+//        mFloatLayout.measure(w, h);
+        //设置监听浮动窗口的触摸移动
+    }
     public static class CommandResult {
 
         // 结果码

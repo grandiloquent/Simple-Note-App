@@ -109,6 +109,12 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 0);
+            }
+        }
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
         mWebView = initializeWebView(this);

@@ -41,6 +41,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -191,6 +192,36 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
         return stringBuilder.toString();
     }
 
+    public static String translateCollegiate(String q, Database database) throws Exception {
+        String result = database.query(q);
+        if (result != null) {
+            return result;
+        }
+        String catchData = "https://dictionaryapi.com/api/v3/references/collegiate/json/" +
+                Uri.encode(q) + "?key=82b5749d-12a6-499f-a916-d9b85d400161";
+        URL url = new URL(catchData);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        InputStream is = connection.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        String line = in.readLine();
+        StringBuffer json = new StringBuffer();
+        while (line != null) {
+            json.append(line);
+            line = in.readLine();
+        }
+        JSONArray jsonArray = new JSONArray(String.valueOf(json));
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+        JSONArray shortdefarray = jsonObject.getJSONArray("shortdef");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < shortdefarray.length(); i++) {
+            stringBuilder.append(shortdefarray.getString(i)).append('\n');
+        }
+        if (stringBuilder.toString().length() > 0) {
+            database.insert(q, stringBuilder.toString());
+        }
+        return stringBuilder.toString();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -211,6 +242,9 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                         String response = "";
                         try {
                             response = mCurrentString.contains(" ") ? translate("zh", mCurrentString) : translateWord(mCurrentString, mDatabase);
+                            if (response.length() == 0) {
+                                response = translateCollegiate(mCurrentString, mDatabase);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -1,4 +1,5 @@
 #include "server.h"
+#include "unzipper.h"
 
 static const char db_name[] = "/storage/emulated/0/.editor/app.db";
 using db = sqlite::Database<db_name>;
@@ -44,6 +45,7 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
                                  return true;
                              });
 }
+
 std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
@@ -77,7 +79,8 @@ void mergeSubtitles(const std::string &dir) {
     std::vector<std::string> tocBuf;
     auto index = 0;
     for (auto const &dir_entry: std::filesystem::directory_iterator{dir}) {
-        if (dir_entry.is_regular_file() && std::regex_search(dir_entry.path().filename().string().c_str(), re)) {
+        if (dir_entry.is_regular_file() &&
+            std::regex_search(dir_entry.path().filename().string().c_str(), re)) {
             std::cout << dir_entry.path() << '\n';
             std::ifstream in(dir_entry.path());
             std::string content((std::istreambuf_iterator<char>(in)),
@@ -115,7 +118,8 @@ void mergeSubtitles(const std::string &dir) {
     }
 
 
-    std::ofstream out(R"(C:\Users\Administrator\Desktop\source.html)", std::ios::out | std::ios::trunc);
+    std::ofstream out(R"(C:\Users\Administrator\Desktop\source.html)",
+                      std::ios::out | std::ios::trunc);
     out << R"(<!DOCTYPE html>
 <html lang="en">
 
@@ -389,6 +393,16 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
                         "application/zip");
     });
+    server.Get("/unzip", [](const httplib::Request &req, httplib::Response &res) {
+        auto path = req.get_param_value("path");
+        Unzipper unzipper(path);
+        bool result = unzipper.extract();
+        if (result) {
+            fs::remove(path);
+        }
+        unzipper.close();
+        res.set_content("Success", "text/plain");
+    });
     server.Post("/picture", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         // auto size = req.files.size();
@@ -434,7 +448,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto s = Title(q);
         res.set_content(s, "text/plain");
     });
-    
+
     server.Get("/file",
                [&t](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");

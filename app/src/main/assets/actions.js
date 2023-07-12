@@ -420,7 +420,7 @@ async function addFavorite(path) {
 async function unCompressFile(path) {
     let res;
     try {
-        res = await fetch(`${baseUri}/api/zip?path=${path}`);
+        res = await fetch(`${baseUri}/unzip?path=${path}`);
         toast.setAttribute('message', '成功');
     } catch (error) {
         toast.setAttribute('message', '错误');

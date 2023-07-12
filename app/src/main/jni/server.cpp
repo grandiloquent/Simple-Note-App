@@ -393,14 +393,17 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
                         "application/zip");
     });
+    // 解压压缩文件
     server.Get("/unzip", [](const httplib::Request &req, httplib::Response &res) {
         auto path = req.get_param_value("path");
+        // 创建存放解压文件的目录
         auto dir = fs::path{SubstringBeforeLast(path, ".")};
         if (!fs::exists(dir)) {
             fs::create_directory(dir);
         }
+       // 初始化解压对象
         Unzipper unzipper(path);
-        bool result = unzipper.extract();
+        bool result = unzipper.extract(dir);
         if (result) {
             fs::remove(path);
         }

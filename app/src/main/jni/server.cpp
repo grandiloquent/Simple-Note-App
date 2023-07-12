@@ -395,6 +395,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/unzip", [](const httplib::Request &req, httplib::Response &res) {
         auto path = req.get_param_value("path");
+        auto dir = fs::path{SubstringBeforeLast(path, ".")};
+        if (!fs::exists(dir)) {
+            fs::create_directory(dir);
+        }
         Unzipper unzipper(path);
         bool result = unzipper.extract();
         if (result) {

@@ -309,7 +309,7 @@ function showContextMenu(evt) {
                 }else if(videoRe.test(path)){
                     mimetype="video/*";
                 }
-                fetch(`/su?cmd="${`am start -a android.intent.action.SEND -t ${mimetype} --eu android.intent.extra.STREAM 'file://${encodeURI(path)}' grant-read-uri-permission"`}`)
+                fetch(`/su?cmd="${`am start -a android.intent.action.SEND -t ${mimetype} --eu android.intent.extra.STREAM 'file://${encodeURI(path)}' --grant-read-uri-permission"`}`)
             }
         });
         addContextMenuItem(bottomSheet, '扫描', () => {

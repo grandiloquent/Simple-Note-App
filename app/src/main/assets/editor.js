@@ -305,6 +305,50 @@ function formatComments(textarea) {
     textarea.setRangeText(strings, start, end + 1);
 
 }
+function sortLines() {
+    const s = textarea.value;
+    let start = textarea.selectionStart;
+    while (start > 0 && s[start - 1] !== '\n') {
+        start--;
+    }
+    while (start > 2) {
+        let tmp = checkPreviousLine(s, start - 1, l => {
+            return l.trim().length > 0;
+        });
+        if (tmp) {
+            start = tmp;
+        } else {
+
+            break;
+        }
+    }
+    let length = textarea.value.length;
+    let end = textarea.selectionEnd;
+    while (end < length && s[end + 1] !== '\n') {
+        end++;
+    }
+    while (end + 2 < length) {
+        //console.log(end + 2,textarea.value[end + 2],textarea.value[end + 2].codePointAt(0))
+        let tmp = checkNextLine(s, end + 1, l => {
+            return l.trim().length > 0;
+        });
+        
+        if (tmp) {
+            end = tmp;
+        } else {
+            break;
+        }
+    }
+
+
+    textarea.setRangeText(textarea.value.slice(start, end + 1)
+    .split('\n')
+    .sort((a, b) =>{
+        return  substringAfter(a,'(').localeCompare(
+            substringAfter(b,'('))
+    })
+    .join('\n'), start, end + 1);
+}
 ///////////////////////////////
 const textarea = document.querySelector('textarea');
 const id = new URL(window.location).searchParams.get('id');
@@ -456,6 +500,14 @@ ${await readText()}
             evt.preventDefault();
             saveNote()
         } else if (evt.key === 'g') {
+            /*
+            const string = textarea.value.trim();
+            const first = string.indexOf('\n');
+            const second = string.indexOf('\n', first + 1);
+            textarea.value = textarea.value.replaceAll(
+                string.substring(0, first),
+                string.substring(first + 1, second));
+            */
             const string = textarea.value.trim();
             const first = string.indexOf('\n');
             const second = string.indexOf('\n', first + 1);
@@ -471,6 +523,9 @@ ${await readText()}
         } else if (evt.key === 'd') {
             evt.preventDefault();
             formatComments(textarea);
+        } else if (evt.key === 'k') {
+            evt.preventDefault();
+            sortLines();
         }
     } else if (evt.key === 'F1') {
         evt.preventDefault();

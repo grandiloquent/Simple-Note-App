@@ -1,6 +1,6 @@
 const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
 const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp)$/);
-const binaryRe = new RegExp(/\.(?:pdf|epub|apk)$/);
+const binaryRe = new RegExp(/\.(?:pdf|epub|apk|azw3|mobi)$/);
 const audioRe = new RegExp(/\.(?:mp3|wav|m4a)$/);
 const videoRe = new RegExp(/\.(?:mp4|v)$/, 'i');
 const zipRe = new RegExp(/\.(?:zip|gzip)$/);
@@ -41,14 +41,15 @@ function onItemClick(evt) {
             if (typeof NativeAndroid !== 'undefined') {
                 NativeAndroid.openFile(path)
             } else {
-                
+
                 // 使用多看阅读器打开电子书
                 // fetch 发送请求可以避免打开新的页面
-                 fetch(`/su?cmd="${`am start -n com.duokan.readex/com.duokan.readex.DkReaderActivity -d 'file://${encodeURI(path)}'"`}`)
-//      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
+                const apk = path.endsWith("epub") ? "com.duokan.readex/com.duokan.readex.DkReaderActivity" : "org.readera/org.readera.read.ReadActivity"
+                fetch(`/su?cmd="${`am start -n ${apk} -d 'file://${encodeURI(path)}'"`}`)
+                //      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
 
                 //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`
-    
+
             }
             return
         }

@@ -209,13 +209,21 @@ async function render(path) {
     })
     document.querySelectorAll('.item-icon').forEach(item => {
 
-        item.addEventListener('click', evt => {
+        item.addEventListener('click', async evt => {
             evt.stopPropagation();
-            deleteFile(item.parentNode.dataset.path);
-            // const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
             // if (buf.indexOf(item.parentNode.dataset.path) === -1)
             //     buf.push(item.parentNode.dataset.path);
             // localStorage.setItem("paths", JSON.stringify(buf));
+            if (new URL(window.location).searchParams.get("y") === "true") {
+                const res = await fetch(`${baseUri}/file/delete`, {
+                    method: 'POST',
+                    body: JSON.stringify([item.parentNode.dataset.path])
+                });
+                queryElementByPath(item.parentNode.dataset.path).remove();
+            } else {
+                deleteFile(item.parentNode.dataset.path);
+                const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+            }
         });
     })
 
@@ -302,12 +310,12 @@ function showContextMenu(evt) {
             bottomSheet.remove();
             if (typeof NativeAndroid !== 'undefined') {
                 NativeAndroid.share(path);
-            }else{
-                let  mimetype="application/*"
-                if(imageRe.test(path)){
-                    mimetype="image/png";
-                }else if(videoRe.test(path)){
-                    mimetype="video/*";
+            } else {
+                let mimetype = "application/*"
+                if (imageRe.test(path)) {
+                    mimetype = "image/png";
+                } else if (videoRe.test(path)) {
+                    mimetype = "video/*";
                 }
                 fetch(`/su?cmd="${`am start -a android.intent.action.SEND -t ${mimetype} --eu android.intent.extra.STREAM 'file://${encodeURI(path)}' --grant-read-uri-permission"`}`)
             }

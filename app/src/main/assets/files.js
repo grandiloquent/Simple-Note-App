@@ -42,9 +42,10 @@ function onItemClick(evt) {
                 NativeAndroid.openFile(path)
             } else {
 
+                 
                 // 使用多看阅读器打开电子书
-                // fetch 发送请求可以避免打开新的页面
-                const apk = path.endsWith("epub") ? "com.duokan.readex/com.duokan.readex.DkReaderActivity" : "org.readera/org.readera.read.ReadActivity"
+                // fetch 发送请求可以避免打开新的页面 org.readera/org.readera.read.ReadActivity
+                const apk = path.endsWith("epub") ? "com.duokan.readex/com.duokan.readex.DkReaderActivity" : "com.adobe.reader/com.adobe.reader.AdobeReader"
                 fetch(`/su?cmd="${`am start -n ${apk} -d 'file://${encodeURI(path)}'"`}`)
                 //      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
 

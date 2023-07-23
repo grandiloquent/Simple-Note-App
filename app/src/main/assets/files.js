@@ -29,6 +29,10 @@ function onItemClick(evt) {
         window.location = `/video.html?path=${path}`
         return;
     }
+    if (path.endsWith(".pdf")) {
+        window.location = `/view.html?path=${encodeURIComponent(path)}`
+        return;
+    }
     if (path.endsWith(".srt")) {
         window.location = `/subtitle.html?path=${encodeURIComponent(substringBeforeLast(path, ".") + ".mp4")}`
 
@@ -42,7 +46,7 @@ function onItemClick(evt) {
                 NativeAndroid.openFile(path)
             } else {
 
-                 
+
                 // 使用多看阅读器打开电子书
                 // fetch 发送请求可以避免打开新的页面 org.readera/org.readera.read.ReadActivity
                 const apk = path.endsWith("epub") ? "com.duokan.readex/com.duokan.readex.DkReaderActivity" : "com.adobe.reader/com.adobe.reader.AdobeReader"

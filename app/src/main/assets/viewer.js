@@ -3205,7 +3205,7 @@ const defaultOptions = {
 };
 {
   defaultOptions.defaultUrl = {
-    value: new URL(window.location).searchParams.get("path"),
+    value: `/file?path=${new URL(window.location).searchParams.get("path")}`,
     kind: OptionKind.VIEWER
   };
   defaultOptions.disablePreferences = {

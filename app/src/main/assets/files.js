@@ -30,7 +30,7 @@ function onItemClick(evt) {
         return;
     }
     if (path.endsWith(".pdf")) {
-        window.location = `/view.html?path=${encodeURIComponent(path)}`
+        window.location = `/viewer.html?path=${encodeURIComponent(path)}`
         return;
     }
     if (path.endsWith(".srt")) {

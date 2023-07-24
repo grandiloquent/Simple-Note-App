@@ -154,6 +154,14 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     std::map<std::string, std::string> t{};
     httplib::Server server;
+
+    server.Get(R"(/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?)",
+               [&](const httplib::Request &req, httplib::Response &res) {
+                   fs::path p{"/storage/emulated/0/.editor"};
+                   p.append(req.path.substr(1));
+                   serveFile(p, res, t);
+               }
+    );
     server.Get(R"(/(.+\.(?:js|css|html|png|jpg|jpeg|gif|json|svg))?)",
                [&t, mgr](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
@@ -434,13 +442,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         ofs << image_file.content;
         res.set_content(SubstringAfterLast(image, "/"), "text/plain");
     });
-    server.Get(R"(/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?)",
-               [&](const httplib::Request &req, httplib::Response &res) {
-                   fs::path p{"/storage/emulated/0/.editor"};
-                   p.append(req.path.substr(1));
-                   serveFile(p, res, t);
-               }
-    );
+
     server.Get("/trans", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto q = req.get_param_value("q");

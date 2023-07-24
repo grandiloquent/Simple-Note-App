@@ -153,9 +153,9 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     db::query<table>();
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     std::map<std::string, std::string> t{};
-    httplib::Server server;
+    httplib::Server serve
 
-    server.Get(R"(/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?)",
+    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
                [&](const httplib::Request &req, httplib::Response &res) {
                    fs::path p{"/storage/emulated/0/.editor"};
                    p.append(req.path.substr(1));

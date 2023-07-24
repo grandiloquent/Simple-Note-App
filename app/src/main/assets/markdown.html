@@ -858,6 +858,10 @@ svg+.article-header-infos-text {
 }
 .header[inputting] .clear-button {
     display: flex;
+}
+
+.header[inputting] .header-search-form{
+    margin-right: 8px;
 }</style></head>
 
 <body>
@@ -909,9 +913,7 @@ svg+.article-header-infos-text {
             <div class="article-content">
                 <div class="article-header">
                     <div class="article-header-top">
-                        <h1 class="article-header-title">
-                            简约而不简单——大众点评+小程序开发经验谈
-                        </h1>
+                        <h1 class="article-header-title"></h1>
                     </div>
                     <div class="article-header-bottom">
                         <div class="article-header-detail">
@@ -922,9 +924,7 @@ svg+.article-header-infos-text {
                                         <path d="M7.97304,2.55286 C7.49865,2.55286 7.03491,2.69353 6.64046,2.95709 C6.24602,3.22065 5.93859,3.59525 5.75704,4.03354 C5.5755,4.47182 5.528,4.95409 5.62055,5.41937 C5.7131,5.88465 5.94154,6.31203 6.27699,6.64748 C6.61244,6.98293 7.03982,7.21137 7.5051,7.30392 C7.97038,7.39647 8.45265,7.34897 8.89093,7.16743 C9.32922,6.98588 9.70382,6.67845 9.96738,6.28401 C10.2309,5.88956 10.3716,5.42582 10.3716,4.95143 C10.3716,4.31529 10.1189,3.7052 9.66909,3.25538 C9.21927,2.80556 8.60918,2.55286 7.97304,2.55286 Z M7.97304,6.32716 C7.70095,6.32716 7.43496,6.24647 7.20872,6.09531 C6.98249,5.94414 6.80616,5.72928 6.70203,5.4779 C6.59791,5.22652 6.57066,4.94991 6.62374,4.68304 C6.67683,4.41617 6.80785,4.17104 7.00025,3.97864 C7.19265,3.78625 7.43778,3.65522 7.70465,3.60214 C7.97151,3.54905 8.24813,3.5763 8.49951,3.68042 C8.75089,3.78455 8.96575,3.96088 9.11692,4.18712 C9.26808,4.41335 9.34877,4.67934 9.34877,4.95143 C9.35012,5.13295 9.31553,5.31295 9.247,5.48104 C9.17846,5.64913 9.07734,5.802 8.94946,5.93084 C8.82158,6.05967 8.66946,6.16192 8.50188,6.2317 C8.3343,6.30147 8.15457,6.33739 7.97304,6.33739 L7.97304,6.32716 Z" id="形状"></path>
                                     </g>
                                 </svg>
-                                <div class="article-header-infos-text">
-                                    6.7K
-                                </div>
+                                <div class="article-header-infos-text"></div>
                                 <div class="article-header-infos-text article-header-infos-text-date">
                                     修改于 <span></span>
                                 </div>
@@ -1050,7 +1050,8 @@ function bindHeaderSearchInput() {
 }
 function bindClearButton() {
     document.querySelector('.clear-button').addEventListener('click', evt => {
-        headerSearchInput.value = ''
+        headerSearchInput.value = '';
+        header.removeAttribute('inputting');
     });
 }
 </script></body>

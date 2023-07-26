@@ -157,6 +157,17 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
     server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
                [&](const httplib::Request &req, httplib::Response &res) {
+                   if (!req.get_header_value("Referer").empty()) {
+                       auto referer = req.get_header_value("Referer");
+                       std::filesystem::path p(
+                               SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
+                       p = p.parent_path();
+                       p = p.append(req.path.substr(1));
+                       if (fs::exists(p)) {
+                           serveFile(p, res, t);
+                           return;
+                       }
+                   }
                    fs::path p{"/storage/emulated/0/.editor"};
                    p.append(req.path.substr(1));
                    serveFile(p, res, t);
@@ -409,7 +420,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (!fs::exists(dir)) {
             fs::create_directory(dir);
         }
-       // 初始化解压对象
+        // 初始化解压对象
         Unzipper unzipper(path);
         bool result = unzipper.extract(dir);
         if (result) {

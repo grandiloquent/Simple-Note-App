@@ -107,23 +107,29 @@ var node = document.getElementById('my-node');
 const text = document.querySelector('.text');
 const textarea = document.querySelector('textarea');
 textarea.addEventListener('input', evt => {
-    text.innerHTML=textarea.value.split('\n')
-    .map(v=>`<p>${v}</p>`).join('');
+    text.innerHTML = textarea.value.split('\n')
+        .map(v => `<p>${v}</p>`).join('');
     buildImage()
 });
 
 file.addEventListener('change', evt => {
     const reader = new FileReader();
     reader.addEventListener("load", function () { // Setting up base64 URL on image
-        img.src = reader.result;
-        img.onload = () => {
-            const width = Math.min(img.naturalWidth, 800);
-            node.style.width = width + "px";
-            if (width > 400) {
-                node.style.fontSize = '28px';
-                text.style.padding = '24px';
+        if (!img.src) {
+            img.src = reader.result;
+            img.onload = () => {
+                const width = Math.min(img.naturalWidth, 800);
+                node.style.width = width + "px";
+                if (width > 400) {
+                    node.style.fontSize = '28px';
+                    text.style.padding = '24px';
+                }
+
             }
-            
+        }else{
+            const newImg=document.createElement('img');
+            newImg.src = reader.result;
+            img.insertAdjacentElement('afterend',newImg);
         }
     }, false);
     reader.readAsDataURL(file.files[0]);

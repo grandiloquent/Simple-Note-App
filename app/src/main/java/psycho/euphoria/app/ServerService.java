@@ -81,6 +81,8 @@ public class ServerService extends Service {
 
     public static native String startServer(ServerService service, AssetManager assetManager, String host, int port);
 
+    public static native String dic(String q);
+
     private void initialSharedPreferences() {
         File dir = new File(Environment.getExternalStorageDirectory(), ".editor");
         if (!dir.exists()) {

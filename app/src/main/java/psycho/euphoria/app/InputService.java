@@ -198,6 +198,18 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
         return stringBuilder.toString();
     }
 
+    public static String translateChineseWord(String q, Database database) throws Exception {
+        String result = database.query(q);
+        if (result != null) {
+            return result;
+        }
+        result = ServerService.dic(q);
+        if (result != null && result.length() > 0) {
+            database.insert(q, result);
+        }
+        return result;
+    }
+
     public static String translateCollegiate(String q, Database database) throws Exception {
         String result = database.query(q);
         if (result != null) {
@@ -247,7 +259,10 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                     new Thread(() -> {
                         String response = "";
                         try {
-                            response = mCurrentString.contains(" ") ? translate("zh", mCurrentString) : translateWord(mCurrentString, mDatabase);
+                            response = mCurrentString.contains(" ") ? translate("zh", mCurrentString) : translateChineseWord(mCurrentString, mDatabase);
+                            if (response == null) {
+                                response = translateWord(mCurrentString, mDatabase);
+                            }
                             if (response == null) {
                                 response = translateCollegiate(mCurrentString, mDatabase);
                             }
@@ -276,7 +291,7 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
             }
         });
         mDatabase = new Database(this,
-                new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "psycho.db").getAbsolutePath());
+                new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "p.db").getAbsolutePath());
 
     }
 

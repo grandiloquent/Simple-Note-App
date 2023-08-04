@@ -42,3 +42,25 @@ Java_psycho_euphoria_app_MainActivity_request(JNIEnv *env, jclass obj) {
     mbedtls_ctr_drbg_init(&ctx);
     return true;
 }
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jstring q) {
+    const std::string w = jsonparse::jni::Convert<std::string>::from(env, q);
+    auto str = Dic(w);
+    nlohmann::json js = nlohmann::json::parse(str);
+    if (js.contains("errorCode") && js["errorCode"] == "0") {
+        if (js.contains("basic")) {
+            std::stringstream ss;
+            for (auto &explain: js["basic"]["explains"]) {
+                ss << explain << "\n";
+            }
+            jstring result;
+            result = env->NewStringUTF(ss.str().c_str());
+            return result;
+
+        }
+    }
+
+    return nullptr;
+}

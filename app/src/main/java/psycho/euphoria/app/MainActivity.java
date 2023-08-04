@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.Process;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -162,7 +163,7 @@ public class MainActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mWebView.loadUrl(mUrl );
+                        mWebView.loadUrl(mUrl);
                     }
                 });
             }
@@ -187,6 +188,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
+
     }
 
     @Override

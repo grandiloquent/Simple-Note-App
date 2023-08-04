@@ -173,7 +173,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    serveFile(p, res, t);
                }
     );
-    server.Get(R"(/(.+\.(?:js|css|html|png|jpg|jpeg|gif|json|svg))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|xhtml|png|jpg|jpeg|gif|json|svg))?)",
                [&t, mgr](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
 

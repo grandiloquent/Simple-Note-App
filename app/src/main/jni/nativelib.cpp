@@ -53,7 +53,7 @@ Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jstring q)
         if (js.contains("basic")) {
             std::stringstream ss;
             for (auto &explain: js["basic"]["explains"]) {
-                ss << explain << "\n";
+                ss <<  explain.get<std::string>() << "\n";
             }
             jstring result;
             result = env->NewStringUTF(ss.str().c_str());

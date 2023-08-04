@@ -1,11 +1,21 @@
 #include "server.h"
 #include "unzipper.h"
+#include "utils.h"
 
 static const char db_name[] = "/storage/emulated/0/.editor/app.db";
 using db = sqlite::Database<db_name>;
 
 void serveFile(const std::filesystem::path &p, httplib::Response &res,
                const std::map<std::string, std::string> t) {
+
+    if (p.extension().string() == ".html" || p.extension().string() == ".xhtml") {
+        auto s = ReadAllText(p);
+        s = ReplaceFirst(s, "</head>",
+                         R"(<meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
+        res.set_content(s, "text/html");
+        return;
+    }
+
     std::shared_ptr<std::ifstream> fs = std::make_shared<std::ifstream>();
     fs->exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
@@ -141,6 +151,10 @@ void mergeSubtitles(const std::string &dir) {
     out.close();
 }
 
+static void serveTextContent(const httplib::Request &req, httplib::Response &res) {
+
+}
+
 void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int port) {
     static const char table[]
             = R"(CREATE TABLE IF NOT EXISTS "favorite" (
@@ -157,38 +171,27 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
     server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
                [&](const httplib::Request &req, httplib::Response &res) {
-                   if (!req.get_header_value("Referer").empty()) {
-                       auto referer = req.get_header_value("Referer");
-                       std::filesystem::path p(
-                               SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
-                       p = p.parent_path();
-                       p = p.append(req.path.substr(1));
-                       if (fs::exists(p)) {
-                           serveFile(p, res, t);
-                           return;
-                       }
+                   res.set_header("Access-Control-Allow-Origin", "*");
+
+                   auto file = FindFile(req);
+                   if (is_regular_file(file)) {
+                       serveFile(file, res, t);
+                       return;
                    }
                    fs::path p{"/storage/emulated/0/.editor"};
                    p.append(req.path.substr(1));
                    serveFile(p, res, t);
                }
     );
-    server.Get(R"(/(.+\.(?:js|css|html|xhtml|png|jpg|jpeg|gif|json|svg))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
                [&t, mgr](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
 
-                   if (!req.get_header_value("Referer").empty()) {
-                       auto referer = req.get_header_value("Referer");
-                       std::filesystem::path p(
-                               SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
-                       p = p.parent_path();
-                       p = p.append(req.path.substr(1));
-                       if (fs::exists(p)) {
-                           serveFile(p, res, t);
-                           return;
-                       }
+                   auto file = FindFile(req);
+                   if (is_regular_file(file)) {
+                       serveFile(file, res, t);
+                       return;
                    }
-
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
                    auto str = std::string{}; //m[p];
 
@@ -591,3 +594,4 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 }
 
 // https://github.com/yhirose/cpp-httplib
+

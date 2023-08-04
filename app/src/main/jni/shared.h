@@ -33,6 +33,10 @@ std::string SubstringBeforeLast(const std::string &s, const std::string &start);
 
 std::string GetLocalIp();
 std::string EncodeUrl(const std::string &s);
+void ReplaceAll(std::string& in_out, const std::string& search, const std::string& substitute);
+std::string ReplaceFirst(std::string str, std::string_view token, std::string_view to);
+std::vector<std::string> ReadAllLines(const std::string &filepath);
+std::string ReadAllText(const std::string& filepath);
 #endif
 /*
 add_library(shared SHARED shared.cpp)

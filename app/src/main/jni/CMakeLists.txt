@@ -33,7 +33,7 @@ add_library(extractor SHARED extractor.cpp)
 target_link_libraries(extractor httplib nlohmann_json::nlohmann_json shared)
 
 add_subdirectory(zipper)
-add_library(server SHARED server.cpp)
+add_library(server SHARED server.cpp utils.cpp)
 
 target_link_libraries(server httplib shared android sqlite3 nlohmann_json::nlohmann_json extractor Zipper)
 target_include_directories(server PRIVATE zipper/zipper)

@@ -1,3 +1,5 @@
+#include <regex>
+#include <fstream>
 #include "shared.h"
 
 
@@ -131,3 +133,50 @@ std::string EncodeUrl(const std::string &s) {
 
     return result;
 }
+
+void ReplaceAll(std::string& in_out, const std::string& search, const std::string& substitute)
+{
+    if (search.empty()) return;
+    in_out = std::regex_replace(in_out, std::regex(search), substitute);
+}
+std::string ReplaceFirst(std::string str, std::string_view token, std::string_view to) {
+    const auto startPos = str.find(token);
+    if (startPos == std::string::npos)
+        return str;
+
+    str.replace(startPos, token.length(), to);
+    return str;
+}
+
+std::vector<std::string> ReadAllLines(const std::string& filepath)
+{
+    std::ifstream file(filepath);
+    std::string str;
+    std::vector<std::string> lines;
+
+    while (std::getline(file, str))
+    {
+        lines.push_back(str);
+    }
+
+    if(file.is_open())
+        file.close();
+    return lines;
+}
+std::string ReadAllText(const std::string& filepath)
+{
+    std::ifstream file(filepath);
+    std::string str;
+    std::string file_contents;
+
+    while (std::getline(file, str))
+    {
+        file_contents += str;
+        file_contents.push_back('\n');
+    }
+
+    if(file.is_open())
+        file.close();
+    return file_contents;
+}
+

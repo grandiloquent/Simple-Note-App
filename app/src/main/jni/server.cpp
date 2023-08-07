@@ -186,13 +186,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
                [&t, mgr](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
-
-                   auto file = FindFile(req);
-                   if (is_regular_file(file)) {
-                       serveFile(file, res, t);
-                       return;
-                   }
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
+                   if (!p.ends_with(".html")) {
+                       auto file = FindFile(req);
+                       if (is_regular_file(file)) {
+                           serveFile(file, res, t);
+                           return;
+                       }
+                   }
+
                    auto str = std::string{}; //m[p];
 
                    if (str.empty()) {

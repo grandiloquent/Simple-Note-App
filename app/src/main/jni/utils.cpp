@@ -22,6 +22,11 @@ std::filesystem::path FindFile(const httplib::Request &req) {
         if (exists(p)) {
             return p;
         }
+        dir = std::filesystem::path{"/storage/emulated/0/.editor"};
+        p = dir.append(req.path.substr(1));
+        if (exists(p)) {
+            return p;
+        }
 
     }
     return std::filesystem::path{};

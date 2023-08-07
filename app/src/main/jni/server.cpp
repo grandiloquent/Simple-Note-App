@@ -169,20 +169,19 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     std::map<std::string, std::string> t{};
     httplib::Server server;
 
-    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
-               [&](const httplib::Request &req, httplib::Response &res) {
-                   res.set_header("Access-Control-Allow-Origin", "*");
-
-                   auto file = FindFile(req);
-                   if (is_regular_file(file)) {
-                       serveFile(file, res, t);
-                       return;
-                   }
-                   fs::path p{"/storage/emulated/0/.editor"};
-                   p.append(req.path.substr(1));
-                   serveFile(p, res, t);
-               }
-    );
+//    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
+//               [&](const httplib::Request &req, httplib::Response &res) {
+//                   res.set_header("Access-Control-Allow-Origin", "*");
+//
+//                   auto file = FindFile(req);
+//
+//                   if (is_regular_file(file)) {
+//                       serveFile(file, res, t);
+//                       return;
+//                   }
+//
+//               }
+//    );
     server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
                [&t, mgr](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");

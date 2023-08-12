@@ -332,7 +332,7 @@ function sortLines() {
         let tmp = checkNextLine(s, end + 1, l => {
             return l.trim().length > 0;
         });
-        
+
         if (tmp) {
             end = tmp;
         } else {
@@ -342,12 +342,12 @@ function sortLines() {
 
 
     textarea.setRangeText(textarea.value.slice(start, end + 1)
-    .split('\n')
-    .sort((a, b) =>{
-        return  substringAfter(a,'(').localeCompare(
-            substringAfter(b,'('))
-    })
-    .join('\n'), start, end + 1);
+        .split('\n')
+        .sort((a, b) => {
+            return substringAfter(a, '(').localeCompare(
+                substringAfter(b, '('))
+        })
+        .join('\n'), start, end + 1);
 }
 ///////////////////////////////
 const textarea = document.querySelector('textarea');
@@ -495,7 +495,7 @@ ${await readText()}
 
             //             `, textarea.selectionStart,
             //                 textarea.selectionEnd, 'end')
-            window.open(`/markdown.html?id=${id}`);
+            window.open(`/markdown.html?id=${id}`, '_blank');
         } else if (evt.key === 's') {
             evt.preventDefault();
             saveNote()
@@ -526,6 +526,10 @@ ${await readText()}
         } else if (evt.key === 'k') {
             evt.preventDefault();
             sortLines();
+        } else if (evt.key === "r") {
+            const start = textarea.selectionStart;
+            textarea.value = `${textarea.value.substring(0, start)}
+${await readText()}`
         }
     } else if (evt.key === 'F1') {
         evt.preventDefault();

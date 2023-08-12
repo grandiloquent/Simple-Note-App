@@ -11,7 +11,7 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
     if (p.extension().string() == ".html" || p.extension().string() == ".xhtml") {
         auto s = ReadAllText(p);
         s = ReplaceFirst(s, "</head>",
-                         R"(<meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
+                         R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
         res.set_content(s, "text/html");
         return;
     }

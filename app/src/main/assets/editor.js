@@ -76,7 +76,7 @@ async function loadNote(baseUri, id) {
 }
 
 async function renderNote() {
-    const res = await loadNote(getBaseUri(), id);
+    const res = await loadNote(baseUri, id);
     document.title = res["title"];
     textarea.value = `${res["title"]}
     
@@ -111,7 +111,7 @@ async function saveNote() {
     // document.getElementById('toast').setAttribute('message', '成功');
     let res;
     try {
-        res = await fetch(`${getBaseUri()}/note`, {
+        res = await fetch(`${baseUri}/note`, {
             method: 'POST',
             body: JSON.stringify(body)
         });
@@ -171,13 +171,14 @@ function findCodeBlock(fn) {
 async function insertLinkWithTitle() {
     let res;
     try {
+        const start=textarea.selectionStart;
         const str = await readText();
         res = await fetch(`${getBaseUri()}/title?path=${encodeURIComponent(str)}`);
         if (res.status !== 200) {
             throw new Error();
         }
 
-        textarea.setRangeText(`- [${(await res.text()).trim()}](${str})`, textarea.selectionStart, textarea.selectionEnd);
+        textarea.setRangeText(`- [${(await res.text()).trim()}](${str})`, start, start);
     } catch (error) {
         console.log(error);
         toast.setAttribute('message', '错误');
@@ -344,8 +345,8 @@ function sortLines() {
     textarea.setRangeText(textarea.value.slice(start, end + 1)
         .split('\n')
         .sort((a, b) => {
-            return substringAfter(a, '(').localeCompare(
-                substringAfter(b, '('))
+            return a.localeCompare(b);
+            //substringAfter(a, '(').localeCompare(substringAfter(b, '('))
         })
         .join('\n'), start, end + 1);
 }
@@ -527,6 +528,7 @@ ${await readText()}
             evt.preventDefault();
             sortLines();
         } else if (evt.key === "r") {
+            evt.preventDefault();
             const start = textarea.selectionStart;
             textarea.value = `${textarea.value.substring(0, start)}
 ${await readText()}`

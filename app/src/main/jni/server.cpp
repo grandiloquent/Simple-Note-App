@@ -208,7 +208,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    res.set_content(str, content_type);
                });
     server.Get("/notes", [](const httplib::Request &req, httplib::Response &res) {
-
+        res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]
                 = R"(SELECT id,title,update_at FROM note WHERE start = 0 ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();
@@ -241,7 +241,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(doc.dump(), "application/json");
     });
     server.Get("/todo/list", [](const httplib::Request &req, httplib::Response &res) {
-
+        res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]
                 = R"(SELECT id,title,start,status,update_at FROM note WHERE start > 0 ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();

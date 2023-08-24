@@ -401,20 +401,32 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(buffer, "text/plain");
     });
     server.Get("/zip", [](const httplib::Request &req, httplib::Response &res) {
-        auto path = req.get_param_value("path");
-        std::vector<unsigned char> zip_vect;
-        Zipper zipper(zip_vect);
-        for (const fs::directory_entry &dir_entry:
-                fs::recursive_directory_iterator(path)) {
-            if (dir_entry.is_regular_file()) {
-                std::ifstream input(dir_entry.path());
-                zipper.add(input, dir_entry.path().string().substr(path.length() + 1));
-            }
+        auto path = std::filesystem::path{req.get_param_value("path")};
+        if (is_directory(path)) {
+            Zipper zipper(path.parent_path().string() + "/" + path.filename().string() + ".zip");
+            auto length = path.string().length() + 1;
+            for (const fs::directory_entry &dir_entry:
+                    fs::recursive_directory_iterator(path)) {
+                if (dir_entry.is_regular_file()) {
+                    std::ifstream input(dir_entry.path());
+                    zipper.add(input, dir_entry.path().string().substr(length));
+                }
 
+            }
         }
-        zipper.close();
-        res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
-                        "application/zip");
+//        std::vector<unsigned char> zip_vect;
+//        Zipper zipper(zip_vect);
+//        for (const fs::directory_entry &dir_entry:
+//                fs::recursive_directory_iterator(path)) {
+//            if (dir_entry.is_regular_file()) {
+//                std::ifstream input(dir_entry.path());
+//                zipper.add(input, dir_entry.path().string().substr(path.length() + 1));
+//            }
+//
+//        }
+     zipper.close();
+//        res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
+//                        "application/zip");
     });
     // 解压压缩文件
     server.Get("/unzip", [](const httplib::Request &req, httplib::Response &res) {

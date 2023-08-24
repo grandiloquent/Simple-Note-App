@@ -62,7 +62,7 @@
                         <path d="M15.984 6h2.016v12h-2.016v-12zM6 18v-12l8.484 6z"></path>
                     </svg>
                 </div>
-                
+
                 <div id="random-play">
                     <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
                         style="pointer-events: none; display: block; width: 100%; height: 100%;">
@@ -112,6 +112,94 @@
     <script src="custom-toast.js"></script>
     <custom-toast id="toast"></custom-toast>
     <script src="custom-dialog.js"></script>
+    <script>
+        function adjustSize(video) {
+            if (video.videoWidth > 0) {
+                const w = Math.min(window.outerWidth, window.innerWidth);
+                const h = Math.min(window.outerHeight, window.innerHeight);
+                let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
+                let height = video.videoHeight * ratio
+                let width = video.videoWidth * ratio;
+                video.style.width = `${width}px`;
+                video.style.height = `${height}px`;
+                video.style.left = `${(w - width) / 2}px`;
+                video.style.top = `${(h - height) / 2}px`
+            }
+        }
+        function formatDuration(ms) {
+            if (isNaN(ms)) return '0:00';
+            if (ms < 0) ms = -ms;
+            const time = {
+                hour: Math.floor(ms / 3600) % 24,
+                minute: Math.floor(ms / 60) % 60,
+                second: Math.floor(ms) % 60,
+            };
+            return Object.entries(time)
+                .filter((val, index) => index || val[1])
+                .map(val => (val[1] + '').padStart(2, '0'))
+                .join(':');
+        }
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
+        function jumpToBookmark(video) {
+            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
+            const currentTime = parseFloat(obj[path]);
+            if (currentTime) {
+                video.currentTime = currentTime;
+            }
+        }
+        function playVideo(baseUri, video, path) {
+            document.title = substringAfterLast(path, "/");
+            toast.setAttribute('message', document.title);
+            video.load();
+            video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
+            video.play();
+        }
+        async function showVideoList(baseUri, path, video) {
+            const dialog = document.createElement('custom-dialog');
+            dialog.setAttribute('title', '视频列表');
+            const d = document.createElement('div');
+            videos.forEach(v => {
+                const div = document.createElement('div');
+                div.style.alignItems = "center";
+                div.style.boxSizing = "border-box";
+                div.style.minHeight = "43px";
+                div.style.display = "flex";
+                div.style.padding = "8px 0";
+                div.style.borderTop = "1px solid rgb(218,220,224)";
+                div.setAttribute("data-src", v.path);
+                d.appendChild(div);
+                div.textContent = substringAfterLast(v.path, "/");
+                div.addEventListener('click', evt => {
+                    playVideo(baseUri, video, evt.currentTarget.dataset.src);
+                    video.play();
+                    jumpToBookmark(video);
+                    dialog.remove();
+                });
+            })
+            dialog.appendChild(d);
+            document.body.appendChild(dialog);
+        }
+        function substringAfterLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(index + delimiter.length);
+            }
+        }
+        function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(0, index);
+            }
+        }
+    </script>
     <script type="module" src="video.js"></script>
 </body>
 

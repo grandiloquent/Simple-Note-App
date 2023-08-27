@@ -507,7 +507,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    auto path = std::filesystem::path{req.get_param_value("path")};
                    if (is_directory(path)) {
                        for (const fs::directory_entry &dir_entry:
-                               fs::recursive_directory_iterator(path)) {
+                               fs::directory_iterator(path)) {
                            if (dir_entry.is_regular_file()) {
                                auto s = dir_entry.path().extension().string();
                                auto w = std::filesystem::path{path.string()};

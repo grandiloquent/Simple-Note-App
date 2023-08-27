@@ -511,12 +511,13 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                            if (dir_entry.is_regular_file()) {
                                auto s = dir_entry.path().extension().string();
                                auto w = std::filesystem::path{path.string()};
-                               w /= std::string{"."} + std::transform(s.begin(), s.end(),
-                                                                      s.begin(),
-                                                                      [](unsigned char c) {
-                                                                          return static_cast<char>(std::toupper(
-                                                                                  c));
-                                                                      });
+                               std::transform(s.begin(), s.end(),
+                                              s.begin(),
+                                              [](unsigned char c) {
+                                                  return static_cast<char>(std::toupper(
+                                                          c));
+                                              });
+                               w /= s;
                                if (!is_directory(w)) {
                                    std::filesystem::create_directory(w);
                                }
@@ -528,222 +529,218 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
                        }
                    };
-               }
+               });
+    server.Get("/files",
+               [](
+                       const httplib::Request &req, httplib::Response
+               &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto path = req.get_param_value("path");
+                   std::filesystem::path p(httplib::detail::decode_url(path, true));
+                   nlohmann::json doc = nlohmann::json::array();
+                   for (
+                       auto const &dir
+                           : std::filesystem::directory_iterator{
+                           p}) {
+                       nlohmann::json j = {
 
-}
+                               {"path",          dir.path().string()},
+                               {"isDirectory",   dir.is_directory()},
+                               {"lastWriteTime", std::chrono::duration_cast<std::chrono::seconds>(
+                                       dir.last_write_time().time_since_epoch()).count()
+                               },
+                               {
+                                "length",        dir.is_directory() ? 0 : dir.file_size()
+                               }
+                       };
+                       doc.
+                               push_back(j);
+                   }
+                   res.
+                           set_content(doc
+                                               .
 
-);
-server.Get("/files",
-[](
-const httplib::Request &req, httplib::Response
-&res) {
-res.set_header("Access-Control-Allow-Origin", "*");
-auto path = req.get_param_value("path");
-std::filesystem::path p(httplib::detail::decode_url(path, true));
-nlohmann::json doc = nlohmann::json::array();
-for (
-auto const &dir
-: std::filesystem::directory_iterator{
-p}) {
-nlohmann::json j = {
+                                                       dump(),
 
-        {"path",          dir.path().string()},
-        {"isDirectory",   dir.is_directory()},
-        {"lastWriteTime", std::chrono::duration_cast<std::chrono::seconds>(
-                dir.last_write_time().time_since_epoch()).count()
-        },
-        {
-         "length",        dir.is_directory() ? 0 : dir.file_size()
+                                       "application/json");
+               });
+    server.Post("/file/delete", [](
+            const httplib::Request &req, httplib::Response
+    &res,
+            const httplib::ContentReader &content_reader
+    ) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](
+                const char *data, size_t
+        data_length) {
+            body.
+                    append(data, data_length
+            );
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        for (
+            const auto &i
+                : doc) {
+            fs::remove_all(i);
         }
-};
-doc.
-push_back(j);
-}
-res.
-set_content(doc
-.
+    });
+    server.Post("/file/move", [](
+            const httplib::Request &req, httplib::Response
+    &res,
+            const httplib::ContentReader &content_reader
+    ) {
+        res.set_header("Access-Control-Allow-Origin", "*");
 
-dump(),
+        std::string body;
+        content_reader([&](
+                const char *data, size_t
+        data_length) {
+            body.
+                    append(data, data_length
+            );
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        auto dst = req.get_param_value("dst");
+        for (
+            const auto &i
+                : doc) {
+            fs::path d{dst};
+            d = d.append(SubstringAfterLast(i, "/"));
+            fs::rename(i, d
+            );
+        }
+    });
+    server.Get("/file/rename", [](
+            const httplib::Request &req, httplib::Response
+    &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        auto dst = req.get_param_value("dst");
+        fs::rename(path, dst
+        );
+    });
+    server.Get("/file/new_file", [](
+            const httplib::Request &req, httplib::Response
+    &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        if (!
+                fs::exists(path)
+                )
+            std::ofstream f(path);
+    });
+    server.Get("/file/new_dir", [](
+            const httplib::Request &req, httplib::Response
+    &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        if (!
+                fs::exists(path)
+                )
+            fs::create_directory(path);
+    });
+    server.Post("/upload", [&](
+            const auto &req,
+            auto &res
+    ) {
+        res.set_header("Access-Control-Allow-Origin", "*");
 
-"application/json");
-});
-server.Post("/file/delete", [](
-const httplib::Request &req, httplib::Response
-&res,
-const httplib::ContentReader &content_reader
-) {
-res.set_header("Access-Control-Allow-Origin", "*");
+        std::string f{req.get_file_value("path").content};
+        std::ofstream ofs(f, std::ios::binary);
+        ofs << req.get_file_value("file").
+                content;
+        res.set_content("Success", "text/plain");
+    });
+    server.Get("/recycle",
+               [](
+                       const httplib::Request &req, httplib::Response
+               &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto path = req.get_param_value("path");
+                   std::filesystem::path p(httplib::detail::decode_url(path, true));
+                   auto parent = p.parent_path();
+                   for (
+                       const fs::directory_entry &dir_entry
+                           :
+                           fs::recursive_directory_iterator(parent)
+                           ) {
+                       if (dir_entry.
 
-std::string body;
-content_reader([&](
-const char *data, size_t
-data_length) {
-body.
-append(data, data_length
-);
-return true;
-});
-nlohmann::json doc = nlohmann::json::parse(body);
-for (
-const auto &i
-: doc) {
-fs::remove_all(i);
-}
-});
-server.Post("/file/move", [](
-const httplib::Request &req, httplib::Response
-&res,
-const httplib::ContentReader &content_reader
-) {
-res.set_header("Access-Control-Allow-Origin", "*");
+                               is_regular_file() &&
 
-std::string body;
-content_reader([&](
-const char *data, size_t
-data_length) {
-body.
-append(data, data_length
-);
-return true;
-});
-nlohmann::json doc = nlohmann::json::parse(body);
-auto dst = req.get_param_value("dst");
-for (
-const auto &i
-: doc) {
-fs::path d{dst};
-d = d.append(SubstringAfterLast(i, "/"));
-fs::rename(i, d
-);
-}
-});
-server.Get("/file/rename", [](
-const httplib::Request &req, httplib::Response
-&res) {
-res.set_header("Access-Control-Allow-Origin", "*");
-auto path = req.get_param_value("path");
-auto dst = req.get_param_value("dst");
-fs::rename(path, dst
-);
-});
-server.Get("/file/new_file", [](
-const httplib::Request &req, httplib::Response
-&res) {
-res.set_header("Access-Control-Allow-Origin", "*");
-auto path = req.get_param_value("path");
-if (!
-fs::exists(path)
-)
-std::ofstream f(path);
-});
-server.Get("/file/new_dir", [](
-const httplib::Request &req, httplib::Response
-&res) {
-res.set_header("Access-Control-Allow-Origin", "*");
-auto path = req.get_param_value("path");
-if (!
-fs::exists(path)
-)
-fs::create_directory(path);
-});
-server.Post("/upload", [&](
-const auto &req,
-auto &res
-) {
-res.set_header("Access-Control-Allow-Origin", "*");
+                           (dir_entry.
 
-std::string f{req.get_file_value("path").content};
-std::ofstream ofs(f, std::ios::binary);
-ofs << req.get_file_value("file").
-content;
-res.set_content("Success", "text/plain");
-});
-server.Get("/recycle",
-[](
-const httplib::Request &req, httplib::Response
-&res) {
-res.set_header("Access-Control-Allow-Origin", "*");
-auto path = req.get_param_value("path");
-std::filesystem::path p(httplib::detail::decode_url(path, true));
-auto parent = p.parent_path();
-for (
-const fs::directory_entry &dir_entry
-:
-fs::recursive_directory_iterator(parent)
-) {
-if (dir_entry.
+                                           path()
 
-is_regular_file() &&
+                                    .
 
-(dir_entry.
+                                            extension()
 
-path()
+                            == ".mp4" ||
+                            dir_entry.
 
-.
+                                            path()
 
-extension()
+                                    .
 
-== ".mp4" ||
-dir_entry.
+                                            extension()
 
-path()
+                            == ".mov" ||
+                            dir_entry.
 
-.
+                                            path()
 
-extension()
+                                    .
 
-== ".mov" ||
-dir_entry.
+                                            extension()
 
-path()
+                            == ".MOV" ||
+                            dir_entry.
 
-.
+                                            path()
 
-extension()
+                                    .
 
-== ".MOV" ||
-dir_entry.
+                                            extension()
 
-path()
+                            ==
+                            ".MP4")) {
+                           std::filesystem::path s = dir_entry.path();
+                           fs::rename(dir_entry
+                                              .
 
-.
+                                                      path(), s
 
-extension()
+                                              .replace_extension("v"));
+                       }
 
-==
-".MP4")) {
-std::filesystem::path s = dir_entry.path();
-fs::rename(dir_entry
-.
+                   }
+                   parent = parent.append("recycle");
+                   if (!
+                           fs::exists(parent)
+                           ) {
+                       fs::create_directory(parent);
+                   }
+                   fs::rename(p, parent
+                           .
+                                   append(p
+                                                  .
 
-path(), s
+                                                          filename()
 
-.replace_extension("v"));
-}
+                                                  .
 
-}
-parent = parent.append("recycle");
-if (!
-fs::exists(parent)
-) {
-fs::create_directory(parent);
-}
-fs::rename(p, parent
-.
-append(p
-.
+                                                          string()
 
-filename()
-
-.
-
-string()
-
-));
-});
-server.
-listen(host, port
-);
+                           ));
+               });
+    server.
+            listen(host, port
+    );
 }
 
 // https://github.com/yhirose/cpp-httplib

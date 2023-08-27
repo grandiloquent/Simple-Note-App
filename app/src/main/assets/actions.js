@@ -22,7 +22,7 @@ function deleteFile(path) {
     document.body.appendChild(dialog);
 }
 async function downloadDirectory(path) {
-    window.open(`${baseUri}/compress_dir?path=${encodeURIComponent(path)}`, '_blank');
+    window.open(`${baseUri}/zip?path=${encodeURIComponent(path)}`, '_blank');
 }
 function getExtension(path) {
     const index = path.lastIndexOf('.');
@@ -280,7 +280,7 @@ function showContextMenu(evt) {
             bottomSheet.remove();
             addFavorite(path);
         });
-        addContextMenuItem(bottomSheet, '下载', () => {
+        addContextMenuItem(bottomSheet, '压缩', () => {
             bottomSheet.remove();
             downloadDirectory(path);
         });

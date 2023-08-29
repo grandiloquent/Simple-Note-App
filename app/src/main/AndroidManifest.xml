@@ -47,8 +47,7 @@
         <service
             android:name=".InputService"
             android:exported="true"
-            android:permission="android.permission.BIND_INPUT_METHOD"
-            android:launchMode= "singleInstance">
+            android:permission="android.permission.BIND_INPUT_METHOD">
             <meta-data
                 android:name="android.view.im"
                 android:resource="@xml/method" />

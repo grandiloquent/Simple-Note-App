@@ -429,6 +429,33 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //        res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
 //                        "application/zip");
     });
+    server.Get("/kill", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        std::string arr[] = {"org.telegram.messenger", "com.android.contacts",
+                             "com.android.camera",
+                             "org.mozilla.firefox",
+                             "com.tencent.mm",
+                             "com.v2ray.ang",
+                             "com.miui.screenrecorder",
+                             "com.xiaomi.account"
+
+        };
+        for (const auto &cmd: arr) {
+            std::string s{"su -c am force-stop "};
+            FILE *pipeFP = popen((s + cmd).c_str(), "r");
+            std::string buffer;
+            if (pipeFP != nullptr) {
+                char buf[BUFSIZ];
+                while (fgets(buf, BUFSIZ, pipeFP) !=
+                       nullptr) {
+                    buffer += buf;
+                }
+                pclose(pipeFP);
+            }
+        }
+
+        res.set_content("Ok", "text/plain");
+    });
     // 解压压缩文件
     server.Get("/unzip", [](const httplib::Request &req, httplib::Response &res) {
         auto path = req.get_param_value("path");

@@ -437,7 +437,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                              "com.tencent.mm",
                              "com.v2ray.ang",
                              "com.miui.screenrecorder",
-                             "com.xiaomi.account"
+                             "com.xiaomi.account",
+                             "com.android.chrome",
+                             "com.duokan.readex",
+                             "com.android.email"
 
         };
         for (const auto &cmd: arr) {

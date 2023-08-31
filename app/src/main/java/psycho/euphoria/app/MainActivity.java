@@ -109,6 +109,24 @@ public class MainActivity extends Activity {
         context.startActivity(intent);
     }
 
+    private static void scanFiles(MainActivity mainActivity) {
+        File[] files = new File(Environment.getExternalStorageDirectory(), "Books").listFiles();
+        List<String> paths = new ArrayList<>();
+        for (File f : files) {
+            if (f.getName().endsWith(".jpg")
+                    || f.getName().endsWith(".jpeg")
+                    || f.getName().endsWith(".mp4"))
+                paths.add(f.getAbsolutePath());
+        }
+        if (paths.size() > 0)
+            MediaScannerConnection.scanFile(
+                    mainActivity, paths.toArray(new String[0]), new String[]{
+                            "image/*",
+                            "video/*"
+                    }, null
+            );
+    }
+
     private int checkStatus() throws Exception {
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(mUrl).openConnection();
         return httpURLConnection.getResponseCode();
@@ -126,21 +144,7 @@ public class MainActivity extends Activity {
         mWebView = initializeWebView(this);
         setWebView(mWebView);
         launchServer(this);
-        File[] files = new File(Environment.getExternalStorageDirectory(), "Books").listFiles();
-        List<String> paths = new ArrayList<>();
-        for (File f : files) {
-            if (f.getName().endsWith(".jpg")
-                    || f.getName().endsWith(".jpeg")
-                    || f.getName().endsWith(".mp4"))
-                paths.add(f.getAbsolutePath());
-        }
-        if (paths.size() > 0)
-            MediaScannerConnection.scanFile(
-                    this, paths.toArray(new String[0]), new String[]{
-                            "image/*",
-                            "video/*"
-                    }, null
-            );
+        scanFiles(this);
 //        Intent intent = getIntent();
 //        String address = getIntent().getStringExtra(KEY_ADDRESS);
 //        if (address != null) {

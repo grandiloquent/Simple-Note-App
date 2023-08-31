@@ -9,6 +9,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Process;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -27,8 +29,11 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import psycho.euphoria.app.CustomWebChromeClient;
 import psycho.euphoria.app.CustomWebViewClient;
@@ -121,6 +126,21 @@ public class MainActivity extends Activity {
         mWebView = initializeWebView(this);
         setWebView(mWebView);
         launchServer(this);
+        File[] files = new File(Environment.getExternalStorageDirectory(), "Books").listFiles();
+        List<String> paths = new ArrayList<>();
+        for (File f : files) {
+            if (f.getName().endsWith(".jpg")
+                    || f.getName().endsWith(".jpeg")
+                    || f.getName().endsWith(".mp4"))
+                paths.add(f.getAbsolutePath());
+        }
+        if (paths.size() > 0)
+            MediaScannerConnection.scanFile(
+                    this, paths.toArray(new String[0]), new String[]{
+                            "image/*",
+                            "video/*"
+                    }, null
+            );
 //        Intent intent = getIntent();
 //        String address = getIntent().getStringExtra(KEY_ADDRESS);
 //        if (address != null) {

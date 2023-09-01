@@ -431,16 +431,23 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/kill", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        std::string arr[] = {"org.telegram.messenger", "com.android.contacts",
-                             "com.android.camera",
-                             "org.mozilla.firefox",
-                             "com.tencent.mm",
-                             "com.v2ray.ang",
-                             "com.miui.screenrecorder",
-                             "com.xiaomi.account",
-                             "com.android.chrome",
-                             "com.duokan.readex",
-                             "com.android.email"
+        std::string arr[] = {"com.android.camera", "com.android.chrome", "com.zhiliaoapp.musically",
+                             "com.tiktok.plugin", "com.android.settings", "com.baidu.input_yijia",
+                             "com.chinasofti.shanghaihuateng.metroapp",
+                             "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
+                             "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
+                             "com.tencent.mm", "com.tencent.qqmusic", "com.v2ray.ang",
+                             "com.yueme.itv", "euphoria.psycho.browser",
+                             "euphoria.psycho.fileserver", "euphoria.psycho.knife",
+                             "euphoria.psycho.lynda", "euphoria.psycho.porn",
+                             "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
+                             "org.telegram.messenger", "psycho.euphoria.editor",
+                             "psycho.euphoria.source", "psycho.euphoria.notepad",
+                             "psycho.euphoria.plane", "psycho.euphoria.reader",
+                             "psycho.euphoria.translator", "psycho.euphoria.unknown",
+                             "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
+                             "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
+                             "cn.yonghui.hyd"
 
         };
         for (const auto &cmd: arr) {

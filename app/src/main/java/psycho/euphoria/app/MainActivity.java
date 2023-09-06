@@ -115,6 +115,8 @@ public class MainActivity extends Activity {
         for (File f : files) {
             if (f.getName().endsWith(".jpg")
                     || f.getName().endsWith(".jpeg")
+                    || f.getName().endsWith(".png")
+                    || f.getName().endsWith(".gif")
                     || f.getName().endsWith(".mp4"))
                 paths.add(f.getAbsolutePath());
         }

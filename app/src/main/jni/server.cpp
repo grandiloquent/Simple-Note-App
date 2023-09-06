@@ -431,8 +431,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/kill", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        std::string arr[] = {"com.android.camera", "com.android.chrome", "com.zhiliaoapp.musically",
-                             "com.tiktok.plugin", "com.android.settings", "com.baidu.input_yijia",
+        std::string arr[] = {"com.android.camera", "com.android.chrome",
+                              "com.android.settings", "com.baidu.input_yijia",
                              "com.chinasofti.shanghaihuateng.metroapp",
                              "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
                              "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
@@ -447,7 +447,9 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                              "psycho.euphoria.translator", "psycho.euphoria.unknown",
                              "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
                              "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-                             "cn.yonghui.hyd"
+                             "cn.yonghui.hyd",
+                             "com.tencent.qqmusic",
+                             "psycho.euphoria.app",
 
         };
         for (const auto &cmd: arr) {

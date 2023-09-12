@@ -47,6 +47,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -115,19 +116,14 @@ public class WebAppInterface {
             apps[i] = info.packageName;
             i++;
         }
-        return Arrays.stream(apps)
-                .sorted(String::compareTo)
-                .collect(Collectors.joining("\n"));
+        return Arrays.stream(apps).sorted(String::compareTo).collect(Collectors.joining("\n"));
     }
 
     @JavascriptInterface
     public void openFile(String path) {
         mContext.runOnUiThread(() -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(new File(path)),
-                    MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                            Shared.substringAfterLast(path, ".")
-                    ));
+            intent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(path, ".")));
             mContext.startActivity(Intent.createChooser(intent, "打开"));
         });
     }
@@ -145,24 +141,16 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void scanFile(String fileName) {
-        MediaScannerConnection.scanFile(
-                mContext, new String[]{
-                        fileName
-                }, new String[]{
-                        MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                                Shared.substringAfterLast(fileName, ".")
-                        )
-                }, new MediaScannerConnectionClient() {
-                    @Override
-                    public void onMediaScannerConnected() {
-                        Log.e("B5aOx2", String.format("onMediaScannerConnected, %s", ""));
-                    }
+        MediaScannerConnection.scanFile(mContext, new String[]{fileName}, new String[]{MimeTypeMap.getSingleton().getMimeTypeFromExtension(Shared.substringAfterLast(fileName, "."))}, new MediaScannerConnectionClient() {
+            @Override
+            public void onMediaScannerConnected() {
+                Log.e("B5aOx2", String.format("onMediaScannerConnected, %s", ""));
+            }
 
-                    @Override
-                    public void onScanCompleted(String s, Uri uri) {
-                    }
-                }
-        );
+            @Override
+            public void onScanCompleted(String s, Uri uri) {
+            }
+        });
     }
 
     @JavascriptInterface
@@ -245,8 +233,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void switchInputMethod() {
-        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
-                .showInputMethodPicker();
+        ((InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE)).showInputMethodPicker();
     }
 
     @JavascriptInterface
@@ -254,18 +241,13 @@ public class WebAppInterface {
         final StringBuilder sb = new StringBuilder();
         try {
             Thread thread = new Thread(() -> {
-                String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl="
-                        + to + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s);
+                String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=" + to + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s);
                 try {
-                    HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(
-                            new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809))
-                    );
+                    HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)));
                     h.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74");
                     h.addRequestProperty("Accept-Encoding", "gzip, deflate, br");
                     String line = null;
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(
-                            new GZIPInputStream(h.getInputStream())
-                    ));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(h.getInputStream())));
                     StringBuilder sb1 = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
                         sb1.append(line).append('\n');
@@ -290,11 +272,7 @@ public class WebAppInterface {
     public void trimVideo(String src, String dst, float start, float end) {
         new Thread(() -> {
             try {
-                startTrim(
-                        new File(src),
-                        new File(dst),
-                        (int) Math.floor(start * 1000), (int) Math.ceil(end * 1000)
-                );
+                startTrim(new File(src), new File(dst), (int) Math.floor(start * 1000), (int) Math.ceil(end * 1000));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -333,6 +311,28 @@ public class WebAppInterface {
             previous = timeOfSyncSample;
         }
         return timeOfSyncSamples[timeOfSyncSamples.length - 1];
+    }
+
+    @JavascriptInterface
+    public String getVideoAddress(String url) {
+        AtomicReference<String> result = new AtomicReference<>();
+        Thread thread = new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                String res = Shared.readString(connection);
+                res = Shared.substringAfter(res, "sl: \"");
+                res = Shared.substringBefore(res, "\"");
+                result.set(res);
+            } catch (Exception ignored) {
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return result.get();
     }
 
 }

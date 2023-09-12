@@ -130,3 +130,23 @@ std::string Dic(const std::string &q) {
         return {};
     }
 }
+
+std::string Hy(const std::string &q) {
+
+
+    auto host = Substring(q, "://", "/");
+    LOGE("%s\n%s", q.c_str(), host.c_str());
+    auto query = SubstringAfterLast(q, host);
+    httplib::SSLClient cli(SubstringBeforeLast(host, ":"),
+                           std::atoi(SubstringAfterLast(host, ":").c_str()));
+    cli.enable_server_certificate_verification(false);
+    if (auto res = cli.Get(
+            query,
+            httplib::Headers{})) {
+        auto s = res->body;
+        s = Substring(s, "sl: \"", "\"");
+        return s;
+    } else {
+        return {};
+    }
+}

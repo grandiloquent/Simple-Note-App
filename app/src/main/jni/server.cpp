@@ -381,7 +381,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get("/extract", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto url = req.get_param_value("url");
-        auto response = Tiktok(url);
+        std::string response;
+        if (url.find("hy11646.com") != std::string::npos) {
+            response = Hy(url);
+        } else {
+            response = Tiktok(url);
+        }
         res.set_content(response, "application/json");
     });
     server.Get("/su", [](const httplib::Request &req, httplib::Response &res) {
@@ -432,7 +437,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get("/kill", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         std::string arr[] = {"com.android.camera", "com.android.chrome",
-                              "com.android.settings", "com.baidu.input_yijia",
+                             "com.android.settings", "com.baidu.input_yijia",
                              "com.chinasofti.shanghaihuateng.metroapp",
                              "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
                              "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",

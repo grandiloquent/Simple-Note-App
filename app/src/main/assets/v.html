@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://fastly.jsdelivr.net/npm/hls.js@1"></script>
+    <script src="shared.js"></script>
+    <script src="custom-dialog.js"></script>
+    <style>
+        input,
+        textarea {
+            background-color: transparent;
+            padding-bottom: 4px;
+            outline: none;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 1px;
+            font: inherit;
+            color: #0f0f0f
+        }
+
+        input::-webkit-input-placeholder,
+        textarea::-webkit-input-placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 8.4rem;
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px
+        }
+
+        input {
+            border-bottom: 1px solid #737373;
+            text-overflow: ellipsis
+        }
+
+        input:focus {
+            margin-bottom: 0;
+            border-bottom-width: 2px;
+            border-bottom-color: #0f0f0f
+        }
+
+        label {
+            position: absolute;
+            clip: rect(1px, 1px, 1px, 1px);
+            -webkit-clip-path: inset(0px 0px 99.9% 99.9%);
+            clip-path: inset(0px 0px 99.9% 99.9%);
+            overflow: hidden;
+            height: 1px;
+            width: 1px;
+            padding: 0;
+            border: 0
+        }
+
+        input[type=range] {
+            --progress: 0%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            height: var(--progress-track-max-height, auto);
+            display: block;
+            border: 0;
+            background-color: transparent;
+            cursor: pointer;
+            -webkit-appearance: none;
+            box-sizing: content-box;
+            position: relative;
+            z-index: 1
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: var(--progress-thumb-width, var(--progress-thumb-height, 9px));
+            height: var(--progress-thumb-height, 9px);
+            transform: scale(var(--progress-thumb-multiplier-active, 1));
+            border: var(--progress-thumb-border-width, 0) solid var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-thumb-border-radius, 50%);
+            background-color: var(--progress-thumb-color, white);
+            background-position: center;
+            outline: 1px solid var(--progress-thumb-outline-active, transparent);
+            -moz-transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            opacity: var(--thumb-opacity, 1);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: var(--progress-thumb-offset, -3px)
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-moz-range-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            width: var(--progress-thumb-width, var(--progress-thumb-height, 9px));
+            height: var(--progress-thumb-height, 9px);
+            transform: scale(var(--progress-thumb-multiplier-active, 1));
+            border: var(--progress-thumb-border-width, 0) solid var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-thumb-border-radius, 50%);
+            background-color: var(--progress-thumb-color, white);
+            background-position: center;
+            outline: 1px solid var(--progress-thumb-outline-active, transparent);
+            -webkit-transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            opacity: var(--thumb-opacity, 1);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: var(--progress-thumb-offset, -3px)
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-moz-range-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-ms-thumb {
+            width: var(--progress-thumb-width, var(--progress-thumb-height, 9px));
+            height: var(--progress-thumb-height, 9px);
+            transform: scale(var(--progress-thumb-multiplier-active, 1));
+            border: var(--progress-thumb-border-width, 0) solid var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-thumb-border-radius, 50%);
+            background-color: var(--progress-thumb-color, white);
+            background-position: center;
+            outline: 1px solid var(--progress-thumb-outline-active, transparent);
+            -ms-transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            transition: transform 0.1s ease-in-out, opacity 0.1s ease-in, background-color 0.1s ease-in;
+            opacity: var(--thumb-opacity, 1);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: var(--progress-thumb-offset, -3px)
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-moz-range-thumb {
+            box-shadow: var(--progress-thumb-box-shadow, none)
+        }
+
+        input[type=range]::-moz-range-track {
+            height: var(--progress-track-height, 3px);
+            display: block;
+            color: transparent;
+            border-color: var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-track-height, 3px);
+            background-color: var(--progress-track-buffering-bg-color, transparent);
+            background-image: var(--progress-track-buffering-bg-image, linear-gradient(var(--track-direction, 90deg), var(--progress-track-color-elapsed, #e5e5e5) var(--progress), var(--progress-track-color, #414141) var(--progress)));
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% var(--progress-track-bg-height, var(--progress-track-height, 3px));
+            cursor: var(--progress-track-cursor, pointer);
+            -webkit-appearance: none
+        }
+
+        input[type=range]::-moz-range-track:focus {
+            outline: none
+        }
+
+        input[type=range]::-ms-track {
+            height: var(--progress-track-height, 3px);
+            display: block;
+            color: transparent;
+            border-color: var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-track-height, 3px);
+            background-color: var(--progress-track-buffering-bg-color, transparent);
+            background-image: var(--progress-track-buffering-bg-image, linear-gradient(var(--track-direction, 90deg), var(--progress-track-color-elapsed, #e5e5e5) var(--progress), var(--progress-track-color, #414141) var(--progress)));
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% var(--progress-track-bg-height, var(--progress-track-height, 3px));
+            cursor: var(--progress-track-cursor, pointer);
+            -webkit-appearance: none
+        }
+
+        input[type=range]::-ms-track:focus {
+            outline: none
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            height: var(--progress-track-height, 3px);
+            display: block;
+            color: transparent;
+            border-color: var(--progress-thumb-color-outline, transparent);
+            border-radius: var(--progress-track-height, 3px);
+            background-color: var(--progress-track-buffering-bg-color, transparent);
+            background-image: var(--progress-track-buffering-bg-image, linear-gradient(var(--track-direction, 90deg), var(--progress-track-color-elapsed, #e5e5e5) var(--progress), var(--progress-track-color, #414141) var(--progress)));
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% var(--progress-track-bg-height, var(--progress-track-height, 3px));
+            cursor: var(--progress-track-cursor, pointer);
+            -webkit-appearance: none
+        }
+
+        input[type=range]::-webkit-slider-runnable-track:focus {
+            outline: none
+        }
+
+        input[type=range]:hover,
+        input[type=range]:active,
+        input[type=range]:focus {
+            --progress-thumb-color: var(--progress-thumb-color-active, white);
+            --progress-thumb-multiplier-active: var(--progress-thumb-multiplier, 1);
+            --progress-thumb-outline-active: var(--progress-thumb-outline-active-alt, var(--progress-thumb-color-outline));
+            --progress-track-color-elapsed: var(--progress-track-color-elapsed-active);
+            border: none;
+            outline: none
+        }
+
+        input[type=range]::-moz-focus-inner,
+        input[type=range]::-moz-focus-outer {
+            border: 0;
+            outline: none
+        }
+
+        input[type=range]:focus {
+            outline: 4px solid var(--keyColor-focus-color, rgba(0, 125, 250, 0.6));
+            outline-offset: 2px
+        }
+
+        input[type=range]:focus[data-focus-method=mouse]:not(input):not(textarea):not(select),
+        input[type=range]:focus[data-focus-method=touch]:not(input):not(textarea):not(select) {
+            outline: none
+        }
+
+        @supports selector(*:focus-visible) {
+            input[type=range]:focus {
+                outline: none
+            }
+
+            input[type=range]:focus-visible {
+                outline: 4px solid var(--keyColor-focus-color, rgba(0, 125, 250, 0.6));
+                outline-offset: 2px
+            }
+
+            input[type=range]:focus-visible[data-focus-method=mouse]:not(input):not(textarea):not(select),
+            input[type=range]:focus-visible[data-focus-method=touch]:not(input):not(textarea):not(select) {
+                outline: none
+            }
+        }
+
+        input[type=range]:disabled::-moz-range-thumb {
+            visibility: hidden
+        }
+
+        input[type=range]:disabled::-webkit-slider-thumb {
+            visibility: hidden
+        }
+
+        input[type=range]:disabled::-ms-thumb {
+            visibility: hidden
+        }
+
+        .container {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: grid;
+            grid-template-rows: 56px 1fr auto;
+            padding: 0 24px;
+        }
+
+        html {
+            font-size: 62.5%
+        }
+
+        body,
+        html {
+            height: 100%
+        }
+
+        body {
+            background-color: #fff;
+            color: rgba(0, 0, 0, 0.88);
+            font-family: "-apple-system", BlinkMacSystemFont, "-webkit-system-font", "Malgun Gothic", "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+            -webkit-font-feature-settings: 'kern';
+            font-feature-settings: 'kern';
+            -moz-font-feature-settings: 'kern'
+        }
+
+        body {
+            background-color: #000;
+        }
+
+        .icon {
+            width: 46px;
+            height: 46px;
+            color: #fff;
+            fill: currentColor;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .icon-container {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: auto;
+            grid-gap: 36px;
+            justify-items: center;
+            align-items: center;
+            transition: opacity .4s cubic-bezier(0, 0, .2, 1) 50ms;
+        }
+
+        .progress-container {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            grid-template-rows: 11px auto;
+            grid-template-areas: "scrubber scrubber scrubber"
+                "elapsed . remaining";
+            grid-area: scrub;
+        }
+
+        .seekbar {
+            grid-area: scrubber / scrubber / scrubber / scrubber;
+            flex: 1 1 100%;
+        }
+
+        .time {
+            font-size: 11px;
+            line-height: 1.27273;
+            font-weight: 500;
+            letter-spacing: 0em;
+            flex-shrink: 0;
+            overflow: hidden;
+            color: var(--progress-time, rgba(255, 255, 255, 0.55));
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .elapsed {
+            grid-area: elapsed / elapsed / elapsed / elapsed;
+        }
+
+        .remaining {
+            grid-area: remaining / remaining / remaining / remaining;
+        }
+    </style>
+
+</head>
+
+<body>
+    <video> </video>
+    <div class="container">
+        <div></div>
+        <div class="icon-container">
+            <div class="icon" style="height: 26px;width: 26px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="84.21 19.76 99.61 109.08">
+                    <path
+                        d="M84.205 79.035c0 27.246 22.608 49.804 49.805 49.804 27.246 0 49.805-22.558 49.805-49.804 0-24.024-17.53-44.385-40.381-48.877v-6.934c0-3.467-2.393-4.395-5.03-2.49l-15.576 10.888c-2.246 1.563-2.295 3.907 0 5.518l15.528 10.938c2.685 1.953 5.078 1.025 5.078-2.49v-6.934c18.457 4.199 32.031 20.605 32.031 40.38 0 23.047-18.408 41.504-41.455 41.504-23.047 0-41.553-18.457-41.504-41.503.049-13.868 6.787-26.124 17.188-33.545 2.002-1.514 2.636-3.809 1.416-5.86-1.221-2.002-3.907-2.539-6.055-.879-12.549 9.131-20.85 23.877-20.85 40.284Zm61.866 20.556c8.105 0 13.427-7.666 13.427-19.385 0-11.816-5.322-19.58-13.427-19.58-8.106 0-13.428 7.764-13.428 19.58 0 11.72 5.322 19.385 13.428 19.385Zm-25.44-.586c1.904 0 3.125-1.318 3.125-3.369V64.923c0-2.392-1.27-3.906-3.467-3.906-1.318 0-2.246.44-4.052 1.611l-6.739 4.541c-1.074.782-1.611 1.66-1.611 2.832 0 1.612 1.27 2.979 2.832 2.979.928 0 1.367-.195 2.344-.879l4.54-3.32v26.855c0 2.002 1.173 3.37 3.028 3.37Zm25.44-5.322c-4.297 0-7.08-5.127-7.08-13.477 0-8.496 2.734-13.671 7.08-13.671 4.345 0 7.03 5.126 7.03 13.671 0 8.35-2.734 13.477-7.03 13.477Z">
+                    </path>
+                </svg>
+            </div>
+            <div class="icon play-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="102.69 30.35 87.5 97.51">
+                    <path
+                        d="M113.428 127.863c2.588 0 5.03-.733 8.448-2.686l60.302-35.01c4.883-2.88 8.008-6.103 8.008-11.084 0-4.98-3.125-8.203-8.008-11.035l-60.302-35.01c-3.418-2.002-5.86-2.685-8.448-2.685-5.566 0-10.742 4.248-10.742 11.67v74.17c0 7.422 5.176 11.67 10.742 11.67Z">
+                    </path>
+                </svg>
+            </div>
+            <div class="icon" style="height: 26px;width: 26px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="84.21 19.78 99.61 109.06">
+                    <path
+                        d="M84.205 79.035c0 27.246 22.608 49.804 49.805 49.804 27.246 0 49.805-22.558 49.805-49.804 0-16.407-8.301-31.153-20.85-40.284-2.148-1.66-4.834-1.123-6.055.88-1.22 2.05-.586 4.345 1.416 5.859 10.4 7.421 17.139 19.677 17.188 33.545.049 23.046-18.457 41.503-41.504 41.503-23.047 0-41.455-18.457-41.455-41.503 0-19.776 13.574-36.182 32.031-40.381v6.982c0 3.467 2.393 4.395 5.078 2.49L145.24 37.19c2.198-1.514 2.247-3.858 0-5.469l-15.527-10.937c-2.734-1.954-5.127-1.026-5.127 2.49v6.885c-22.851 4.492-40.38 24.853-40.38 48.877Zm61.621 20.556c8.106 0 13.428-7.666 13.428-19.385 0-11.816-5.322-19.58-13.428-19.58-8.105 0-13.427 7.764-13.427 19.58 0 11.72 5.322 19.385 13.427 19.385Zm-25.44-.586c1.905 0 3.126-1.318 3.126-3.369V64.923c0-2.392-1.27-3.906-3.467-3.906-1.318 0-2.246.44-4.053 1.611l-6.738 4.541c-1.074.782-1.611 1.66-1.611 2.832 0 1.612 1.27 2.979 2.832 2.979.928 0 1.367-.195 2.344-.879l4.54-3.32v26.855c0 2.002 1.172 3.37 3.028 3.37Zm25.44-5.322c-4.296 0-7.08-5.127-7.08-13.477 0-8.496 2.735-13.671 7.08-13.671 4.346 0 7.032 5.126 7.032 13.671 0 8.35-2.735 13.477-7.032 13.477Z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div>
+            <style>
+                .bottom-container {
+                    display: grid;
+                    -webkit-column-gap: 12px;
+                    -moz-column-gap: 12px;
+                    column-gap: 12px;
+                    grid-area: footer;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    grid-template: 'info   controls' auto '.      .' 16px 'scrub  scrub' 14px '.      .' 16px 'tabs   tabs' auto/1fr;
+                    padding-bottom: 24px;
+                }
+
+                .controls-container {
+                    display: flex;
+                    grid-gap: 14px;
+                    justify-content: end;
+                    margin-top: auto;
+                }
+            </style>
+            <div class="bottom-container">
+                <div class="progress-container" style="align-self: baseline;">
+                    <input class="seekbar" type="range">
+                    <div class="time elapsed"></div>
+                    <div class="time remaining"></div>
+                </div>
+                <div class="controls-container">
+                    <div style="width: 24px;height: 24px;color: #fff;fill: currentColor;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="87.48 32.45 93.07 93.16">
+                            <path
+                                d="M91.969 71.954c2.587 0 4.443-1.953 4.443-4.54v-4.102l-.977-17.041 12.842 13.525 15.04 15.137c.83.879 1.903 1.27 3.075 1.27 2.784 0 4.834-1.807 4.834-4.542 0-1.318-.44-2.49-1.318-3.369L114.82 53.253l-13.525-12.842 17.09.977h4.052c2.588 0 4.59-1.807 4.59-4.443 0-2.637-1.953-4.492-4.59-4.492h-27.1c-4.98 0-7.86 2.88-7.86 7.86v27.1c0 2.54 1.904 4.541 4.492 4.541Zm53.564 53.663h27.1c4.98 0 7.91-2.881 7.91-7.862v-27.1c0-2.538-1.905-4.54-4.54-4.54-2.54 0-4.445 1.953-4.445 4.54v4.102l1.026 17.041-12.89-13.525-14.991-15.137c-.83-.879-1.953-1.27-3.125-1.27-2.734 0-4.834 1.807-4.834 4.542 0 1.318.488 2.49 1.367 3.369l15.04 15.039 13.573 12.842-17.09-.977h-4.101c-2.588 0-4.59 1.807-4.59 4.443 0 2.637 2.002 4.493 4.59 4.493Z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        const video = document.querySelector('video');
+
+        initializeVideo();
+        const playButton = document.querySelector('.play-button');
+        const container = document.querySelector('.container');
+        let timer;
+
+
+        playButton.addEventListener('click', evt => {
+            video.play();
+        });
+        const seekbar = document.querySelector('.seekbar');
+
+
+        seekbar.addEventListener('change', evt => {
+            video.currentTime = parseInt(seekbar.value);
+        });
+
+        const elapsed = document.querySelector('.elapsed');
+        const remaining = document.querySelector('.remaining');
+
+        initialize();
+
+        function calculatePlaybackProgress() {
+            const e = Math.round(100 * (video.currentTime / video.duration || 0)) / 100;
+            return e;
+        }
+        function updateProgress() {
+            const ratio = video.currentTime / video.duration * 100;
+            seekbar.style.setProperty('--progress', `${ratio}%`);
+            seekbar.value = video.currentTime | 0;
+        }
+        function initialize() {
+            const dialog = document.createElement('custom-dialog');
+            dialog.setAttribute('title', '视频地址');
+            const d = document.createElement('input');
+            d.type = "text";
+            d.style.width = "100%";
+            dialog.addEventListener('submit', async () => {
+                const res = await getVideoAddress(d.value);
+                loadVideo(res);
+            });
+            dialog.appendChild(d);
+            document.body.appendChild(dialog);
+        }
+
+        function loadVideo(videoSrc) {
+            video.load();
+            //var videoSrc = 'https://files.rbbrao.com/20230611/1kBrPNRE/index.m3u8';
+            if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+            } else {
+                var hls = new Hls();
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+            }
+        }
+
+        function updateTime() {
+            elapsed.textContent = formatDuration(video.currentTime);
+            remaining.textContent = formatDuration(video.duration - video.currentTime);
+
+        }
+
+        function initializeVideo() {
+            video.addEventListener('durationchange', evt => {
+                seekbar.setAttribute('max', video.duration | 0);
+                updateTime();
+                updateProgress();
+                adjustSize();
+            });
+            video.addEventListener('timeupdate', evt => {
+                updateTime();
+                updateProgress();
+            });
+            video.addEventListener('play', evt => {
+                scheduleHide();
+            });
+            video.addEventListener('click', evt => {
+                container.style.display = 'grid';
+            });
+        }
+        function scheduleHide() {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                container.style.display = 'none';
+            }, 5000);
+        }
+        function formatDuration(ms) {
+            if (isNaN(ms)) return '0:00';
+            if (ms < 0) ms = -ms;
+            const time = {
+                hour: Math.floor(ms / 3600) % 24,
+                minute: Math.floor(ms / 60) % 60,
+                second: Math.floor(ms) % 60,
+            };
+            return Object.entries(time)
+                .filter((val, index) => index || val[1])
+                .map(val => (val[1] + '').padStart(2, '0'))
+                .join(':');
+        }
+        async function getVideoAddress(url) {
+            let baseUri = window.location.host === '127.0.0.1:5500' ? "http://192.168.8.55:8500" : '';
+            try {
+                const response = await fetch(`${baseUri}/extract?url=${encodeURIComponent(url)}`);
+                if (response.status > 399 || response.status < 200) {
+                    throw new Error(`${response.status}: ${response.statusText}`)
+                }
+                const results = await response.text();
+                return results;
+            } catch (error) {
+                console.log(error);
+            }
+            return null;
+        }
+        function adjustSize() {
+
+            if (!video.videoWidth || video.videoWidth <= 0) {
+                return;
+            }
+            const difX = window.innerWidth - video.videoWidth;
+            const difY = window.innerHeight - video.videoHeight;
+            let ratio;
+            if (difX > difY) {
+                ratio = video.videoHeight / window.innerHeight;
+            } else {
+                ratio = video.videoWidth / window.innerWidth;
+            }
+            const width = video.videoWidth / ratio;
+            const height = video.videoHeight / ratio;
+            video.style.width = width + 'px';
+            video.style.height = height + 'px';
+            video.style.position = 'fixed';
+            video.style.left = (window.innerWidth - width) / 2 + "px";
+            video.style.top = (window.innerHeight - height) / 2 + "px";
+        }
+    </script>
+</body>
+
+</html>

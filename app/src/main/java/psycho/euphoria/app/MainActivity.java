@@ -146,7 +146,6 @@ public class MainActivity extends Activity {
         mWebView = initializeWebView(this);
         setWebView(mWebView);
         launchServer(this);
-        scanFiles(this);
 //        Intent intent = getIntent();
 //        String address = getIntent().getStringExtra(KEY_ADDRESS);
 //        if (address != null) {
@@ -210,6 +209,10 @@ public class MainActivity extends Activity {
         startService(stopService);
     }
 
+    private void triggerScan() {
+        scanFiles(this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -257,9 +260,10 @@ public class MainActivity extends Activity {
         menu.add(0, 6, 0, "首页");
         menu.add(0, 7, 0, "复制");
         menu.add(0, 8, 0, "文件管理器");
+        menu.add(0, 13, 0, "清空");
         menu.add(0, 9, 0, "字幕");
         menu.add(0, 10, 0, "输入法");
-        menu.add(0, 5, 0, "退出");
+        menu.add(0, 5, 0, "媒体");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -272,7 +276,7 @@ public class MainActivity extends Activity {
             case 3:
                 break;
             case 5:
-                stopService();
+                triggerScan();
                 break;
             case 6:
                 mWebView.loadUrl(mUrl);
@@ -291,6 +295,14 @@ public class MainActivity extends Activity {
             case 10:
                 ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
                         .showInputMethodPicker();
+                break;
+            case 13:
+                if (mUrl != null) {
+                    String url = Shared.substringBeforeLast(mUrl, "/") + "/kill";
+                    openWithChrome(this, url);
+                } else {
+                    Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
         }

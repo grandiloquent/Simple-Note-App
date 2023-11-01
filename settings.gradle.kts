@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "app"
-include ':app'
+rootProject.name = "SecretGarden"
+include(":app")
+ 

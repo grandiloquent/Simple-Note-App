@@ -169,21 +169,36 @@ async function render(path) {
     setDocumentTitle(path);
     const searchParams = new URL(window.location).searchParams;
     path = path || searchParams.get("path") || '/storage/emulated/0';
-    const res = await loadData(path, searchParams.get("size"));
-    this.wrapper.innerHTML = res.sort((x, y) => {
-        if (x.isDirectory !== y.isDirectory) if (x.isDirectory) return -1; else return 1;
-        if (y.length && x.length) {
-            const dif = y.length - x.length;
-            if (dif > 0) {
-                return 1;
-            } else if (dif < 0) {
-                return -1;
-            } else {
-                return 0;
+    const isSize = searchParams.get("size") || false;
+    const res = await loadData(path, isSize);
+    this.wrapper.innerHTML = res
+        .sort((x, y) => {
+            if (x.isDirectory !== y.isDirectory) if (x.isDirectory) return -1; else return 1;
+            if (isSize === "0") {
+                const dif = y.lastWriteTime - x.lastWriteTime;
+                if (dif > 0) {
+                    return 1;
+                } else if (dif < 0) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (isSize) {
+                if (y.length && x.length) {
+                    const dif = y.length - x.length;
+                    if (dif > 0) {
+                        return 1;
+                    } else if (dif < 0) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
             }
-        }
-        //return x.path.localeCompare(y.path)
-    })
+            else {
+                return x.path.localeCompare(y.path)
+            }
+        })
         .map(x => {
             return `<div class="item" data-path="${x.path}" data-isdirectory=${x.isDirectory}>
             <div class="item-icon ${x.isDirectory ? 'item-directory' : 'item-file'}" 
@@ -372,6 +387,12 @@ function onMenu(evt) {
         bottomSheet.remove();
         const url = new URL(window.location);
         url.searchParams.set('size', true);
+        window.location = url;
+    });
+    addContextMenuItem(bottomSheet, '时间', () => {
+        bottomSheet.remove();
+        const url = new URL(window.location);
+        url.searchParams.set('size', "0");
         window.location = url;
     });
     addContextMenuItem(bottomSheet, '合并图片', () => {

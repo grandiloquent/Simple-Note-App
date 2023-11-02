@@ -36,10 +36,7 @@ public class Utils {
     public static void createPdfFromImages(String path, List<String> images, float marginLeft, float marginRight,
                                            float marginTop, float marginBottom) {
         Rectangle pageSize = calculateCommonPageSize(images);
-        pageSize.setBackgroundColor(new BaseColor(
-                Color.red(255),
-                Color.green(255),
-                Color.blue(255)
+        pageSize.setBackgroundColor(new BaseColor(255,255,255
         ));
         Document document = new Document(pageSize,
                 marginLeft, marginRight, marginTop, marginBottom);

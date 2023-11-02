@@ -35,6 +35,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,6 +45,7 @@ import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -333,6 +335,24 @@ public class WebAppInterface {
             throw new RuntimeException(e);
         }
         return result.get();
+    }
+
+    @JavascriptInterface
+    public void createPdfFromImages(String dir) {
+        File directory = new File(dir);
+        if (!directory.isDirectory()) {
+            return;
+        }
+        File[] files = directory.listFiles(file -> file.isFile() && (file.getName().endsWith(".jpg")
+                || file.getName().endsWith(".png")
+                || file.getName().endsWith(".jpeg")
+        ));
+        if (files == null || files.length == 0) return;
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (File file : files) {
+            arrayList.add(file.getPath());
+        }
+        Utils.createPdfFromImages(new File(dir, "image.pdf").getPath(), arrayList, 32, 32, 32, 32);
     }
 
 }

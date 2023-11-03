@@ -1,10 +1,13 @@
 package psycho.euphoria.app;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -17,6 +20,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 public class Utils {
@@ -36,7 +41,7 @@ public class Utils {
     public static void createPdfFromImages(String path, List<String> images, float marginLeft, float marginRight,
                                            float marginTop, float marginBottom) {
         Rectangle pageSize = calculateCommonPageSize(images);
-        pageSize.setBackgroundColor(new BaseColor(255,255,255
+        pageSize.setBackgroundColor(new BaseColor(255, 255, 255
         ));
         Document document = new Document(pageSize,
                 marginLeft, marginRight, marginTop, marginBottom);
@@ -80,6 +85,22 @@ public class Utils {
         return new Rectangle(options.outWidth, options.outHeight);
     }
 
+    public static void killProcesses(String baseUrl) {
+        new Thread(() -> {
+            String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
+            try {
+                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                c.connect();
+            } catch (Exception ignored) {
+            }
+        }).start();
+    }
+
+    public static void launchInputMethodPicker(Context context) {
+        ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE))
+                .showInputMethodPicker();
+    }
+
     private static void addPageNumber(Rectangle documentRect, PdfWriter writer) {
         ColumnText.showTextAligned(writer.getDirectContent(),
                 Element.ALIGN_BOTTOM,
@@ -87,6 +108,4 @@ public class Utils {
                 ((documentRect.getRight() + documentRect.getLeft()) / 2),
                 documentRect.getBottom() + 25, 0);
     }
-
-
 }

@@ -293,16 +293,10 @@ public class MainActivity extends Activity {
                         setPrimaryClip(ClipData.newPlainText(null, mWebView.getUrl()));
                 break;
             case 10:
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
-                        .showInputMethodPicker();
+                Utils.launchInputMethodPicker(this);
                 break;
             case 13:
-                if (mUrl != null) {
-                    String url = Shared.substringBeforeLast(mUrl, "/") + "/kill";
-                    openWithChrome(this, url);
-                } else {
-                    Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();
-                }
+                Utils.killProcesses(mUrl);
                 break;
 
         }

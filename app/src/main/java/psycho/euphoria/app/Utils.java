@@ -90,7 +90,7 @@ public class Utils {
             String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
             try {
                 HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-                c.connect();
+                c.getResponseCode();
             } catch (Exception ignored) {
             }
         }).start();

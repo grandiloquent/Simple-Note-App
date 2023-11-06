@@ -218,11 +218,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
-        try {
-            ImageUitls.drawText("大将军看看看看看","/storage/emulated/0/Books/123.png");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -266,7 +261,7 @@ public class MainActivity extends Activity {
         menu.add(0, 7, 0, "复制");
         menu.add(0, 8, 0, "文件管理器");
         menu.add(0, 13, 0, "清空");
-        menu.add(0, 9, 0, "字幕");
+        menu.add(0, 9, 0, "图片");
         menu.add(0, 10, 0, "输入法");
         menu.add(0, 5, 0, "媒体");
         return super.onCreateOptionsMenu(menu);
@@ -291,7 +286,8 @@ public class MainActivity extends Activity {
                 break;
             case 9:
                 //Shared.setText(this, Shared.substringBeforeLast(mUrl, "/") + "/subtitle.html?path=");
-                openIndexPage();
+                //openIndexPage();
+                Utils.drawFromClipboard(this);
                 break;
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).

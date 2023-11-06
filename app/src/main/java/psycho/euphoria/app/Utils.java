@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -22,11 +23,14 @@ import org.json.JSONArray;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class Utils {
@@ -146,5 +150,22 @@ public class Utils {
                 new Phrase(String.format("%d", writer.getPageNumber())),
                 ((documentRect.getRight() + documentRect.getLeft()) / 2),
                 documentRect.getBottom() + 25, 0);
+    }
+
+    public static void drawFromClipboard(Context context) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");
+        String name = dateFormat.format(new Date()) + ".png";
+        File file = new File("/storage/emulated/0/Books", name);
+        try {
+            ImageUitls.drawText(Shared.getText(context).toString(), file.getAbsolutePath());
+            MediaScannerConnection.scanFile(
+                    context, new String[]{file.getAbsolutePath()}, new String[]{
+                            "image/*",
+                            "video/*"
+                    }, null
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

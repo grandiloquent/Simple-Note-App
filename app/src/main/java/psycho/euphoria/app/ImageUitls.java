@@ -10,8 +10,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.text.LineBreakConfig;
 import android.os.Build;
 import android.text.Layout;
+import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
@@ -188,8 +190,8 @@ public class ImageUitls {
         paint.setTextSize(24);
         paint.setAntiAlias(true);
         StaticLayout.Builder sb = StaticLayout.Builder.obtain(text, 0, text.length(), paint, width)
-                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                .setLineSpacing(1, 0)
+                .setAlignment(Alignment.ALIGN_NORMAL)
+                .setLineSpacing(0, 1)
                 .setIncludePad(false);
         StaticLayout layout = sb.build();
         Bitmap b = BitmapFactory.decodeFile(getImageFile());
@@ -201,27 +203,41 @@ public class ImageUitls {
         Paint p = new Paint();
         p.setColor(0XFFFEFEFE);
         p.setAntiAlias(true);
-        canvas.drawRoundRect(new RectF(0, 0, width, height), 8, 8, p);
+        //canvas.drawRoundRect(new RectF(0, 0, width, height), 8, 8, p);
+        canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(b, (width - b.getWidth()) / 2, padding, paint);
         canvas.save();
         canvas.translate(padding, padding * 2 + b.getHeight());
         layout.draw(canvas);
         canvas.restore();
-        Random random=new Random();
-
-
+        Random random = new Random();
         Paint fill = new Paint();
         fill.setStyle(Paint.Style.FILL);
-        for (int i = 0; i < 100; i++) {
-            fill.setColor(Color.argb(10,random.nextInt(255),random.nextInt(255),random.nextInt(255)));
-            Path path=new Path();
-            path.setFillType(Path.FillType.EVEN_ODD);
-            path.moveTo(random.nextInt(width), random.nextInt(height));
-            path.lineTo(random.nextInt(width), random.nextInt(height));
-            path.lineTo(random.nextInt(width), random.nextInt(height));
-            path.lineTo(random.nextInt(width), random.nextInt(height));
-            path.close();
-            canvas.drawPath(path, fill);
+//        for (int i = 0; i < 100; i++) {
+//            fill.setColor(Color.argb(10, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+//            Path path = new Path();
+//            path.setFillType(Path.FillType.EVEN_ODD);
+//            path.moveTo(random.nextInt(width), random.nextInt(height));
+//            path.lineTo(random.nextInt(width), random.nextInt(height));
+//            path.lineTo(random.nextInt(width), random.nextInt(height));
+//            path.lineTo(random.nextInt(width), random.nextInt(height));
+//            path.close();
+//            canvas.drawPath(path, fill);
+//        }
+        float xw = width / 10.0f;
+        float yw = height / 10.0f;
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                fill.setColor(Color.argb(10, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+                Path path = new Path();
+                path.setFillType(Path.FillType.EVEN_ODD);
+                path.moveTo(x * xw, y * yw);
+                path.lineTo((x + 1) * xw, y * yw);
+                path.lineTo((x + 1) * xw, (y + 1) * yw);
+                path.lineTo(x * xw, (y + 1) * yw);
+                path.close();
+                canvas.drawPath(path, fill);
+            }
         }
         OutputStream out = new FileOutputStream(outPath);
         bitmap.compress(CompressFormat.PNG, 80, out);

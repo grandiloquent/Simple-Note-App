@@ -116,9 +116,19 @@ public class Utils {
                         "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
                         "cn.yonghui.hyd",
                         "com.tencent.qqmusic",
+                        "psycho.euphoria.v",
+                        "psycho.euphoria.app",
+                        "psycho.euphoria.app",
+                        "nekox.messenger",
+                        "com.jingdong.app.mall",
+                        "com.azure.authenticator",
+                        "com.tencent.mobileqq",
+                        "com.xiaomi.account",
                         "psycho.euphoria.app"
+
                 };
                 wr.write(new JSONArray(packages).toString());
+                wr.close();
                 c.getResponseCode();
             } catch (Exception ignored) {
             }

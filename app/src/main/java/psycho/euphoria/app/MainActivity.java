@@ -219,7 +219,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         initialize();
         try {
-            ImageUitls.drawText("大将军看看看看看","");
+            ImageUitls.drawText("大将军看看看看看","/storage/emulated/0/Books/123.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

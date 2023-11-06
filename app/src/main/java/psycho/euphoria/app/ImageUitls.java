@@ -224,17 +224,18 @@ public class ImageUitls {
 //            path.close();
 //            canvas.drawPath(path, fill);
 //        }
-        float xw = width / 10.0f;
-        float yw = height / 10.0f;
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                fill.setColor(Color.argb(10, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+        float xw = width / 50.0f;
+        float yw = height / 50.0f;
+        for (int x = 0; x < 50; x++) {
+            for (int y = 0; y < 50; y++) {
+                fill.setColor(Color.argb(70, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
                 Path path = new Path();
                 path.setFillType(Path.FillType.EVEN_ODD);
                 path.moveTo(x * xw, y * yw);
                 path.lineTo((x + 1) * xw, y * yw);
                 path.lineTo((x + 1) * xw, (y + 1) * yw);
                 path.lineTo(x * xw, (y + 1) * yw);
+                path.lineTo(x * xw, y * yw);
                 path.close();
                 canvas.drawPath(path, fill);
             }

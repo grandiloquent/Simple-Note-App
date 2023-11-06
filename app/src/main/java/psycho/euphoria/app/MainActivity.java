@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -217,7 +218,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
-
+        try {
+            ImageUitls.drawText("大将军看看看看看","");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

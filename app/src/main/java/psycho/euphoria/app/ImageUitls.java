@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Build;
 import android.text.Layout;
@@ -184,7 +185,7 @@ public class ImageUitls {
         int padding = 24;
         TextPaint paint = new TextPaint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(32);
+        paint.setTextSize(24);
         paint.setAntiAlias(true);
         StaticLayout.Builder sb = StaticLayout.Builder.obtain(text, 0, text.length(), paint, width)
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL)
@@ -202,8 +203,26 @@ public class ImageUitls {
         p.setAntiAlias(true);
         canvas.drawRoundRect(new RectF(0, 0, width, height), 8, 8, p);
         canvas.drawBitmap(b, (width - b.getWidth()) / 2, padding, paint);
-        canvas.translate(padding, padding);
+        canvas.save();
+        canvas.translate(padding, padding * 2 + b.getHeight());
         layout.draw(canvas);
+        canvas.restore();
+        Random random=new Random();
+
+
+        Paint fill = new Paint();
+        fill.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < 100; i++) {
+            fill.setColor(Color.argb(10,random.nextInt(255),random.nextInt(255),random.nextInt(255)));
+            Path path=new Path();
+            path.setFillType(Path.FillType.EVEN_ODD);
+            path.moveTo(random.nextInt(width), random.nextInt(height));
+            path.lineTo(random.nextInt(width), random.nextInt(height));
+            path.lineTo(random.nextInt(width), random.nextInt(height));
+            path.lineTo(random.nextInt(width), random.nextInt(height));
+            path.close();
+            canvas.drawPath(path, fill);
+        }
         OutputStream out = new FileOutputStream(outPath);
         bitmap.compress(CompressFormat.PNG, 80, out);
         out.close();
@@ -334,18 +353,12 @@ public class ImageUitls {
             }
         });
         if (jpgImages == null || jpgImages.length == 0) return null;
-        Arrays.sort(jpgImages, new Comparator<File>() {
-            @Override
-            public int compare(File file, File t1) {
-                long dif = file.lastModified() - t1.lastModified();
-                if (dif > 0) return 1;
-                if (dif < 0) return -1;
-                return 0;
-            }
+        Arrays.sort(jpgImages, (file, t1) -> {
+            long dif = file.lastModified() - t1.lastModified();
+            if (dif > 0) return -1;
+            if (dif < 0) return 1;
+            return 0;
         });
-        BitmapFactory.Options options = new Options();
-        options.inJustDecodeBounds = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(jpgImages[0].getAbsolutePath(), options);
         return jpgImages[0].getAbsolutePath();
     }
 }

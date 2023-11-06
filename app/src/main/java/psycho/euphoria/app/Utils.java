@@ -18,8 +18,13 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import org.json.JSONArray;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -90,6 +95,30 @@ public class Utils {
             String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
             try {
                 HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                c.setRequestMethod("POST");
+                OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
+                String[] packages = new String[]{
+                        "com.android.camera", "com.android.chrome",
+                        "com.android.settings", "com.baidu.input_yijia",
+                        "com.chinasofti.shanghaihuateng.metroapp",
+                        "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
+                        "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
+                        "com.tencent.mm", "com.tencent.qqmusic", "com.v2ray.ang",
+                        "com.yueme.itv", "euphoria.psycho.browser",
+                        "euphoria.psycho.fileserver", "euphoria.psycho.knife",
+                        "euphoria.psycho.lynda", "euphoria.psycho.porn",
+                        "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
+                        "org.telegram.messenger", "psycho.euphoria.editor",
+                        "psycho.euphoria.source", "psycho.euphoria.notepad",
+                        "psycho.euphoria.plane", "psycho.euphoria.reader",
+                        "psycho.euphoria.translator", "psycho.euphoria.unknown",
+                        "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
+                        "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
+                        "cn.yonghui.hyd",
+                        "com.tencent.qqmusic",
+                        "psycho.euphoria.app"
+                };
+                wr.write(new JSONArray(packages).toString());
                 c.getResponseCode();
             } catch (Exception ignored) {
             }

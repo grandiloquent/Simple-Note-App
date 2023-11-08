@@ -199,8 +199,8 @@ public class ImageUitls {
                 .setLineSpacing(0, 1)
                 .setIncludePad(false);
         StaticLayout layout = sb.build();
-        Bitmap b = BitmapFactory.decodeFile(getImageFile());
-        b = resizeDownBySideLength(b, width, true);
+        Bitmap b = combineImages(); //BitmapFactory.decodeFile(getImageFile());
+        //b = resizeDownBySideLength(b, width, true);
         width = width + padding * 2;
         int height = layout.getHeight() + b.getHeight() + padding * 2 + padding;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
@@ -233,7 +233,9 @@ public class ImageUitls {
 //        }
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < text.length() * 100; i++) {
-            stringBuffer.append(Character.toChars(random.nextInt((26)) + 65));
+            int n = random.nextInt(10);
+            stringBuffer.append(n % 2);
+            //stringBuffer.append(Character.toChars(random.nextInt((26)) + 65));
         }
         paint.setColor(Color.argb(30, 0, 0, 0));
         sb = StaticLayout.Builder.obtain(stringBuffer.toString(), 0, stringBuffer.length(), paint, width)
@@ -567,7 +569,7 @@ public class ImageUitls {
         return jpgImages[0].getAbsolutePath();
     }
 
-    public static void combineImages() {
+    public static Bitmap combineImages() {
         File dir = new File("/storage/emulated/0/Books/图片");
         File[] images = dir.listFiles(file -> file.isFile() && (file.getName().endsWith(".jpg") ||
                 file.getName().endsWith(".png") ||
@@ -577,7 +579,7 @@ public class ImageUitls {
         Rectangle size = getImageSize(images[0].getAbsolutePath());
         int width = 600;
         int margin = 24;
-        float ratio = (width / 2 - margin / 2) / (size.getWidth() * 0.1f);
+        float ratio = (width / 2 - margin / 2) / (size.getWidth() * 1.0f);
         int height = (int) (ratio * size.getHeight());
         Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -588,21 +590,24 @@ public class ImageUitls {
         paint.setAntiAlias(true);
         Bitmap src = BitmapFactory.decodeFile(images[0].getAbsolutePath());
         canvas.drawBitmap(src, 0, 0, paint);
+        canvas.restore();
         src.recycle();
         src = BitmapFactory.decodeFile(images[1].getAbsolutePath());
-        ratio = Math.min(height / src.getHeight() * 0.1f, width / src.getWidth() * 0.1f);
+        ratio = Math.min(height / (src.getHeight() * 1.0f), (width / 2 - margin / 2) / (src.getWidth() * 1.0f));
+        canvas.translate(width / 2 + margin / 2 + ((width / 2 - margin / 2) - ratio * src.getWidth()) / 2,
+                (height - ratio * src.getHeight()) / 2);
         canvas.scale(ratio, ratio);
-        canvas.drawBitmap(src, width / 2, 0, paint);
+        canvas.drawBitmap(src, 0, 0, paint);
         src.recycle();
-        canvas.restore();
-        try {
-            FileOutputStream out = new FileOutputStream(new File(dir, "9.jpg"));
-            bitmap.compress(CompressFormat.JPEG, 80, out);
-            bitmap.recycle();
-            out.close();
-        } catch (Exception ignored) {
-            Log.e("B5aOx2", String.format("combineImages, %s", ignored));
-        }
+//        try {
+//            FileOutputStream out = new FileOutputStream(new File(dir, "9.jpg"));
+//            bitmap.compress(CompressFormat.JPEG, 80, out);
+//            bitmap.recycle();
+//            out.close();
+//        } catch (Exception ignored) {
+//            Log.e("B5aOx2", String.format("combineImages, %s", ignored));
+//        }
+        return bitmap;
     }
 
     public static Rectangle getImageSize(String imageUri) {

@@ -20,6 +20,8 @@ import android.text.TextPaint;
 import android.util.Log;
 import android.graphics.Matrix;
 
+import com.itextpdf.text.Rectangle;
+
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -262,6 +264,7 @@ public class ImageUitls {
         canvas.drawBitmap(b, (width - b.getWidth()) / 2, padding, imagePaint);
         OutputStream out = new FileOutputStream(outPath);
         bitmap.compress(CompressFormat.JPEG, 80, out);
+        bitmap.recycle();
         out.close();
     }
 
@@ -563,4 +566,51 @@ public class ImageUitls {
         });
         return jpgImages[0].getAbsolutePath();
     }
+
+    public static void combineImages() {
+        File dir = new File("/storage/emulated/0/Books/图片");
+        File[] images = dir.listFiles(file -> file.isFile() && (file.getName().endsWith(".jpg") ||
+                file.getName().endsWith(".png") ||
+                file.getName().endsWith(".jpeg")
+        ));
+        Arrays.sort(images, Comparator.comparing(File::getName));
+        Rectangle size = getImageSize(images[0].getAbsolutePath());
+        int width = 600;
+        int margin = 24;
+        float ratio = (width / 2 - margin / 2) / (size.getWidth() * 0.1f);
+        int height = (int) (ratio * size.getHeight());
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        canvas.save();
+        canvas.scale(ratio, ratio);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        Bitmap src = BitmapFactory.decodeFile(images[0].getAbsolutePath());
+        canvas.drawBitmap(src, 0, 0, paint);
+        src.recycle();
+        src = BitmapFactory.decodeFile(images[1].getAbsolutePath());
+        ratio = Math.min(height / src.getHeight() * 0.1f, width / src.getWidth() * 0.1f);
+        canvas.scale(ratio, ratio);
+        canvas.drawBitmap(src, width / 2, 0, paint);
+        src.recycle();
+        canvas.restore();
+        try {
+            FileOutputStream out = new FileOutputStream(new File(dir, "9.jpg"));
+            bitmap.compress(CompressFormat.JPEG, 80, out);
+            bitmap.recycle();
+            out.close();
+        } catch (Exception ignored) {
+            Log.e("B5aOx2", String.format("combineImages, %s", ignored));
+        }
+    }
+
+    public static Rectangle getImageSize(String imageUri) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        File imageFile = new File(imageUri);
+        BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
+        return new Rectangle(options.outWidth, options.outHeight);
+    }
+
 }

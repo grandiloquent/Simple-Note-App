@@ -154,7 +154,7 @@ public class Utils {
 
     public static void drawFromClipboard(Context context) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_hhmmss");
-        String name = dateFormat.format(new Date()) + ".png";
+        String name = dateFormat.format(new Date()) + ".jpg";
         File file = new File("/storage/emulated/0/Books", name);
         try {
             ImageUitls.drawText(Shared.getText(context).toString(), file.getAbsolutePath());

@@ -278,6 +278,11 @@ function showContextMenu(evt) {
         bottomSheet.remove();
         writeText(path);
     });
+    addContextMenuItem(bottomSheet, '选择', () => {
+        bottomSheet.remove();
+        localStorage.setItem("paths", JSON.stringify([path]));
+        toast.setAttribute('message', '已成功写入剪切板');
+    });
     addContextMenuItem(bottomSheet, '选择相同类型', () => {
         bottomSheet.remove();
         selectSameType(path, isDirectory);
@@ -389,6 +394,7 @@ function onMenu(evt) {
         url.searchParams.set('size', true);
         window.location = url;
     });
+    // createPdfFromImages
     addContextMenuItem(bottomSheet, '时间', () => {
         bottomSheet.remove();
         const url = new URL(window.location);
@@ -401,6 +407,14 @@ function onMenu(evt) {
             const url = new URL(window.location);
             const path = url.searchParams.get('path');
             NativeAndroid.combineImages(path, 400, null)
+        }
+    });
+    addContextMenuItem(bottomSheet, '创建PDF', () => {
+        bottomSheet.remove();
+        if (typeof NativeAndroid !== 'undefined') {
+            const url = new URL(window.location);
+            const path = url.searchParams.get('path');
+            NativeAndroid.createPdfFromImages(path)
         }
     });
     document.body.appendChild(bottomSheet);

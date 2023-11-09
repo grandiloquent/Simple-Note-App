@@ -182,8 +182,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //
 //               }
 //    );
+
+    jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
+            env->FindClass("psycho/euphoria/app/ImageUitls")));
+    JavaVM *jvm;
+    env->GetJavaVM(&jvm);
     server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
-               [&t, mgr](const httplib::Request &req, httplib::Response &res) {
+               [&t, mgr, env, jclass1,jvm](const httplib::Request &req,
+                                       httplib::Response &res) {
+
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
                    if (!p.ends_with(".html")) {
@@ -197,6 +204,16 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                    auto str = std::string{}; //m[p];
 
                    if (str.empty()) {
+//                       if (p.ends_with("files.html")) {
+//
+//                           if (jvm->AttachCurrentThread(reinterpret_cast<JNIEnv **>((void **) &env),
+//                                                        NULL) != 0){
+//                               return;
+//                           }
+//                           jmethodID jmethodId = env->GetStaticMethodID(jclass1, "combineImages",
+//                                                                        "()V");
+//                           env->CallStaticVoidMethod(jclass1, jmethodId);
+//                       }
                        unsigned char *data;
                        unsigned int len = 0;
                        ReadBytesAsset(mgr, p,
@@ -434,32 +451,22 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //        res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
 //                        "application/zip");
     });
-    server.Get("/kill", [](const httplib::Request &req, httplib::Response &res) {
+    server.Post("/kill", [](const httplib::Request &req, httplib::Response &res,
+                            const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        std::string arr[] = {"com.android.camera", "com.android.chrome",
-                             "com.android.settings", "com.baidu.input_yijia",
-                             "com.chinasofti.shanghaihuateng.metroapp",
-                             "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
-                             "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
-                             "com.tencent.mm", "com.tencent.qqmusic", "com.v2ray.ang",
-                             "com.yueme.itv", "euphoria.psycho.browser",
-                             "euphoria.psycho.fileserver", "euphoria.psycho.knife",
-                             "euphoria.psycho.lynda", "euphoria.psycho.porn",
-                             "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
-                             "org.telegram.messenger", "psycho.euphoria.editor",
-                             "psycho.euphoria.source", "psycho.euphoria.notepad",
-                             "psycho.euphoria.plane", "psycho.euphoria.reader",
-                             "psycho.euphoria.translator", "psycho.euphoria.unknown",
-                             "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
-                             "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-                             "cn.yonghui.hyd",
-                             "com.tencent.qqmusic",
-                             "psycho.euphoria.app",
+        std::string arr[] = {
 
         };
-        for (const auto &cmd: arr) {
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        auto j = doc.size();
+        for (int i = 0; i < j; i++) {
             std::string s{"su -c am force-stop "};
-            FILE *pipeFP = popen((s + cmd).c_str(), "r");
+            FILE *pipeFP = popen((s + to_string(doc.at(i))).c_str(), "r");
             std::string buffer;
             if (pipeFP != nullptr) {
                 char buf[BUFSIZ];

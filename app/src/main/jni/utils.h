@@ -8,6 +8,11 @@
 
 std::filesystem::path FindFile(const httplib::Request &req);
 
+typedef struct {
+    int width;
+    int height;
+    int degree;
+} Size;
 
 
 #endif

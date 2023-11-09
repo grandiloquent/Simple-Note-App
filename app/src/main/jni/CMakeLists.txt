@@ -13,7 +13,11 @@ set_target_properties(lib_ssl PROPERTIES IMPORTED_LOCATION
 
 add_library(nativelib SHARED
         nativelib.cpp
-        logging.cpp)
+        logging.cpp
+        cameraEngine.cpp
+        cameraManager.cpp
+        CameraWrapper.cpp
+        imageReader.cpp)
 
 add_library(httplib SHARED httplib.cc)
 target_include_directories(httplib PUBLIC
@@ -41,4 +45,6 @@ target_include_directories(server PRIVATE zipper/zipper)
 target_link_libraries(nativelib
         android
         mbedtls
-        server)
+        server
+        camera2ndk
+        mediandk)

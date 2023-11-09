@@ -1,6 +1,8 @@
 package psycho.euphoria.app;
 
 import android.app.Notification;
+import android.app.Notification.Action;
+import android.app.Notification.Builder;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,8 +36,10 @@ import static psycho.euphoria.app.Shared.getUsablePort;
 
 public class ServerService extends Service {
     public static final String ACTION_DISMISS = "psycho.euphoria.app.ServerService.ACTION_DISMISS";
+    public static final String ACTION_KILL = "psycho.euphoria.app.ServerService.ACTION_KILL";
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
+
 
     static {
 /*
@@ -52,7 +56,13 @@ public class ServerService extends Service {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainActivity.KEY_ADDRESS, address);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        Notification notification = new Notification.Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记").setSmallIcon(android.R.drawable.stat_sys_download).addAction(getAction(piDismiss)).setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
+        Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .addAction(getAction(piDismiss))
+                .addAction(new Action.Builder(null, "其他",
+                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                                .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE)).build())
+                .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }
 
@@ -128,11 +138,19 @@ public class ServerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_DISMISS)) {
-            stopForeground(true);
-            stopSelf();
-            Process.killProcess(Process.myPid());
-            return START_NOT_STICKY;
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals(ACTION_DISMISS)) {
+                stopForeground(true);
+                stopSelf();
+                Process.killProcess(Process.myPid());
+                return START_NOT_STICKY;
+            } else if (intent.getAction().equals(ACTION_KILL)) {
+                Utils.killProcesses(new String[]{
+                        "nekox.messenger",
+                        "com.tencent.mm"
+                });
+            }
+
         }
         return super.onStartCommand(intent, flags, startId);
     }

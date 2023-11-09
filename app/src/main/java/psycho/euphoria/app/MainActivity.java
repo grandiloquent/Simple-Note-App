@@ -297,7 +297,7 @@ public class MainActivity extends Activity {
                 Utils.launchInputMethodPicker(this);
                 break;
             case 13:
-                Utils.killProcesses(mUrl);
+                Utils.killProcesses(this,mUrl);
                 break;
 
         }

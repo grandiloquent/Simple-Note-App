@@ -1,6 +1,7 @@
 package psycho.euphoria.app;
 
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -94,7 +95,12 @@ public class Utils {
         return new Rectangle(options.outWidth, options.outHeight);
     }
 
-    public static void killProcesses(String baseUrl) {
+    public static void killProcesses(Context context, String baseUrl) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.killBackgroundProcesses("com.icbc");
+        activityManager.killBackgroundProcesses("com.azure.authenticator");
+        activityManager.killBackgroundProcesses("nekox.messenger");
+
         new Thread(() -> {
             String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
             try {

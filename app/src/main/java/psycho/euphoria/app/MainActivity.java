@@ -218,6 +218,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
+        Log.e("B5aOx2", String.format("onCreate, %s", Utils.sudoForResult("ps -a")));
     }
 
     @Override

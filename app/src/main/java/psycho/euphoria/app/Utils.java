@@ -108,7 +108,7 @@ public class Utils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         String[] results = Utils.sudoForResult("ps -A").split("\n");
         Pattern pattern = Pattern.compile("\\s+\\d+\\s+");
-        Stream<String> packages = Arrays.stream(new String[]{"com.icbc",
+        String[] packages = new String[]{"com.icbc",
                 "com.azure.authenticator",
                 "com.android.nfc",
                 "nekox.messenger",
@@ -140,10 +140,10 @@ public class Utils {
                 "com.azure.authenticator",
                 "com.tencent.mobileqq",
                 "com.xiaomi.account",
-
-        });
+                "sv.mftv"
+        };
         for (String result : results) {
-            if (packages.anyMatch(x -> result.contains(x))) {
+            if (Arrays.stream(packages).anyMatch(x -> result.contains(x))) {
                 Matcher matcher = pattern.matcher(result);
                 if (matcher.find()) {
                     try {
@@ -165,20 +165,20 @@ public class Utils {
                 }
             }
         }
-        new Thread(() -> {
-            String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
-            try {
-                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-                c.setRequestMethod("POST");
-                OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
-                wr.write(new JSONArray(new String[]{
-                        "psycho.euphoria.app"
-                }).toString());
-                wr.close();
-                c.getResponseCode();
-            } catch (Exception ignored) {
-            }
-        }).start();
+//        new Thread(() -> {
+//            String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
+//            try {
+//                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+//                c.setRequestMethod("POST");
+//                OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
+//                wr.write(new JSONArray(new String[]{
+//                        "psycho.euphoria.app", "sv.mftv"
+//                }).toString());
+//                wr.close();
+//                c.getResponseCode();
+//            } catch (Exception ignored) {
+//            }
+//        }).start();
     }
 
     public static void launchInputMethodPicker(Context context) {

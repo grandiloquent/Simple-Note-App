@@ -159,7 +159,7 @@ public class ServerService extends Service {
 
     native void cameraPreview();
 
-    native void takePhoto();
+   public static native void takePhoto();
 
     native void deleteCamera();
 }

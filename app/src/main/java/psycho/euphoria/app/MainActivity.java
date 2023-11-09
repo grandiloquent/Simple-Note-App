@@ -1,5 +1,6 @@
 package psycho.euphoria.app;
 
+import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,6 +10,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build.VERSION;
@@ -142,6 +144,18 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
                 startActivityForResult(intent, 0);
             }
+        }
+        List<String> permissions = new ArrayList<>();
+        if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.CAMERA);
+            return;
+        }
+        if (VERSION.SDK_INT <= 28 && checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (permissions.size() > 0) {
+            requestPermissions(permissions.toArray(new String[0]), 0);
+            return;
         }
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
@@ -279,6 +293,7 @@ public class MainActivity extends Activity {
                 break;
             case 5:
                 triggerScan();
+                ServerService.takePhoto();
                 break;
             case 6:
                 mWebView.loadUrl(mUrl);
@@ -299,7 +314,7 @@ public class MainActivity extends Activity {
                 Utils.launchInputMethodPicker(this);
                 break;
             case 13:
-                Utils.killProcesses( mUrl);
+                Utils.killProcesses(mUrl);
                 break;
 
         }

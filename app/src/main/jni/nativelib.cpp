@@ -93,7 +93,7 @@ Java_psycho_euphoria_app_ServerService_cameraPreview(JNIEnv* env, jobject thiz)
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_takePhoto(JNIEnv* env, jobject thiz){
+Java_psycho_euphoria_app_ServerService_takePhoto(JNIEnv* env, jclass clazz){
     std::thread photoHandler(&cameraEngine::onTakeImage, cameraEngine1);
     photoHandler.detach();
 }

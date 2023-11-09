@@ -133,7 +133,7 @@ void cameraManager::CreateSession(ANativeWindow *previewWindow,
     requests_[JPG_CAPTURE_REQUEST_IDX].outputNativeWindow_ = captureWindow;
 
     ACaptureSessionOutputContainer_create(&outputContainer);
-    for (auto &req : requests_) {
+    for (auto &req: requests_) {
         ANativeWindow_acquire(req.outputNativeWindow_);
         ACaptureSessionOutput_create(req.outputNativeWindow_, &req.sessionOutput_);
         ACaptureSessionOutputContainer_add(outputContainer, req.sessionOutput_);
@@ -177,7 +177,7 @@ cameraManager::~cameraManager() {
     }
     ACameraCaptureSession_close(captureSession_);
 
-    for (auto &req : requests_) {
+    for (auto &req: requests_) {
         ACaptureRequest_removeTarget(req.request_, req.target_);
         ACaptureRequest_free(req.request_);
         ACameraOutputTarget_free(req.target_);
@@ -191,7 +191,7 @@ cameraManager::~cameraManager() {
     requests_.resize(0);
     ACaptureSessionOutputContainer_free(outputContainer);
 
-    for (auto &cam : cameras_) {
+    for (auto &cam: cameras_) {
         if (cam.second.device_) {
             ACameraDevice_close(cam.second.device_);
         }
@@ -395,7 +395,6 @@ void cameraManager::TakePhoto() {
     if (captureSessionState_ == CaptureSessionState::ACTIVE) {
         ACameraCaptureSession_stopRepeating(captureSession_);
     }
-
     ACameraCaptureSession_capture(captureSession_, GetCaptureCallback(), 1,
                                   &requests_[JPG_CAPTURE_REQUEST_IDX].request_,
                                   &requests_[JPG_CAPTURE_REQUEST_IDX].sessionSequenceId_);

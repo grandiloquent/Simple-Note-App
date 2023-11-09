@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Process;
 import android.os.StrictMode;
@@ -148,14 +149,10 @@ public class MainActivity extends Activity {
         List<String> permissions = new ArrayList<>();
         if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.CAMERA);
-            return;
         }
-        if (VERSION.SDK_INT <= 28 && checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.WRITE_EXTERNAL_STORAGE);
-        }
+
         if (permissions.size() > 0) {
             requestPermissions(permissions.toArray(new String[0]), 0);
-            return;
         }
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
@@ -290,10 +287,11 @@ public class MainActivity extends Activity {
                 mWebView.reload();
                 break;
             case 3:
+                Utils.takePhoto();
                 break;
             case 5:
                 triggerScan();
-                ServerService.takePhoto();
+
                 break;
             case 6:
                 mWebView.loadUrl(mUrl);
@@ -309,6 +307,7 @@ public class MainActivity extends Activity {
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).
                         setPrimaryClip(ClipData.newPlainText(null, mWebView.getUrl()));
+
                 break;
             case 10:
                 Utils.launchInputMethodPicker(this);

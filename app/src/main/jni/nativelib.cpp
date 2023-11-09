@@ -74,13 +74,13 @@ Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jstring q)
     return nullptr;
 }
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_openCamera(JNIEnv* env, jobject thiz, jboolean isCameraBack, jobject pInstance)
+Java_psycho_euphoria_app_ServerService_openCamera(JNIEnv* env, jclass clazz)
 {
-    wrapper = new CameraWrapper(env, pInstance);
+    //wrapper = new CameraWrapper(env, pInstance);
     uint32_t w = 480;
     uint32_t h = 640;
     DisplayDimension dimension = DisplayDimension(w, h);
-    cameraEngine1 = new cameraEngine(&dimension, isCameraBack);
+    cameraEngine1 = new cameraEngine(&dimension, true);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -99,7 +99,7 @@ Java_psycho_euphoria_app_ServerService_takePhoto(JNIEnv* env, jclass clazz){
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_deleteCamera(JNIEnv* env, jobject thiz)
+Java_psycho_euphoria_app_ServerService_deleteCamera(JNIEnv* env, jclass clazz)
 {
     if(cameraEngine1)
     {

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -281,4 +282,15 @@ public class Utils {
                 ((documentRect.getRight() + documentRect.getLeft()) / 2),
                 documentRect.getBottom() + 25, 0);
     }
+   public static void  takePhoto(){
+       ServerService.openCamera();
+       new CountDownTimer(30000, 3000) {
+           public void onTick(long millisUntilFinished) {
+               ServerService.takePhoto();
+           }
+           public void onFinish() {
+               ServerService.deleteCamera();
+           }
+       }.start();
+   }
 }

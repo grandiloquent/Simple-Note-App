@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
@@ -22,6 +21,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import org.json.JSONArray;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataOutputStream;
@@ -36,8 +36,12 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class Utils {
     public static Rectangle calculateCommonPageSize(List<String> imagesUri) {
@@ -102,47 +106,74 @@ public class Utils {
 
     public static void killProcesses(Context context, String baseUrl) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        activityManager.killBackgroundProcesses("com.icbc");
-        activityManager.killBackgroundProcesses("com.azure.authenticator");
-        activityManager.killBackgroundProcesses("nekox.messenger");
+        String[] results = Utils.sudoForResult("ps -A").split("\n");
+        Pattern pattern = Pattern.compile("\\s+\\d+\\s+");
+        Stream<String> packages = Arrays.stream(new String[]{"com.icbc",
+                "com.azure.authenticator",
+                "com.android.nfc",
+                "nekox.messenger",
+                "euphoria.psycho.browser",
+                "com.goodix.fingerprint",
+                "com.android.camera", "com.android.chrome",
+                "com.android.settings", "com.baidu.input_yijia",
+                "com.chinasofti.shanghaihuateng.metroapp",
+                "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
+                "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
+                "com.tencent.mm", "com.tencent.qqmusic", "com.v2ray.ang",
+                "com.yueme.itv", "euphoria.psycho.browser",
+                "euphoria.psycho.fileserver", "euphoria.psycho.knife",
+                "euphoria.psycho.lynda", "euphoria.psycho.porn",
+                "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
+                "org.telegram.messenger", "psycho.euphoria.editor",
+                "psycho.euphoria.source", "psycho.euphoria.notepad",
+                "psycho.euphoria.plane", "psycho.euphoria.reader",
+                "psycho.euphoria.translator", "psycho.euphoria.unknown",
+                "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
+                "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
+                "cn.yonghui.hyd",
+                "com.tencent.qqmusic",
+                "psycho.euphoria.v",
+                "psycho.euphoria.app",
+                "psycho.euphoria.app",
+                "nekox.messenger",
+                "com.jingdong.app.mall",
+                "com.azure.authenticator",
+                "com.tencent.mobileqq",
+                "com.xiaomi.account",
 
+        });
+        for (String result : results) {
+            if (packages.anyMatch(x -> result.contains(x))) {
+                Matcher matcher = pattern.matcher(result);
+                if (matcher.find()) {
+                    try {
+                        Process rootProcess = Runtime.getRuntime().exec(new String[]{"su"});
+                        String command = "kill -9 " + Integer.parseInt(matcher.group().trim());
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(rootProcess.getOutputStream()), 2048);
+                        try {
+                            bw.write(command);
+                            bw.newLine();
+                            bw.flush();
+                        } catch (IOException e) {
+                            // Handle error
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // Device not rooted!
+                    }
+                    //  android.os.Process.killProcess(Integer.parseInt(matcher.group().trim()));
+                }
+            }
+        }
         new Thread(() -> {
             String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
             try {
                 HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
                 c.setRequestMethod("POST");
                 OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
-                String[] packages = new String[]{
-                        "com.android.camera", "com.android.chrome",
-                        "com.android.settings", "com.baidu.input_yijia",
-                        "com.chinasofti.shanghaihuateng.metroapp",
-                        "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
-                        "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
-                        "com.tencent.mm", "com.tencent.qqmusic", "com.v2ray.ang",
-                        "com.yueme.itv", "euphoria.psycho.browser",
-                        "euphoria.psycho.fileserver", "euphoria.psycho.knife",
-                        "euphoria.psycho.lynda", "euphoria.psycho.porn",
-                        "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
-                        "org.telegram.messenger", "psycho.euphoria.editor",
-                        "psycho.euphoria.source", "psycho.euphoria.notepad",
-                        "psycho.euphoria.plane", "psycho.euphoria.reader",
-                        "psycho.euphoria.translator", "psycho.euphoria.unknown",
-                        "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
-                        "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-                        "cn.yonghui.hyd",
-                        "com.tencent.qqmusic",
-                        "psycho.euphoria.v",
-                        "psycho.euphoria.app",
-                        "psycho.euphoria.app",
-                        "nekox.messenger",
-                        "com.jingdong.app.mall",
-                        "com.azure.authenticator",
-                        "com.tencent.mobileqq",
-                        "com.xiaomi.account",
+                wr.write(new JSONArray(new String[]{
                         "psycho.euphoria.app"
-
-                };
-                wr.write(new JSONArray(packages).toString());
+                }).toString());
                 wr.close();
                 c.getResponseCode();
             } catch (Exception ignored) {
@@ -180,35 +211,36 @@ public class Utils {
         }
     }
 
-    public static String sudoForResult(String...strings) {
+    public static String sudoForResult(String... strings) {
         String res = "";
         DataOutputStream outputStream = null;
         InputStream response = null;
-        try{
-            Process su = Runtime.getRuntime().exec("su");
+        try {
+            Process su = Runtime.getRuntime().exec(new String[]{"su"});
             outputStream = new DataOutputStream(su.getOutputStream());
             response = su.getInputStream();
-
-            for (String s : strings) {
-                outputStream.writeBytes(s+"\n");
-                outputStream.flush();
-            }
-
+//
+//            for (String s : strings) {
+            outputStream.writeBytes("ps -A\n");
+            outputStream.flush();
+//            }
+//
             outputStream.writeBytes("exit\n");
             outputStream.flush();
-            try {
-                su.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                su.waitFor();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             res = readFully(response);
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
-           closeSilently(outputStream, response);
+            closeSilently(outputStream, response);
         }
         return res;
     }
+
     public static String readFully(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -218,19 +250,20 @@ public class Utils {
         }
         return baos.toString("UTF-8");
     }
+
     public static void closeSilently(Object... xs) {
         // Note: on Android API levels prior to 19 Socket does not implement Closeable
         for (Object x : xs) {
             if (x != null) {
                 try {
                     if (x instanceof Closeable) {
-                        ((Closeable)x).close();
+                        ((Closeable) x).close();
                     } else if (x instanceof Socket) {
-                        ((Socket)x).close();
+                        ((Socket) x).close();
                     } else if (x instanceof DatagramSocket) {
-                        ((DatagramSocket)x).close();
+                        ((DatagramSocket) x).close();
                     } else {
-                        throw new RuntimeException("cannot close "+x);
+                        throw new RuntimeException("cannot close " + x);
                     }
                 } catch (Throwable e) {
                 }

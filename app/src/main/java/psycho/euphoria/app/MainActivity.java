@@ -35,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import psycho.euphoria.app.CustomWebChromeClient;
 import psycho.euphoria.app.CustomWebViewClient;
@@ -218,7 +219,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
-        Log.e("B5aOx2", String.format("onCreate, %s", Utils.sudoForResult("ps -a")));
+
     }
 
     @Override
@@ -298,7 +299,7 @@ public class MainActivity extends Activity {
                 Utils.launchInputMethodPicker(this);
                 break;
             case 13:
-                Utils.killProcesses(this,mUrl);
+                Utils.killProcesses(this, mUrl);
                 break;
 
         }

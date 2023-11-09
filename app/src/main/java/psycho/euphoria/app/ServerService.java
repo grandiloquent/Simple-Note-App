@@ -136,4 +136,12 @@ public class ServerService extends Service {
         }
         return super.onStartCommand(intent, flags, startId);
     }
+
+    native void openCamera(boolean isCameraBack, MainActivity mainActivity);
+
+    native void cameraPreview();
+
+    native void takePhoto();
+
+    native void deleteCamera();
 }

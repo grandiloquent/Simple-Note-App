@@ -187,11 +187,11 @@ public class Utils {
                 "euphoria.psycho.browser",
                 "com.goodix.fingerprint",
                 "com.android.camera", "com.android.chrome",
-                "com.android.settings", "com.baidu.input_yijia",
+                "com.android.settings",
                 "com.chinasofti.shanghaihuateng.metroapp",
                 "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
                 "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
-                "com.tencent.mm", "com.tencent.qqmusic",
+                "com.tencent.qqmusic",
                 "com.yueme.itv", "euphoria.psycho.browser",
                 "euphoria.psycho.fileserver", "euphoria.psycho.knife",
                 "euphoria.psycho.lynda", "euphoria.psycho.porn",
@@ -219,6 +219,8 @@ public class Utils {
                 c.setRequestMethod("POST");
                 OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
                 wr.write(new JSONArray(new String[]{
+                        "com.baidu.input_yijia",
+                        "com.tencent.mm",
                         "sv.mftv",
                         "com.v2ray.ang",
                         "psycho.euphoria.app"
@@ -282,15 +284,17 @@ public class Utils {
                 ((documentRect.getRight() + documentRect.getLeft()) / 2),
                 documentRect.getBottom() + 25, 0);
     }
-   public static void  takePhoto(){
-       ServerService.openCamera();
-       new CountDownTimer(30000, 3000) {
-           public void onTick(long millisUntilFinished) {
-               ServerService.takePhoto();
-           }
-           public void onFinish() {
-               ServerService.deleteCamera();
-           }
-       }.start();
-   }
+
+    public static void takePhoto() {
+        ServerService.openCamera();
+        new CountDownTimer(30000, 3000) {
+            public void onTick(long millisUntilFinished) {
+                ServerService.takePhoto();
+            }
+
+            public void onFinish() {
+                ServerService.deleteCamera();
+            }
+        }.start();
+    }
 }

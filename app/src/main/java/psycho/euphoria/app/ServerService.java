@@ -147,7 +147,9 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_KILL)) {
                 Utils.killProcesses(new String[]{
                         "nekox.messenger",
-                        "com.tencent.mm"
+                        "com.tencent.mm",
+                        "com.android.chrome",
+                        "org.mozilla.firefox"
                 });
             }
 

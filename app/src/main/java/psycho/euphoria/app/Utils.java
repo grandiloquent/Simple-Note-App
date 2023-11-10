@@ -186,7 +186,7 @@ public class Utils {
                 "nekox.messenger",
                 "euphoria.psycho.browser",
                 "com.goodix.fingerprint",
-                "com.android.camera", "com.android.chrome",
+                "com.android.camera",
                 "com.android.settings",
                 "com.chinasofti.shanghaihuateng.metroapp",
                 "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
@@ -195,7 +195,7 @@ public class Utils {
                 "com.yueme.itv", "euphoria.psycho.browser",
                 "euphoria.psycho.fileserver", "euphoria.psycho.knife",
                 "euphoria.psycho.lynda", "euphoria.psycho.porn",
-                "euphoria.psycho.server", "org.mozilla.firefox", "org.readera",
+                "euphoria.psycho.server","org.readera",
                 "org.telegram.messenger", "psycho.euphoria.editor",
                 "psycho.euphoria.source", "psycho.euphoria.notepad",
                 "psycho.euphoria.plane", "psycho.euphoria.reader",
@@ -221,6 +221,8 @@ public class Utils {
                 wr.write(new JSONArray(new String[]{
                         "com.baidu.input_yijia",
                         "com.tencent.mm",
+                        "com.android.chrome",
+                        "org.mozilla.firefox",
                         "sv.mftv",
                         "com.v2ray.ang",
                         "psycho.euphoria.app"

@@ -217,7 +217,7 @@ void imageReader::WriteFile(AImage *image) {
                 std::to_string(localTime.tm_mday) + dash +
                 std::to_string(localTime.tm_hour) +
                 std::to_string(localTime.tm_min) +
-                std::to_string(localTime.tm_sec) + ".jpg";
+                std::to_string(localTime.tm_sec) + ".v";
     FILE *file = fopen(fileName.c_str(), "wb");
     if (file && data && len) {
         fwrite(data, 1, len, file);

@@ -231,8 +231,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         initialize();
 
-        Intent intent=new Intent(this,ImageViewerActivity.class);
-        startActivity(intent);
+//        Intent intent=new Intent(this,ImageViewerActivity.class);
+//        intent.setData(Uri.fromFile(
+//                new File("/storage/emulated/0/Pictures/WeiXin").listFiles()[0]
+//        ));
+//        startActivity(intent);
 
     }
 

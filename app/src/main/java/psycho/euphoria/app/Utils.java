@@ -189,7 +189,7 @@ public class Utils {
                 "com.android.camera",
                 "com.android.settings",
                 "com.chinasofti.shanghaihuateng.metroapp",
-                "com.eg.android.AlipayGphone", "com.icbc", "com.jeffmony.videodemo",
+                 "com.icbc", "com.jeffmony.videodemo",
                 "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
                 "com.tencent.qqmusic",
                 "com.yueme.itv", "euphoria.psycho.browser",
@@ -202,11 +202,10 @@ public class Utils {
                 "psycho.euphoria.translator", "psycho.euphoria.unknown",
                 "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
                 "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-                "cn.yonghui.hyd",
+
                 "com.tencent.qqmusic",
                 "psycho.euphoria.v",
                 "nekox.messenger",
-                "com.jingdong.app.mall",
                 "com.azure.authenticator",
                 "com.tencent.mobileqq",
                 "com.xiaomi.account",
@@ -225,6 +224,9 @@ public class Utils {
                         "org.mozilla.firefox",
                         "sv.mftv",
                         "com.v2ray.ang",
+                        "cn.yonghui.hyd",
+                        "com.jingdong.app.mall",
+                        "com.eg.android.AlipayGphone",
                         "psycho.euphoria.app"
                 }).toString());
                 wr.close();

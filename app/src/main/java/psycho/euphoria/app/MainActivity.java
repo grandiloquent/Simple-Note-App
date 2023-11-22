@@ -231,6 +231,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         initialize();
 
+        Intent intent=new Intent(this,ImageViewerActivity.class);
+        startActivity(intent);
+
     }
 
     @Override

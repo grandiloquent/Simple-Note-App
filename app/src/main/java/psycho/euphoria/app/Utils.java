@@ -204,7 +204,7 @@ public class Utils {
                 "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
 
                 "com.tencent.qqmusic",
-                "psycho.euphoria.v",
+
                 "nekox.messenger",
                 "com.azure.authenticator",
                 "com.tencent.mobileqq",
@@ -228,6 +228,7 @@ public class Utils {
                         "com.jingdong.app.mall",
                         "com.eg.android.AlipayGphone",
                         "euphoria.psycho.browser",
+                        "psycho.euphoria.v",
                         "com.android.settings",
                         "psycho.euphoria.app"
                 }).toString());

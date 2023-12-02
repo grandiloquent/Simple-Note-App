@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -37,6 +38,7 @@ import static psycho.euphoria.app.Shared.getUsablePort;
 public class ServerService extends Service {
     public static final String ACTION_DISMISS = "psycho.euphoria.app.ServerService.ACTION_DISMISS";
     public static final String ACTION_KILL = "psycho.euphoria.app.ServerService.ACTION_KILL";
+    public static final String ACTION_TRANSLATOR = "psycho.euphoria.app.ServerService.ACTION_TRANSLATOR";
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
 
@@ -62,6 +64,9 @@ public class ServerService extends Service {
                 .addAction(new Action.Builder(null, "其他",
                         PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                                 .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE)).build())
+                .addAction(new Action.Builder(null, "翻译",
+                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                                .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE)).build())
                 .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }
@@ -151,17 +156,21 @@ public class ServerService extends Service {
                         "com.android.chrome",
                         "org.mozilla.firefox"
                 });
+            } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
+                startActivity(launchIntent);
             }
 
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public static  native void openCamera();
+    public static native void openCamera();
 
     native void cameraPreview();
 
-   public static native void takePhoto();
+    public static native void takePhoto();
 
-    public static   native void deleteCamera();
+    public static native void deleteCamera();
 }

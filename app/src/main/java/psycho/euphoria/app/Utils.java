@@ -184,10 +184,10 @@ public class Utils {
         killProcesses(new String[]{"com.icbc",
                 "com.android.nfc",
                 "nekox.messenger",
-                "euphoria.psycho.browser",
+
                 "com.goodix.fingerprint",
                 "com.android.camera",
-                "com.android.settings",
+
                 "com.chinasofti.shanghaihuateng.metroapp",
                  "com.icbc", "com.jeffmony.videodemo",
                 "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
@@ -227,6 +227,8 @@ public class Utils {
                         "cn.yonghui.hyd",
                         "com.jingdong.app.mall",
                         "com.eg.android.AlipayGphone",
+                        "euphoria.psycho.browser",
+                        "com.android.settings",
                         "psycho.euphoria.app"
                 }).toString());
                 wr.close();

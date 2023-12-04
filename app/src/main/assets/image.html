@@ -12,6 +12,7 @@
     <div id="createPNGButton">
         <button onclick="putImage()">Save as Image</button>
     </div>
+    <input type="text" id="text">
     <input id="input" type="file" multiple accept="image/*" />
     <canvas id="canvas"></canvas>
     <script>
@@ -28,12 +29,26 @@
 
         }
         const canvas = document.querySelector('#canvas');
+        const contxt = canvas.getContext('2d');
 
         const input = document.querySelector('#input');
         input.addEventListener('change', async evt => {
-            const images = await Promise.all([...input.files].map(x => loadImage(x)));
-            //images.sort((x, y) => y.width - x.width);
+            const s = document.getElementById('text').value.trim();
+            contxt.font = "48px sans-serif";
+            const textMetrics = contxt.measureText(s);
+            const textWidth = textMetrics.width;
+            const textHeight = -textMetrics.actualBoundingBoxDescent + textMetrics.actualBoundingBoxAscent;
+
+const files=[...input.files];
+files.sort((x, y) => x.name.localeCompare(y.name))
+            const images = await Promise.all(files.map(x => loadImage(x)));
+            
+             
             canvas.width = Math.min(images[0].width * 2 + 32 * 3, 1280);
+
+            // contxt.textAlign = "center";
+            //contxt.textBaseline = "middle"
+
             const heights = images.map(x => {
                 const width = canvas.width / 2 - 32 * 1.5;
                 if (x.width > width) {
@@ -50,11 +65,16 @@
                     right += heights[index] + 32;
                 }
             }
-            canvas.height = Math.max(left + 32, right + 32);
-            const contxt = canvas.getContext('2d');
+            canvas.height = Math.max(left + 32, right + 32) + textHeight * 1.25 + 32;
             let x = 32; ly = 32, ry = 32;
             left = 0;
             right = 0;
+            contxt.textAlign = "center";
+            contxt.textBaseline = "top"
+            contxt.font = "48px sans-serif";
+            contxt.fillText(s, canvas.width / 2, 32);
+            contxt.translate(0, 32 + textHeight * 1.25);
+
             for (let index = 0; index < images.length; index++) {
                 const element = images[index];
                 const halfWidth = canvas.width / 2 - 32 * 1.5;
@@ -79,7 +99,7 @@
                 } else {
                     contxt.drawImage(element,
                         0, 0, element.width, element.height,
-                        (halfWidth - width) / 2 + canvas.width / 2 +  16, ry,
+                        (halfWidth - width) / 2 + canvas.width / 2 + 16, ry,
                         width,
                         height
                     );

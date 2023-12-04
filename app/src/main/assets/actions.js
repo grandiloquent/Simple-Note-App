@@ -495,6 +495,30 @@ function showVideoInformation(path) {
 function showImage(path) {
     const div = document.createElement('div');
     div.className = 'photo-viewer';
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = "X"
+    deleteButton.style = `
+    position: fixed;
+    background: #fff;
+    z-index: 10001;
+    left: 32px;
+    top: 32px;
+    padding: 12px;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    line-height: 32px;
+    font-size: 24px;
+    box-sizing: content-box;
+`
+    div.appendChild(deleteButton);
+    deleteButton.addEventListener('click',async evt => {
+        const res = await fetch(`${baseUri}/file/delete`, {
+            method: 'POST',
+            body: JSON.stringify([path])
+        });
+        queryElementByPath(path).remove();
+    })
     const img = document.createElement('img');
     img.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
     div.appendChild(img);

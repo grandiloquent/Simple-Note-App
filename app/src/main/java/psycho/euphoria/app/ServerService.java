@@ -41,7 +41,7 @@ public class ServerService extends Service {
     public static final String ACTION_TRANSLATOR = "psycho.euphoria.app.ServerService.ACTION_TRANSLATOR";
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
-
+    public static final String ACTION_SHUTDOWN = "psycho.euphoria.app.ServerService.ACTION_SHUTDOWN";
 
     static {
 /*
@@ -67,6 +67,9 @@ public class ServerService extends Service {
                 .addAction(new Action.Builder(null, "翻译",
                         PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                                 .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE)).build())
+                .addAction(new Action.Builder(null, "关闭",
+                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                                .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE)).build())
                 .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }
@@ -156,6 +159,8 @@ public class ServerService extends Service {
                         "com.android.chrome",
                         "org.mozilla.firefox"
                 });
+            } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
+                Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");

@@ -62,17 +62,14 @@ public class ServerService extends Service {
         RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_small);
         notificationLayout.setOnClickPendingIntent(R.id.other,PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.dismiss,piDismiss);
+        notificationLayout.setOnClickPendingIntent(R.id.translator, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
-                .addAction(getAction(piDismiss))
-
-                .addAction(new Action.Builder(null, "翻译",
-                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                                .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE)).build())
-                .addAction(new Action.Builder(null, "清理",
-                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                                .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE)).build())
-                .setCustomContentView(notificationLayout)
+                .setCustomBigContentView(notificationLayout)
                 .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }

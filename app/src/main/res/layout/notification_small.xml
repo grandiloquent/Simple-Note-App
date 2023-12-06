@@ -10,4 +10,28 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="其他" />
+    <TextView
+        android:id="@+id/other"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="其他" />
+    <TextView
+        android:id="@+id/dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="关闭" />
+    <TextView
+        android:id="@+id/translator"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="翻译" />
+    <TextView
+        android:id="@+id/clean"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="翻译" />
 </LinearLayout>

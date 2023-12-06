@@ -31,6 +31,7 @@ import java.util.Enumeration;
 
 import android.os.Process;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import static psycho.euphoria.app.Shared.getDeviceIP;
 import static psycho.euphoria.app.Shared.getUsablePort;
@@ -58,18 +59,20 @@ public class ServerService extends Service {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainActivity.KEY_ADDRESS, address);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_small);
+        notificationLayout.setOnClickPendingIntent(R.id.other,PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .addAction(getAction(piDismiss))
-                .addAction(new Action.Builder(null, "其他",
-                        PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                                .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE)).build())
+
                 .addAction(new Action.Builder(null, "翻译",
                         PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                                 .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE)).build())
-                .addAction(new Action.Builder(null, "关闭",
+                .addAction(new Action.Builder(null, "清理",
                         PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                                 .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE)).build())
+                .setCustomContentView(notificationLayout)
                 .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
         context.startForeground(1, notification);
     }

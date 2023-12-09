@@ -67,10 +67,11 @@ public class ServerService extends Service {
                 .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.app,PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setCustomBigContentView(notificationLayout)
-                .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)).build();
+                .setCustomContentView(notificationLayout )
+                        .build();
         context.startForeground(1, notification);
     }
 
@@ -157,7 +158,8 @@ public class ServerService extends Service {
                         "nekox.messenger",
                         "com.tencent.mm",
                         "com.android.chrome",
-                        "org.mozilla.firefox"
+                        "org.mozilla.firefox",
+                        "com.zhiliaoapp.musically"
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 Utils.takePhoto();

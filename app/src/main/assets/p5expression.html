@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="index.css">
+    <script src="custom-toast.js"></script>
+    <script src="shared.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <textarea id="textarea"></textarea>
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="square_foot">
+            <span class="material-symbols-outlined">
+                square_foot
+            </span>
+            <div class="pivot-bar-item-title">长度</div>
+        </div>
+
+        <div class="bar-item-tab" id="data_array">
+            <span class="material-symbols-outlined">
+                data_array
+            </span>
+            <div class="pivot-bar-item-title">格式化</div>
+        </div>
+
+
+    </div>
+    <script>
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('keydown', evt => {
+            if (evt.key === 'F1') {
+                evt.preventDefault();
+                console.log(getLine(textarea))
+                textarea.value = textarea.value + '\n' + eval(getLine(textarea));
+            }
+        });
+
+        document.addEventListener('visibilitychange', evt => {
+            localStorage.setItem('value', textarea.value)
+        })
+        if (localStorage.getItem('value')) {
+            textarea.value = localStorage.getItem('value');
+        }
+        function getLine(textarea) {
+            let start = textarea.selectionStart;
+            let end = textarea.selectionEnd;
+            while (start - 1 > 0 && textarea.value[start - 1] !== '\n') {
+                start--;
+            }
+            while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
+                end++;
+            }
+            return textarea.value.substring(start, end + 1);
+        }
+        document.getElementById('square_foot')
+            .addEventListener('click', evt => {
+
+                var NUM_POINTS = 120;
+
+                let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d',
+                    textarea.value.match(/(?<=d=")[^"]+(?=")/)
+                );
+                svg.appendChild(path);
+                svg.style.position = 'absolute';
+                svg.style.left = '-100%';
+                document.body.appendChild(svg);
+
+                var len = path.getTotalLength();
+               
+                textarea.value = `${textarea.value}
+
+${len}`;
+                svg.remove();
+            });
+            
+            document.getElementById('data_array')
+            .addEventListener('click', evt => {
+
+                var NUM_POINTS = 120;
+
+                let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d',
+                    textarea.value.match(/(?<=d=")[^"]+(?=")/)
+                );
+                svg.appendChild(path);
+                svg.style.position = 'absolute';
+                svg.style.left = '-100%';
+                document.body.appendChild(svg);
+
+                var len = path.getTotalLength();
+                var points = [];
+
+                for (var i = 0; i < NUM_POINTS; i++) {
+                    var pt = path.getPointAtLength(i * len / (NUM_POINTS - 1));
+                    points.push([pt.x, pt.y]);
+                }
+                textarea.value = `${textarea.value}
+
+${JSON.stringify(points)}`;
+                svg.remove();
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑器</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <script src="custom-toast.js"></script>
+    <script src="shared.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <textarea id="textarea"></textarea>
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="save">
+            <span class="material-symbols-outlined">
+                save
+            </span>
+            <div class="pivot-bar-item-title">保存</div>
+        </div>
+
+        <div class="bar-item-tab" id="format">
+            <span class="material-symbols-outlined">
+                code
+            </span>
+            <div class="pivot-bar-item-title">格式化</div>
+        </div>
+
+        <div class="bar-item-tab" id="calculate">
+            <span class="material-symbols-outlined">
+                calculate
+            </span>
+            <div class="pivot-bar-item-title">计算</div>
+        </div>
+        <div class="bar-item-tab" id="preview">
+            <span class="material-symbols-outlined">
+                preview
+            </span>
+            <div class="pivot-bar-item-title">预览</div>
+        </div>
+
+
+
+    </div>
+    <custom-toast id="toast"></custom-toast>
+    <script>
+        const textarea = document.getElementById("textarea");
+        function cacheCode() {
+            textarea.value = localStorage.getItem('code');
+            document.addEventListener('visibilitychange', evt => {
+                localStorage.setItem('code', textarea.value.trim());
+            });
+        }
+        function initialize() {
+            document.getElementById('format').addEventListener('click', evt => {
+                const options = { indent_size: 2, space_in_empty_paren: true }
+                textarea.value = js_beautify(textarea.value, options);
+            })
+            document.getElementById('save').addEventListener('click', evt => {
+                localStorage.setItem('code', textarea.value.trim());
+            })
+            document.getElementById('calculate').addEventListener('click', evt => {
+                window.open("./p5expression.html", '_blank');
+            })
+            document.getElementById('preview').addEventListener('click', evt => {
+                window.open("./p5view.html", '_blank');
+            })
+        }
+        cacheCode();
+        initialize();
+
+    </script>
+</body>
+
+</html>

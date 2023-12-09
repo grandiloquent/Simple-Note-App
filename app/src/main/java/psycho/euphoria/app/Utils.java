@@ -230,6 +230,7 @@ public class Utils {
                         "euphoria.psycho.browser",
                         "psycho.euphoria.v",
                         "com.android.settings",
+                        "com.zhiliaoapp.musically",
                         "psycho.euphoria.app"
                 }).toString());
                 wr.close();

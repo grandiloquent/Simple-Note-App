@@ -31,7 +31,12 @@
             </span>
             <div class="pivot-bar-item-title">格式化</div>
         </div>
-
+        <div class="bar-item-tab" id="text-box">
+            <span class="material-symbols-outlined">
+                square_foot
+            </span>
+            <div class="pivot-bar-item-title">文本长度</div>
+        </div>
 
     </div>
     <script>
@@ -77,14 +82,35 @@
                 document.body.appendChild(svg);
 
                 var len = path.getTotalLength();
-               
+
                 textarea.value = `${textarea.value}
 
 ${len}`;
                 svg.remove();
             });
-            
-            document.getElementById('data_array')
+        document.getElementById('text-box')
+            .addEventListener('click', evt => {
+
+
+                let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.textContent = getLine(textarea);
+                text.style.fontFamily="方正兰亭黑简体";
+                text.style.fontSize="24px";
+
+                svg.appendChild(text);
+                svg.style.position = 'absolute';
+                svg.style.left = '-100%';
+                document.body.appendChild(svg);
+
+                var len = svg.getBBox();
+                console.log(len);
+                textarea.value = `${textarea.value}
+
+${JSON.stringify(len)}`;
+                svg.remove();
+            });
+        document.getElementById('data_array')
             .addEventListener('click', evt => {
 
                 var NUM_POINTS = 120;
@@ -111,6 +137,7 @@ ${len}`;
 ${JSON.stringify(points)}`;
                 svg.remove();
             });
+
     </script>
 </body>
 

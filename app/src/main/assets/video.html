@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频</title>
+    <link rel="stylesheet" href="video.css">
+    <script src="shared.js"></script>
+    <script src="custom_seekbar.js"></script>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <video id="video"></video>
+        <div id="top-wrapper">
+            <div id="message"></div>
+            <div class="btn" id="jump-sepcify-time">
+                <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="M12.984 6l8.531 6-8.531 6v-12zM3.984 18v-12l8.531 6z"></path>
+                </svg>
+            </div>
+            <div class="btn" id="next-frame">
+                <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="M12.984 6l8.531 6-8.531 6v-12zM3.984 18v-12l8.531 6z"></path>
+                </svg>
+            </div>
+        </div>
+        <div id="middle-wrapper">
+            <div id="previous">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="M19 6 9 12l10 6V6zM7 6H5v12h2V6z"></path>
+                </svg>
+            </div>
+            <div id="play-pause">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="m7 4 12 8-12 8V4z"></path>
+                </svg>
+            </div>
+            <div id="next">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="m5 18 10-6L5 6v12zM19 6h-2v12h2V6z"></path>
+                </svg>
+            </div>
+        </div>
+        <div id="bottom-wrapper">
+            <div style="display: flex;align-items: center;user-select: none;">
+                <div id="time-first">00:00</div>
+                <div id="time-delimiter">/</div>
+                <div id="time-second">00:00</div>
+                <div style="flex-grow: 1;"></div>
+                <div id="play-next">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="M15.984 6h2.016v12h-2.016v-12zM6 18v-12l8.484 6z"></path>
+                    </svg>
+                </div>
+
+                <div id="random-play">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path
+                            d="M14.813 13.406l3.141 3.141 2.063-2.063v5.531h-5.531l2.063-2.063-3.141-3.141zM14.484 3.984h5.531v5.531l-2.063-2.063-12.563 12.563-1.406-1.406 12.563-12.563zM10.594 9.188l-1.406 1.406-5.203-5.203 1.406-1.406z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="video-list">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path>
+                    </svg>
+                </div>
+                <div id="recycle">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path
+                            d="M15.516 3.984h3.469v2.016h-13.969v-2.016h3.469l1.031-0.984h4.969zM8.016 9v9.984h7.969v-9.984h-7.969zM6 18.984v-12h12v12q0 0.797-0.609 1.406t-1.406 0.609h-7.969q-0.797 0-1.406-0.609t-0.609-1.406z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="timer">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path
+                            d="M12 20.016q2.906 0 4.945-2.063t2.039-4.969-2.039-4.945-4.945-2.039-4.945 2.039-2.039 4.945 2.039 4.969 4.945 2.063zM19.031 7.406q0.797 1.031 1.383 2.648t0.586 2.93q0 3.703-2.625 6.352t-6.375 2.648-6.375-2.648-2.625-6.352 2.625-6.352 6.375-2.648q1.266 0 2.93 0.609t2.695 1.406l1.406-1.453q0.75 0.609 1.406 1.406zM11.016 14.016v-6h1.969v6h-1.969zM15 0.984v2.016h-6v-2.016h6z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="split">
+                    <svg viewBox="0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false">
+                        <path
+                            d="M18.984 3h3v0.984l-6.984 7.031-2.016-2.016zM12 12.516q0.516 0 0.516-0.516t-0.516-0.516-0.516 0.516 0.516 0.516zM6 20.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM6 8.016q0.797 0 1.406-0.586t0.609-1.43-0.609-1.43-1.406-0.586-1.406 0.586-0.609 1.43 0.609 1.43 1.406 0.586zM9.656 7.641l12.328 12.375v0.984h-3l-6.984-6.984-2.344 2.344q0.328 0.703 0.328 1.641 0 1.641-1.172 2.813t-2.813 1.172-2.813-1.172-1.172-2.813 1.172-2.813 2.813-1.172q0.938 0 1.641 0.328l2.344-2.344-2.344-2.344q-0.703 0.328-1.641 0.328-1.641 0-2.813-1.172t-1.172-2.813 1.172-2.813 2.813-1.172 2.813 1.172 1.172 2.813q0 0.938-0.328 1.641z">
+                        </path>
+                    </svg>
+                </div>
+                <div id="fullscreen">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="M7,11H6V6h5v1H7V11z M18,6h-5v1h4v4h1V6z M18,13h-1v4h-4v1h5V13z M11,17H7v-4H6v5h5V17z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+            <custom-seekbar id="custom-seekbar"></custom-seekbar>
+        </div>
+    </div>
+    <script src="custom-toast.js"></script>
+    <custom-toast id="toast"></custom-toast>
+    <script src="custom-dialog.js"></script>
+    <script>
+        function adjustSize(video) {
+            if (video.videoWidth > 0) {
+                const w = Math.min(window.outerWidth, window.innerWidth);
+                const h = Math.min(window.outerHeight, window.innerHeight);
+                let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
+                let height = video.videoHeight * ratio
+                let width = video.videoWidth * ratio;
+                video.style.width = `${width}px`;
+                video.style.height = `${height}px`;
+                video.style.left = `${(w - width) / 2}px`;
+                video.style.top = `${(h - height) / 2}px`
+            }
+        }
+        function formatDuration(ms) {
+            if (isNaN(ms)) return '0:00';
+            if (ms < 0) ms = -ms;
+            const time = {
+                hour: Math.floor(ms / 3600) % 24,
+                minute: Math.floor(ms / 60) % 60,
+                second: Math.floor(ms) % 60,
+            };
+            return Object.entries(time)
+                .filter((val, index) => index || val[1])
+                .map(val => (val[1] + '').padStart(2, '0'))
+                .join(':');
+        }
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
+        function jumpToBookmark(video) {
+            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
+            const currentTime = parseFloat(obj[path]);
+            if (currentTime) {
+                video.currentTime = currentTime;
+            }
+        }
+        function playVideo(baseUri, video, path) {
+            document.title = substringAfterLast(path, "/");
+            toast.setAttribute('message', document.title);
+            video.load();
+            video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
+            video.play();
+        }
+        async function showVideoList(baseUri, path, video) {
+            const dialog = document.createElement('custom-dialog');
+            dialog.setAttribute('title', '视频列表');
+            const d = document.createElement('div');
+            videos.forEach(v => {
+                const div = document.createElement('div');
+                div.style.alignItems = "center";
+                div.style.boxSizing = "border-box";
+                div.style.minHeight = "43px";
+                div.style.display = "flex";
+                div.style.padding = "8px 0";
+                div.style.borderTop = "1px solid rgb(218,220,224)";
+                div.setAttribute("data-src", v.path);
+                d.appendChild(div);
+                div.textContent = substringAfterLast(v.path, "/");
+                div.addEventListener('click', evt => {
+                    playVideo(baseUri, video, evt.currentTarget.dataset.src);
+                    video.play();
+                    jumpToBookmark(video);
+                    dialog.remove();
+                });
+            })
+            dialog.appendChild(d);
+            document.body.appendChild(dialog);
+        }
+        function substringAfterLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(index + delimiter.length);
+            }
+        }
+        function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(0, index);
+            }
+        }
+    </script>
+    <script type="module" src="video.js"></script>
+</body>
+
+</html>

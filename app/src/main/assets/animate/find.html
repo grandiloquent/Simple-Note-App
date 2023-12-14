@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>替换</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+
+    <link rel="stylesheet" href="index.css">
+    <script src="custom-toast.js"></script>
+    <script src="shared.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <textarea id="textarea"></textarea>
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="search">
+            <span class="material-symbols-outlined">
+                search
+            </span>
+            <div class="pivot-bar-item-title">全字</div>
+        </div>
+
+        <div class="bar-item-tab" id="search-regex">
+            <span class="material-symbols-outlined">
+                search
+            </span>
+            <div class="pivot-bar-item-title">正则表达式</div>
+        </div>
+        <div class="bar-item-tab" id="search-patterns">
+            <span class="material-symbols-outlined">
+                search
+            </span>
+            <div class="pivot-bar-item-title">模式</div>
+        </div>
+
+
+    </div>
+    <custom-toast id="toast"></custom-toast>
+    <script>
+        const textarea = document.getElementById("textarea");
+        function cacheCode() {
+            textarea.value = localStorage.getItem('find');
+            document.addEventListener('visibilitychange', evt => {
+                localStorage.setItem('find', textarea.value.trim());
+            });
+        }
+        function initialize() {
+            document.getElementById('search').addEventListener('click', evt => {
+                const s = textarea.value.trim();
+                const first = substringBefore(s, "\n");
+                const second = substringAfter(s, "\n");
+                const regex = new RegExp(`\\b${substringBefore(first, " ")}\\b`, 'g');
+                textarea.value = first + "\n" + second.replaceAll(regex,
+                    substringAfter(first, " ").trim());
+            })
+            document.getElementById('search-regex').addEventListener('click', evt => {
+                const s = textarea.value.trim();
+                const first = substringBefore(s, "\n");
+                const second = substringAfter(s, "\n");
+                const regex = new RegExp(`${substringBefore(first, " ")}`, 'g');
+                console.log(regex);
+                textarea.value = first + "\n" +  second.replaceAll(regex,
+                    substringAfter(first, " ").trim());
+            })
+            document.getElementById('search-patterns').addEventListener('click', evt => {
+               
+                textarea.value = `(?<=")[^"]+(?=")
+`+textarea.value
+            })
+        }
+        cacheCode();
+        initialize();
+
+    </script>
+</body>
+
+</html>

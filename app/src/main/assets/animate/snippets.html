@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码段</title>
+    <style>
+        pre {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-family: Consolas;
+            font-size: 12px;
+            word-wrap: normal;
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            color: #1F2328;
+            background-color: #f6f8fa;
+            border-radius: 6px;
+        }
+
+        pre code {
+            font-size: 100%;
+            font-family: Consolas;
+        }
+
+        pre>code {
+            padding: 0;
+            margin: 0;
+            word-break: normal;
+            white-space: pre;
+            background: transparent;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const items = [
+            {
+                body: `<path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
+  <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
+</path>`
+            }
+        ]
+        items.forEach(element => {
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            pre.appendChild(code);
+            code.innerText = element.body;
+            document.body.appendChild(pre);
+        });
+    </script>
+</body>
+
+</html>

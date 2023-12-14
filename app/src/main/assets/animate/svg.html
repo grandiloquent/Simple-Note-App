@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG 编辑器</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+
+    <link rel="stylesheet" href="index.css">
+    <script src="custom-toast.js"></script>
+    <script src="shared.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <textarea id="textarea"></textarea>
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="save">
+            <span class="material-symbols-outlined">
+                save
+            </span>
+            <div class="pivot-bar-item-title">保存</div>
+        </div>
+
+        <div class="bar-item-tab" id="format">
+            <span class="material-symbols-outlined">
+                code
+            </span>
+            <div class="pivot-bar-item-title">格式化</div>
+        </div>
+
+        <div class="bar-item-tab" id="calculate">
+            <span class="material-symbols-outlined">
+                calculate
+            </span>
+            <div class="pivot-bar-item-title">计算</div>
+        </div>
+        <div class="bar-item-tab" id="preview">
+            <span class="material-symbols-outlined">
+                preview
+            </span>
+            <div class="pivot-bar-item-title">预览</div>
+        </div>
+        <div class="bar-item-tab" id="text_snippet">
+            <span class="material-symbols-outlined">
+                text_snippet
+                </span>
+            <div class="pivot-bar-item-title">代码段</div>
+        </div>
+        <div class="bar-item-tab" id="help">
+            <span class="material-symbols-outlined">
+                help
+                </span>
+            <div class="pivot-bar-item-title">帮助</div>
+        </div>
+
+
+    </div>
+    <custom-toast id="toast"></custom-toast>
+    <script>
+        const textarea = document.getElementById("textarea");
+        function cacheCode() {
+            textarea.value = localStorage.getItem('svg');
+            document.addEventListener('visibilitychange', evt => {
+                localStorage.setItem('svg', textarea.value.trim());
+            });
+        }
+        function initialize() {
+            document.getElementById('format').addEventListener('click', evt => {
+                formatCode();   
+            })
+            document.getElementById('save').addEventListener('click', evt => {
+                localStorage.setItem('code', textarea.value.trim());
+            })
+            document.getElementById('calculate').addEventListener('click', evt => {
+                window.open("./expression.html", '_blank');
+            })
+            document.getElementById('preview').addEventListener('click', evt => {
+                window.open("./svgpreview.html", '_blank');
+            })
+            document.getElementById('text_snippet').addEventListener('click', evt => {
+                window.open("./snippets.html", '_blank');
+            })
+            document.getElementById('help').addEventListener('click', evt => {
+                window.open("./svghelper.html", '_blank');
+            })
+        }
+        function formatCode(){
+            const options = { indent_size: 2, space_in_empty_paren: true }
+                textarea.value = html_beautify(textarea.value, options);
+        
+        }
+        document.addEventListener('keydown', evt => {
+            if (evt.key === 'F1') {
+                evt.preventDefault();
+                formatCode();
+            }
+        })
+        cacheCode();
+        initialize();
+
+    </script>
+</body>
+
+</html>

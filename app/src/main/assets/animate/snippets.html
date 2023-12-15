@@ -45,6 +45,21 @@
                 body: `<path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
   <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
 </path>`
+            },{
+                body:`<g>
+  <animate id="o1" begin="tt1.end+1s" attributeName="opacity" values="0" dur=".3s" calcMode="linear" fill="freeze" />
+  <path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
+    <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
+  </path>
+  <text id="t1" x="460" y="558.1180954897479" font-size="24px" font-family="苹方" fill="#000" mask="url(#m1)">内角</text>
+  <mask id="m1">
+    <rect x="460" y="533.1181030273438" width="48" height="33" fill="#000">
+    </rect>
+    <rect x="412" y="533.1181030273438" width="48" height="33" fill="#fff">
+      <animateTransform id="tt1" begin="p1.end+1s" attributeName="transform" attributeType="XML" type="translate" to="48 0" dur=".3s" repeatCount="1" fill="freeze" />
+    </rect>
+    </clipPath>
+</g>`
             }
         ]
         items.forEach(element => {

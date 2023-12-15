@@ -53,6 +53,12 @@
                 </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
+        <div class="bar-item-tab" id="edit_note">
+            <span class="material-symbols-outlined">
+                edit_note
+                </span>
+            <div class="pivot-bar-item-title">注释</div>
+        </div>
         <div class="bar-item-tab" id="help">
             <span class="material-symbols-outlined">
                 help
@@ -90,6 +96,10 @@
             document.getElementById('help').addEventListener('click', evt => {
                 window.open("./svghelper.html", '_blank');
             })
+            document.getElementById('edit_note').addEventListener('click', evt => {
+                window.open("./text-swipe.html", '_blank');
+            })
+            
         }
         function formatCode(){
             const options = { indent_size: 2, space_in_empty_paren: true }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本 Swipe 动画</title>
+    <script src="shared.js"></script>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        button {
+            padding: 0;
+            border: none;
+            outline: none;
+            font: inherit;
+            text-transform: inherit;
+            color: inherit;
+            background: transparent;
+        }
+
+        button,
+        select,
+        [role=button],
+        input[type=checkbox] {
+            cursor: pointer;
+        }
+
+
+        input,
+        textarea {
+            background-color: transparent;
+            padding-bottom: 4px;
+            outline: none;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 1px;
+            font: inherit;
+            color: #0f0f0f
+        }
+
+        input::-webkit-input-placeholder,
+        textarea::-webkit-input-placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 8.4rem;
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            flex-grow: 1;
+
+        }
+    </style>
+</head>
+
+<body>
+    <textarea> </textarea>
+    <button style="padding: 12px;width: 100%;">确认</button>
+    <script>
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('keydown', evt => {
+            if (evt.key === 'F1') {
+                evt.preventDefault();
+                drawShape();
+
+            }
+        });
+        document.addEventListener('visibilitychange', evt => {
+            localStorage.setItem('text-swipe', textarea.value)
+        })
+        if (localStorage.getItem('text-swipe')) {
+            textarea.value = localStorage.getItem('text-swipe');
+        }
+        function getBBox(s) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', "0 0 720 720");
+            svg.innerHTML = s;
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            return svg.querySelector('text').getBBox();
+        }
+
+
+        function drawShape() {
+            let s = textarea.value.trim();
+            let box = getBBox(s);
+
+            let start = 5;
+            s = `<g>
+  <animate id="o1" begin="tt1.end+5s" attributeName="opacity" values="0" dur=".3s" calcMode="linear" fill="freeze" />
+  <path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
+    <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
+  </path>
+   ${s.replace(">", ' mask="url(#m1)">')}
+  <mask id="m1">
+    <rect x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}" fill="#000">
+    </rect>
+    <rect x="${box.x - box.width}" y="${box.y}" width="${box.width}" height="${box.height}" fill="#fff">
+      <animateTransform id="tt1" begin="p1.end+.5s" attributeName="transform" attributeType="XML" type="translate" to="${box.width} 0" dur=".3s" repeatCount="1" fill="freeze" />
+    </rect>
+    </clipPath>
+</g>`
+            let index = getRandomInt(0, 100);
+            textarea.value = s.replaceAll(/(?<=id=")[^"]+(?=")/g, m => {
+                return m.replaceAll(/\d+/g, x => {
+                    return parseInt(x) + index;
+                })
+            }).replaceAll(/(?<=begin=")[^"]+(?=.end)/g, m => {
+                return m.replaceAll(/\d+/g, x => {
+                    return parseInt(x) + index;
+                });
+            });
+
+            document.querySelector('svg').remove();
+        }
+        function getRandomArbitrary(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
+    </script>
+</body>
+
+</html>

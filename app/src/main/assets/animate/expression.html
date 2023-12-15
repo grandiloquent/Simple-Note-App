@@ -617,7 +617,7 @@
             <span class="material-symbols-outlined">
                 data_array
             </span>
-            <div class="pivot-bar-item-title">格式化</div>
+            <div class="pivot-bar-item-title">锚点组</div>
         </div>
         <div class="bar-item-tab" id="text-box">
             <span class="material-symbols-outlined">
@@ -638,10 +638,10 @@
         });
 
         document.addEventListener('visibilitychange', evt => {
-            localStorage.setItem('value', textarea.value)
+            localStorage.setItem('expression', textarea.value)
         })
-        if (localStorage.getItem('value')) {
-            textarea.value = localStorage.getItem('value');
+        if (localStorage.getItem('expression')) {
+            textarea.value = localStorage.getItem('expression');
         }
         function getLine(textarea) {
             let start = textarea.selectionStart;

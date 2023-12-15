@@ -89,6 +89,9 @@
 
             }
         });
+        document.querySelector('button').addEventListener('click', evt =>   {
+            drawShape();
+        });
         document.addEventListener('visibilitychange', evt => {
             localStorage.setItem('text-swipe', textarea.value)
         })
@@ -109,14 +112,12 @@
 
         function drawShape() {
             let s = textarea.value.trim();
-            let box = getBBox(s);
+            let box = getBBox("<text " + substringAfter(s, "<text "));
 
             let start = 5;
             s = `<g>
   <animate id="o1" begin="tt1.end+5s" attributeName="opacity" values="0" dur=".3s" calcMode="linear" fill="freeze" />
-  <path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
-    <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
-  </path>
+  ${getPath(substringBefore(s, "<text "))}
    ${s.replace(">", ' mask="url(#m1)">')}
   <mask id="m1">
     <rect x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}" fill="#000">
@@ -146,6 +147,35 @@
             min = Math.ceil(min);
             max = Math.floor(max);
             return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
+        function getPath(s) {
+
+
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d',
+                textarea.value.match(/(?<=d=")[^"]+(?=")/)
+            );
+            svg.appendChild(path);
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = path.getTotalLength();
+
+            return `${s.match(/<path [^>\/]+/)}
+stroke-dasharray="${len}"
+stroke-dashoffset="${len}" >
+<animate id="p1" 
+begin="1s" 
+attributeName="stroke-dashoffset" 
+values="${len};0" 
+dur="1s" 
+calcMode="linear" 
+fill="freeze"/>
+</path>
+`;
+
         }
     </script>
 </body>

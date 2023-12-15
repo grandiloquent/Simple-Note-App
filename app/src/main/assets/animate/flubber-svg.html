@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        svg {
+            width: 720px;
+            height: 720px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <svg viewBox="0 0 720 720">
+        <path d="M560,360L460,533.2H260L160,360l100-173.2h200L560,360z">
+        </path>
+        <path d="M544.8,283.5v153.1L436.5,544.8H283.5L175.2,436.5V283.5l108.2-108.2h153.1L544.8,283.5z" />
+        <path
+            d="M521.8,242.4L560,360l-38.2,117.6l-100,72.7H298.2l-100-72.7L160,360l38.2-117.6l100-72.7h123.6L521.8,242.4z" />
+        <path
+            d="M501.4,218.6l51.8,89.7v103.5l-51.8,89.7l-89.7,51.8H308.2l-89.7-51.8l-51.8-89.7V308.2l51.8-89.7l89.7-51.8h103.5L501.4,218.6z">
+        </path>
+        <path d="M484.7,203.6l55.5,69.6L560,360l-19.8,86.8l-55.5,69.6L404.5,555h-89l-80.2-38.6l-55.5-69.6L160,360l19.8-86.8
+	l55.5-69.6l80.2-38.6h89L484.7,203.6z" />
+        <path d="M436.5,175.2l45.2,26.1l36.9,36.9l26.1,45.2l13.5,50.4v52.2l-13.5,50.4l-26.1,45.2l-36.9,36.9l-45.2,26.1
+	l-50.4,13.5h-52.2l-50.4-13.5l-45.2-26.1l-36.9-36.9l-26.1-45.2l-13.5-50.4v-52.2l13.5-50.4l26.1-45.2l36.9-36.9l45.2-26.1
+	l50.4-13.5h52.2L436.5,175.2z" />
+        <path d="M560,360c0,110.5-89.5,200-200,200s-200-89.5-200-200s89.5-200,200-200S560,249.5,560,360z"></path>
+    </svg>
+    <script src="./d3.v4.min.js"></script>
+    <script src="./flubber.min.js"></script>
+    <script>
+        var index = 0;
+
+        var pathStrings = Array.from(document.querySelectorAll("path")).map(d => d.getAttribute("d"));
+
+        // Remove all the paths except the first
+        d3.selectAll("path")
+            .filter(function (d, i) { return i; })
+            .remove();
+
+        d3.select("path")
+            .style("display", "block")
+            .style('fill', '#000')
+            .call(animate);
+
+        function animate(sel) {
+            var start = pathStrings.shift(),
+                end = pathStrings[0];
+
+            pathStrings.push(start);
+
+            sel
+                .datum({ start, end })
+                .transition()
+                .duration(1500)
+                .ease(d3.easeQuadIn)
+                .attrTween("d", function (d) {
+
+                    return flubber.interpolate(d.start, d.end, { maxSegmentLength: 1 })
+                })
+                .on("end", function () {
+                    sel.call(animate);
+                });
+        }   </script>
+</body>
+
+</html>

@@ -17,8 +17,49 @@
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="wrapper" style="padding-top: 49px;">
         <textarea id="textarea"></textarea>
+    </div>
+    <div class="bar-renderer" style="top: 0;">
+
+        <div class="bar-item-tab" id="format">
+            <span class="material-symbols-outlined">
+                code
+            </span>
+            <div class="pivot-bar-item-title">格式化</div>
+        </div>
+        <div class="bar-item-tab" id="calculate">
+            <span class="material-symbols-outlined">
+                calculate
+            </span>
+            <div class="pivot-bar-item-title">计算</div>
+        </div>
+
+        <div class="bar-item-tab" id="square_foot">
+            <span class="material-symbols-outlined">
+                square_foot
+            </span>
+            <div class="pivot-bar-item-title">长度</div>
+        </div>
+
+        <div class="bar-item-tab" id="pattern">
+            <span class="material-symbols-outlined">
+                pattern
+            </span>
+            <div class="pivot-bar-item-title">模式</div>
+        </div>
+        <div class="bar-item-tab" id="comment">
+            <span class="material-symbols-outlined">
+                comment
+            </span>
+            <div class="pivot-bar-item-title">模式</div>
+        </div>
+        <div class="bar-item-tab" id="degree">
+            <span class="material-symbols-outlined">
+                square_foot
+            </span>
+            <div class="pivot-bar-item-title">角度</div>
+        </div>
     </div>
     <div class="bar-renderer">
         <div class="bar-item-tab" id="save">
@@ -28,19 +69,8 @@
             <div class="pivot-bar-item-title">保存</div>
         </div>
 
-        <div class="bar-item-tab" id="format">
-            <span class="material-symbols-outlined">
-                code
-            </span>
-            <div class="pivot-bar-item-title">格式化</div>
-        </div>
 
-        <div class="bar-item-tab" id="calculate">
-            <span class="material-symbols-outlined">
-                calculate
-            </span>
-            <div class="pivot-bar-item-title">计算</div>
-        </div>
+
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
                 preview
@@ -50,19 +80,19 @@
         <div class="bar-item-tab" id="text_snippet">
             <span class="material-symbols-outlined">
                 text_snippet
-                </span>
+            </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
         <div class="bar-item-tab" id="edit_note">
             <span class="material-symbols-outlined">
                 edit_note
-                </span>
+            </span>
             <div class="pivot-bar-item-title">注释</div>
         </div>
         <div class="bar-item-tab" id="help">
             <span class="material-symbols-outlined">
                 help
-                </span>
+            </span>
             <div class="pivot-bar-item-title">帮助</div>
         </div>
 
@@ -79,13 +109,13 @@
         }
         function initialize() {
             document.getElementById('format').addEventListener('click', evt => {
-                formatCode();   
+                formatCode();
             })
             document.getElementById('save').addEventListener('click', evt => {
                 localStorage.setItem('code', textarea.value.trim());
             })
             document.getElementById('calculate').addEventListener('click', evt => {
-                window.open("./expression.html", '_blank');
+                calculate();
             })
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("./svgpreview.html", '_blank');
@@ -99,12 +129,40 @@
             document.getElementById('edit_note').addEventListener('click', evt => {
                 window.open("./text-swipe.html", '_blank');
             })
-            
+            document.getElementById('pattern').addEventListener('click', evt => {
+                processSelection(s => {
+                    return ` stroke="#2196F3" `
+                })
+            })
+            document.getElementById('comment').addEventListener('click', evt => {
+                processSelection(s => {
+                    return `<!---->`
+                })
+            })
+            document.getElementById('degree').addEventListener('click', evt => {
+                processSelection(selectedString => {
+                    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', selectedString);
+                    svg.appendChild(path);
+                    svg.style.position = 'absolute';
+                    svg.style.left = '-100%';
+                    document.body.appendChild(svg);
+
+                    var len = path.getTotalLength();
+                    var firstPoint = path.getPointAtLength(0);
+                    var secondPoint = path.getPointAtLength(len);
+                    var deg = Math.atan2(firstPoint.y - secondPoint.y, firstPoint.x - secondPoint.x) * (180 / Math.PI);
+                    svg.remove();
+                    return deg
+                })
+            })
+
         }
-        function formatCode(){
+        function formatCode() {
             const options = { indent_size: 2, space_in_empty_paren: true }
-                textarea.value = html_beautify(textarea.value, options);
-        
+            textarea.value = html_beautify(textarea.value, options);
+
         }
         document.addEventListener('keydown', evt => {
             if (evt.key === 'F1') {
@@ -115,6 +173,81 @@
         cacheCode();
         initialize();
 
+        function calculate() {
+            processSelection(eval)
+        }
+        document.getElementById('square_foot')
+            .addEventListener('click', evt => {
+                processSelection(s => {
+                    if (s.indexOf('<') !== -1) {
+
+                        return animateShape(s);
+                    } else {
+                        return animatePath(s);
+                    }
+                })
+            });
+        function processSelection(fn) {
+            const selectionStart = textarea.selectionStart;
+            const selectionEnd = textarea.selectionEnd;
+            const selectedString = textarea.value.substring(selectionStart, selectionEnd);
+            textarea.value = `${textarea.value.substring(0, selectionStart)}${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
+
+        }
+        function animateShape(selectedString) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.innerHTML = selectedString;
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = svg.children[0].getTotalLength();
+            svg.remove();
+            return `
+${substringBefore(selectedString, '>')} 
+fill="none" 
+stroke="red" 
+stroke-width="4"
+stroke-dasharray="${len}"
+stroke-dashoffset="${len}" >
+<animate id="" 
+begin="1s" 
+attributeName="stroke-dashoffset" 
+values="${len};0" 
+dur="1s" 
+calcMode="linear" 
+fill="freeze"/>
+    </${selectedString.match(/(?<=<)[^ ]+/)}>
+`;
+        }
+        function animatePath(selectedString) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', selectedString);
+            svg.appendChild(path);
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = path.getTotalLength();
+            svg.remove();
+            return `
+<path d="${selectedString}" 
+fill="none" 
+stroke="red" 
+stroke-width="4"
+stroke-dasharray="${len}"
+stroke-dashoffset="${len}" >
+<animate id="" 
+begin="1s" 
+attributeName="stroke-dashoffset" 
+values="${len};0" 
+dur="1s" 
+calcMode="linear" 
+fill="freeze"/>
+    </path>
+`;
+        }
     </script>
 </body>
 

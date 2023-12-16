@@ -33,7 +33,7 @@
     <script>
         async function loadData() {
             const res = await fetch('../an');
-            if (res.statusCode !== 200)
+            if (res.status !== 200)
                 throw new Error(res.status);
             const data = await res.text();
             return data;

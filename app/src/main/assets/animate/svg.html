@@ -244,7 +244,7 @@ flex-direction: column;
         const textarea = document.getElementById("textarea");
         async function loadData() {
             const res = await fetch('../an');
-            if (res.statusCode !== 200)
+            if (res.status !== 200)
                 throw new Error(res.status);
             const data = await res.text();
             return data;
@@ -254,7 +254,7 @@ flex-direction: column;
                 method: 'POST',
                 body: textarea.value
             });
-            if (res.statusCode !== 200)
+            if (res.status !== 200)
                 throw new Error(res.status);
             await res.text();
         }

@@ -98,6 +98,121 @@
 
 
     </div>
+    <div id="dialog" style="position: fixed;left:0;right: 0;bottom: 0;top: 0;
+    background: rgba(0, 0, 0, .35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    ">
+        <div style="width: 80vw;max-height: 70vh;font-size: 12px; display: flex;
+align-items: center;
+justify-content: center;
+background-color: #fff;
+flex-direction: column;
+">
+            <div id="dialog-list" style="display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            width: 100%;
+            padding:0 12px;
+            box-sizing: border-box;
+            line-height: 24px;
+            font-size: 12px;
+            ">
+
+            </div>
+            <div style="display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 32px;
+            width: 100%;
+            ">
+                <div style="flex-grow: 1;text-align: center;">导出</div>
+                <div style="flex-grow: 1;text-align: center;">导入</div>
+                <div id="add_snippet" style="flex-grow: 1;text-align: center;">添加</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dialog = document.getElementById('dialog');
+        dialog.addEventListener('click', evt => {
+            dialog.style.display = 'none';
+        })
+
+        const dialogBody = document.getElementById('dialog-list');
+        let snippets = [];
+        document.getElementById('add_snippet')
+            .addEventListener('click', evt => {
+                dialog.style.display = 'none';
+                let selectionStart = textarea.selectionStart;
+                let selectionEnd = textarea.selectionEnd;
+                let selectedString = textarea.value.substring(selectionStart, selectionEnd);
+
+                const s = selectedString.trim();
+                if (s) {
+                    snippets.push(s);
+                    snippets = [...new Set(snippets)];
+                    localStorage.setItem('snippets', JSON.stringify(snippets));
+                }
+
+            })
+        function loadSnippets() {
+            const s = localStorage.getItem('snippets') || '[]';
+            snippets = JSON.parse(s);
+            dialogBody.innerHTML = '';
+            const array = [];
+            snippets.forEach(snippet => {
+                array.push(`<div class="dialog-item" style="width: 100%;border:1px solid #ddd;
+                display: flex;
+            align-items: center;
+            justify-content: center;"
+            data-snippet="${escapeHtml(snippet)}"
+            >
+                    <div style="flex-grow: 1;">${escapeHtml(snippet)}</div>
+                    <div class="dialog-delete"  style="width: 24px;text-align: center;">X</div>
+                </div>`)
+            })
+
+            dialogBody.innerHTML = array.join('');
+            document.querySelectorAll('.dialog-item')
+                .forEach(x => {
+                    x.addEventListener('click', evt => {
+                        let selectionStart = textarea.selectionStart;
+                        let selectionEnd = textarea.selectionEnd;
+                        let selectedString = textarea.value.substring(selectionStart, selectionEnd);
+                        textarea.value = `${textarea.value.substring(0, selectionStart)}${x.dataset.snippet}${textarea.value.substring(selectionEnd)}`;
+                    });
+                    x.querySelector('.dialog-delete')
+                        .addEventListener('click', evt => {
+                            evt.stopPropagation();
+                            const array = [];
+                            for (let index = 0; index < snippets.length; index++) {
+                                const element = snippets[index]; if (element === x.dataset.snippet) { }
+                                if (element === x.dataset.snippet) {
+                                    continue;
+                                }
+                                array.push(element);
+                            }
+                            snippets = [...new Set(array)];
+                            localStorage.setItem('snippets', JSON.stringify(snippets));
+                            dialog.style.display = 'none';
+
+                        });
+                })
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
     <custom-toast id="toast"></custom-toast>
     <script>
         const textarea = document.getElementById("textarea");
@@ -130,9 +245,8 @@
                 window.open("./text-swipe.html", '_blank');
             })
             document.getElementById('pattern').addEventListener('click', evt => {
-                processSelection(s => {
-                    return ` stroke="#2196F3" `
-                })
+                dialog.style.display = 'flex';
+                loadSnippets();
             })
             document.getElementById('comment').addEventListener('click', evt => {
                 processSelection(s => {
@@ -189,9 +303,9 @@ begin=".end+1s"
                 if (s.indexOf('<path') !== -1 &&
                     s.indexOf('<text') !== -1) {
                     return calculateCenterTextPath(s)
-                }else if (/^[0-9]+<path/.test(s)) {
+                } else if (/^[0-9]+<path/.test(s)) {
                     return calculateMoveAlongNormalPath(s)
-                }else if(/\d+,\d+,\d+,\d+/.test(s)){
+                } else if (/\d+,\d+,\d+,\d+/.test(s)) {
                     return eval(`drawPolygon(${s})`);
                 } else {
                     return eval(s);

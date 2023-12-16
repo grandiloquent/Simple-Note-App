@@ -137,8 +137,15 @@
             document.getElementById('comment').addEventListener('click', evt => {
                 processSelection(s => {
                     return `<!--
-Math.sin(30/Math.PI*180)*
-/Math.sin(30/Math.PI*180)
+Math.sin(30*Math.PI/180)*
+/Math.sin(30*Math.PI/180)
+360,360,6,200
+fill="#2196F3"
+fill="none"
+fill="freeze"
+id=""
+begin=".end+1s"
+
                         -->`
                 })
             })

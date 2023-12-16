@@ -52,7 +52,7 @@
             <span class="material-symbols-outlined">
                 comment
             </span>
-            <div class="pivot-bar-item-title">模式</div>
+            <div class="pivot-bar-item-title">注释</div>
         </div>
         <div class="bar-item-tab" id="degree">
             <span class="material-symbols-outlined">
@@ -136,7 +136,10 @@
             })
             document.getElementById('comment').addEventListener('click', evt => {
                 processSelection(s => {
-                    return `<!---->`
+                    return `<!--
+Math.sin(30/Math.PI*180)*
+/Math.sin(30/Math.PI*180)
+                        -->`
                 })
             })
             document.getElementById('degree').addEventListener('click', evt => {
@@ -174,7 +177,19 @@
         initialize();
 
         function calculate() {
-            processSelection(eval)
+
+            processSelection(s => {
+                if (s.indexOf('<path') !== -1 &&
+                    s.indexOf('<text') !== -1) {
+                    return calculateCenterTextPath(s)
+                }else if (/^[0-9]+<path/.test(s)) {
+                    return calculateMoveAlongNormalPath(s)
+                }else if(/\d+,\d+,\d+,\d+/.test(s)){
+                    return eval(`drawPolygon(${s})`);
+                } else {
+                    return eval(s);
+                }
+            })
         }
         document.getElementById('square_foot')
             .addEventListener('click', evt => {
@@ -188,11 +203,42 @@
                 })
             });
         function processSelection(fn) {
-            const selectionStart = textarea.selectionStart;
-            const selectionEnd = textarea.selectionEnd;
-            const selectedString = textarea.value.substring(selectionStart, selectionEnd);
+            let selectionStart = textarea.selectionStart;
+            let selectionEnd = textarea.selectionEnd;
+            let selectedString = textarea.value.substring(selectionStart, selectionEnd);
+            if (!selectedString) {
+                selectedString = getLine(textarea);
+                if (textarea.value[selectionStart] !== '\n') {
+                    while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart + 1] !== '\n') {
+                        selectionStart++;
+                    }
+                    selectionStart++;
+                }
+
+                selectionEnd = selectionStart
+                textarea.value = `${textarea.value.substring(0, selectionStart)}
+${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
+                return;
+            }
             textarea.value = `${textarea.value.substring(0, selectionStart)}${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
 
+        }
+        function getLine(textarea) {
+            let start = textarea.selectionStart;
+            let end = textarea.selectionEnd;
+            if (textarea.value[start] === '\n' && start - 1 > 0) {
+                start--;
+            }
+            if (textarea.value[end] === '\n' && end - 1 > 0) {
+                end--;
+            }
+            while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+                start--;
+            }
+            while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
+                end++;
+            }
+            return textarea.value.substring(start, end + 1);
         }
         function animateShape(selectedString) {
             let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -247,6 +293,93 @@ calcMode="linear"
 fill="freeze"/>
     </path>
 `;
+        }
+        function drawPolygon(x, y, n, radius, options = {}) {
+            const array = [];
+            array.push(
+                [x + radius * Math.cos(options.rotation || 0),
+                y + radius * Math.sin(options.rotation || 0)]);
+            for (let i = 1; i <= n; i += 1) {
+                const angle = (i * (2 * Math.PI / n)) + (options.rotation || 0);
+                array.push(
+                    [
+                        x + radius * Math.cos(angle),
+                        y + radius * Math.sin(angle)
+                    ])
+            }
+            const d = `M${array.map(x => `${x[0]} ${x[1]}`).join('L')}`;
+            return `<path stroke="#FF5722" fill="none" stroke-width="4"  d="${d}">
+    </path>`
+        }
+        function getTotalLength(d) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', d);
+            svg.appendChild(path);
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = path.getTotalLength();
+            svg.remove();
+            return len;
+        }
+        function getBBox(s, isLen) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.innerHTML = s;
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = isLen ? svg.children[0].getTotalLength() : svg.children[0].getBBox();
+            svg.remove()
+            return len;
+        }
+        function getCenterPath(s, offset) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.innerHTML = s;
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = svg.children[0].getTotalLength();
+            let first = svg.children[0].getPointAtLength(len / 2 - offset)
+            let second = svg.children[0].getPointAtLength(len / 2 + offset)
+
+            svg.remove()
+            return `M${first.x} ${first.y}L${second.x} ${second.y}`;
+        }
+        function getNormalPath(s, offset) {
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.innerHTML = s;
+            svg.style.position = 'absolute';
+            svg.style.left = '-100%';
+            document.body.appendChild(svg);
+
+            var len = svg.children[0].getTotalLength();
+            let firstPoint = svg.children[0].getPointAtLength(0)
+            let secondPoint = svg.children[0].getPointAtLength(len)
+            var deg = Math.atan2(firstPoint.y - secondPoint.y, firstPoint.x - secondPoint.x) * (180 / Math.PI);
+            deg = 180 - deg;
+            var offsetX = Math.sin(deg / Math.PI * 180) * offset;
+            var offsetY = Math.cos(deg / Math.PI * 180) * offset;
+
+            svg.remove()
+            return `M${firstPoint.x + offsetX} ${firstPoint.y + offsetY}L${secondPoint.x + offsetX} ${secondPoint.y + offsetY}`;
+        }
+
+        function calculateCenterTextPath(s) {
+            let path = substringBefore(s, "<text");
+            let text = "<text" + substringAfter(s, "<text");
+            let box = getBBox(text, false);
+            let v = getCenterPath(path, box.width / 2)
+            return s.replace(/(?<=d=")[^"]+(?=")/, v);
+        }
+        function calculateMoveAlongNormalPath(s) {
+            let offset = substringBefore(s, "<path").trim();
+            let path = "<path" + substringAfter(s, "<path");
+            let v = getNormalPath(path, parseInt(offset))
+            return s.replace(/(?<=d=")[^"]+(?=")/, v);
         }
     </script>
 </body>

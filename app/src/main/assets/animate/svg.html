@@ -144,7 +144,7 @@ flex-direction: column;
 
         const dialogBody = document.getElementById('dialog-list');
         let snippets = [];
-        document.getElementById('import_snippets')
+        document.getElementById('export_snippets')
             .addEventListener('click', evt => {
                 try {
                     snippets = JSON.parse(textarea.value.trim())
@@ -154,9 +154,10 @@ flex-direction: column;
 
                 }
             });
-        document.getElementById('export_snippets')
+        document.getElementById('import_snippets')
             .addEventListener('click', evt => {
-                textarea.value = textarea.value + "\n\n\n" + JSON.stringify(snippets);
+                textarea.value = textarea.value + "\n\n\n" +
+                    JSON.stringify(snippets);
             });
         document.getElementById('add_snippet')
             .addEventListener('click', evt => {

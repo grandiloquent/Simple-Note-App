@@ -41,12 +41,104 @@
 <body>
     <script>
         const items = [
+
+            { body: `<circle cx="50" cy="50" r="50" />` },
+            { body: `<ellipse cx="100" cy="50" rx="100" ry="50" />` },
+            { body: `<line x1="0" y1="80" x2="100" y2="20" stroke="black" />` },
+            { body: `<polygon points="0,100 50,25 50,75 100,0" />` },
+            { body: `<polyline points="0,100 50,25 50,75 100,0" />` },
+            {
+                body: `<clipPath id="myClip">
+    <!--
+      Everything outside the circle will be
+      clipped and therefore invisible.
+    -->
+    <circle cx="40" cy="35" r="35" />
+  </clipPath>
+
+  <!-- The original black heart, for reference -->
+  <path
+    id="heart"
+    d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+
+  <!--
+    Only the portion of the red heart
+    inside the clip circle is visible.
+  -->
+  <use clip-path="url(#myClip)" href="#heart" fill="red" />`},
+            {
+                body: ` <rect x="-10" y="-10" width="120" height="120" fill="blue" />
+  <mask id="myMask">
+    <!-- Everything under a white pixel will be visible -->
+    <rect x="0" y="0" width="100" height="100" fill="white" />
+
+    <!-- Everything under a black pixel will be invisible -->
+    <path
+      d="M10,35 A20,20,0,0,1,50,35 A20,20,0,0,1,90,35 Q90,65,50,95 Q10,65,10,35 Z"
+      fill="black" />
+  </mask>
+
+  <polygon points="-10,110 110,110 110,-10" fill="orange" />
+
+  <!-- with this mask applied, we "punch" a heart shape hole into the circle -->
+  <circle cx="50" cy="50" r="50" fill="purple" mask="url(#myMask)" />`},
+            {
+                body: ` <rect
+    x="1"
+    y="1"
+    width="498"
+    height="298"
+    fill="none"
+    stroke="blue"
+    stroke-width="2" />
+
+  <!-- Draw the outline of the motion path in blue, along
+          with three small circles at the start, middle and end. -->
+  <path
+    id="path1"
+    d="M100,250 C 100,50 400,50 400,250"
+    fill="none"
+    stroke="blue"
+    stroke-width="7.06" />
+  <circle cx="100" cy="250" r="17.64" fill="blue" />
+  <circle cx="250" cy="100" r="17.64" fill="blue" />
+  <circle cx="400" cy="250" r="17.64" fill="blue" />
+
+  <!-- Here is a triangle which will be moved about the motion path.
+       It is defined with an upright orientation with the base of
+       the triangle centered horizontally just above the origin. -->
+  <path
+    d="M-25,-12.5 L25,-12.5 L 0,-87.5 z"
+    fill="yellow"
+    stroke="red"
+    stroke-width="7.06">
+    <!-- Define the motion path animation -->
+    <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#path1" />
+    </animateMotion>
+  </path>`},
+            {
+                body: `<animate
+      attributeName="rx"
+      values="0;5;0"
+      dur="10s"
+      repeatCount="indefinite" />`},
+            {
+                body: `<animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 60 70"
+      to="360 60 70"
+      dur="10s"
+      repeatCount="indefinite" />`},
+
             {
                 body: `<path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
   <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
 </path>`
-            },{
-                body:`<g>
+            }, {
+                body: `<g>
   <animate id="o1" begin="tt1.end+1s" attributeName="opacity" values="0" dur=".3s" calcMode="linear" fill="freeze" />
   <path d="M360 560 l100 -25.881904510252074l73.20508075688771 -73.20508075688771" stroke="#ff0000" fill="none" stroke-width="4" stroke-dasharray="206.82269287109375" stroke-dashoffset="206.82269287109375">
     <animate id="p1" begin="1s" attributeName="stroke-dashoffset" values="206.82269287109375;0" dur=".3s" calcMode="linear" fill="freeze" />
@@ -60,8 +152,8 @@
     </rect>
     </clipPath>
 </g>`
-            },{
-                body:`<svg class="svgwave" xmlns="http://www.w3.org/2000/svg" width="301" height="301" viewBox="0 0 301 301" style="width:auto; height: auto; overflow: visible;">
+            }, {
+                body: `<svg class="svgwave" xmlns="http://www.w3.org/2000/svg" width="301" height="301" viewBox="0 0 301 301" style="width:auto; height: auto; overflow: visible;">
                 <path id="wavepath" d="M145.5 301.5H13C6.09645 301.5 0.5 295.904 0.5 289V13C0.5 6.09645 6.09644 0.5 13 0.5H289C295.904 0.5 301.5 6.09644 301.5 13V289C301.5 295.904 295.904 301.5 289 301.5H156.5 H13C6.09645 301.5 0.5 295.904 0.5 289V13C0.5 6.09645 6.09644 0.5 13 0.5H289C295.904 0.5 301.5 6.09644 301.5 13V289C301.5 295.904 295.904 301.5 289 301.5H156.5 H13C6.09645 301.5 0.5 295.904 0.5 289V13C0.5 6.09645 6.09644 0.5 13 0.5H289C295.904 0.5 301.5 6.09644 301.5 13V289C301.5 295.904 295.904 301.5 289 301.5H156.5 H13C6.09645 301.5 0.5 295.904 0.5 289V13C0.5 6.09645 6.09644 0.5 13 0.5H289C295.904 0.5 301.5 6.09644 301.5 13V289C301.5 295.904 295.904 301.5 289 301.5H156.5" style="fill: transparent; stroke: transparent; stroke-width: 1px;" ></path>
 
                 <foreignObject x='6' y='6' width='300px' height='300px'>

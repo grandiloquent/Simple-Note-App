@@ -129,8 +129,8 @@ flex-direction: column;
             line-height: 32px;
             width: 100%;
             ">
-                <div style="flex-grow: 1;text-align: center;">导出</div>
-                <div style="flex-grow: 1;text-align: center;">导入</div>
+                <div id="import_snippets" style="flex-grow: 1;text-align: center;">导出</div>
+                <div id="export_snippets" style="flex-grow: 1;text-align: center;">导入</div>
                 <div id="add_snippet" style="flex-grow: 1;text-align: center;">添加</div>
             </div>
         </div>
@@ -144,6 +144,20 @@ flex-direction: column;
 
         const dialogBody = document.getElementById('dialog-list');
         let snippets = [];
+        document.getElementById('import_snippets')
+            .addEventListener('click', evt => {
+                try {
+                    snippets = JSON.parse(textarea.value.trim())
+                    snippets = [...new Set(snippets)];
+                    localStorage.setItem('snippets', JSON.stringify(snippets));
+                } catch (e) {
+
+                }
+            });
+        document.getElementById('export_snippets')
+            .addEventListener('click', evt => {
+                textarea.value = textarea.value + "\n\n\n" + JSON.stringify(snippets);
+            });
         document.getElementById('add_snippet')
             .addEventListener('click', evt => {
                 dialog.style.display = 'none';
@@ -212,6 +226,7 @@ flex-direction: column;
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
     </script>
     <custom-toast id="toast"></custom-toast>
     <script>

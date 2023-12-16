@@ -243,14 +243,14 @@ flex-direction: column;
     <script>
         const textarea = document.getElementById("textarea");
         async function loadData() {
-            const res = await fetch('/an');
+            const res = await fetch('../an');
             if (res.statusCode !== 200)
                 throw new Error(res.status);
             const data = await res.text();
             return data;
         }
         async function saveData() {
-            const res = await fetch('/an', {
+            const res = await fetch('../an', {
                 method: 'POST',
                 body: textarea.value
             });

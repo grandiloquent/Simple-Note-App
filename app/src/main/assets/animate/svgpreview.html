@@ -32,7 +32,7 @@
     </svg>
     <script>
         async function loadData() {
-            const res = await fetch('/an');
+            const res = await fetch('../an');
             if (res.statusCode !== 200)
                 throw new Error(res.status);
             const data = await res.text();

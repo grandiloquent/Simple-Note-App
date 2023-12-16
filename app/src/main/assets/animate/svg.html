@@ -232,10 +232,31 @@ flex-direction: column;
     <custom-toast id="toast"></custom-toast>
     <script>
         const textarea = document.getElementById("textarea");
-        function cacheCode() {
+        async function loadData() {
+            const res = await fetch('/an');
+            const data = await res.text();
+            return data;
+        }
+        async function saveData() {
+            const res = await fetch('/an', {
+                method: 'POST',
+                body: textarea.value
+            });
+            await res.text();
+        }
+        async function cacheCode() {
+            try {
+                textarea.value = await loadData();
+            } catch (error) {
             textarea.value = localStorage.getItem('svg');
-            document.addEventListener('visibilitychange', evt => {
-                localStorage.setItem('svg', textarea.value.trim());
+            }
+
+            document.addEventListener('visibilitychange', async evt => {
+                try {
+                    await saveData();
+                } catch (error) {
+                    localStorage.setItem('svg', textarea.value.trim());
+                }
             });
         }
         function initialize() {
@@ -270,13 +291,7 @@ flex-direction: column;
 Math.sin(30*Math.PI/180)*
 /Math.sin(30*Math.PI/180)
 360,360,6,200
-fill="#2196F3"
-fill="none"
-fill="freeze"
-id=""
-begin=".end+1s"
-
-                        -->`
+-->`
                 })
             })
             document.getElementById('degree').addEventListener('click', evt => {

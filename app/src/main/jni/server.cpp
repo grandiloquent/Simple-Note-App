@@ -183,13 +183,24 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //               }
 //    );
 
+    static const char contentTableSql[]
+            = R"(CREATE TABLE IF NOT EXISTS "content" (
+	"id"	INTEGER,
+	"content"	TEXT,
+	"create_at"	INTEGER default current_timestamp,
+	"update_at"	INTEGER default current_timestamp,
+	PRIMARY KEY("id" AUTOINCREMENT)
+))";
+    db::QueryResult fetch_row = db::query<contentTableSql>();
+
+
     jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
             env->FindClass("psycho/euphoria/app/ImageUitls")));
     JavaVM *jvm;
     env->GetJavaVM(&jvm);
     server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
-               [&t, mgr, env, jclass1,jvm](const httplib::Request &req,
-                                       httplib::Response &res) {
+               [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
+                                            httplib::Response &res) {
 
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto p = req.path == "/" ? "index.html" : req.path.substr(1);
@@ -321,6 +332,36 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(j.dump(), "application/json");
         }
     });
+    server.Get("/an", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 1)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view  content;
+
+        if (fetch_row(content)) {
+
+            res.set_content(content.data(),content.size(), "text/plain");
+        }
+    });
+    server.Post("/an", [](const httplib::Request &req, httplib::Response &res,
+                            const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+
+            static const char query[]
+                    = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (1,?1,?2))";
+            db::QueryResult fetch_row = db::query<query>(body,
+                                                         GetTimeStamp());
+            res.set_content(std::to_string(fetch_row.resultCode()),
+                            "text/plain; charset=UTF-8");
+
+    });
     server.Post("/note", [](const httplib::Request &req, httplib::Response &res,
                             const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
@@ -371,7 +412,6 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                             "text/plain; charset=UTF-8");
         }
     });
-
     server.Get("/fav/insert", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto path = req.get_param_value("path");

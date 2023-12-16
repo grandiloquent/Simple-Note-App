@@ -31,7 +31,14 @@
     <svg viewBox="0 0 1280 720">
     </svg>
     <script>
-        document.addEventListener('keydown', evt => {
+        async function loadData() {
+            const res = await fetch('/an');
+            if (res.statusCode !== 200)
+                throw new Error(res.status);
+            const data = await res.text();
+            return data;
+        }
+        document.addEventListener('keydown', async evt => {
 
             if (evt.key === ' ') {
                 evt.preventDefault();
@@ -44,12 +51,16 @@
             }
 
         });
-        document.querySelector('svg').innerHTML = localStorage.getItem('svg')
 
-        document.addEventListener('visibilitychange', evt => {
-            document.querySelector('svg').innerHTML = localStorage.getItem('svg')
+        document.addEventListener('visibilitychange', async evt => {
+            document.querySelector('svg').innerHTML = await loadData();
             document.querySelector('svg').setCurrentTime(0)
         })
+        async function initialize() {
+            document.querySelector('svg').innerHTML = await loadData();
+        }
+        initialize();
+
 
     </script>
 </body>

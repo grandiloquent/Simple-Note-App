@@ -422,7 +422,8 @@ document.querySelector('#save-note').addEventListener('click', evt => {
 document.querySelector('#format-head').addEventListener('click', evt => {
     formatHead(textarea)
 });
-document.querySelector('#format-code').addEventListener('click', evt => {
+document.querySelector('#format-code').addEventListener('click', evt =>
+{
     formatCode(textarea);
 
 });

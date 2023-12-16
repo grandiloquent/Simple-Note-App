@@ -186,8 +186,18 @@ flex-direction: column;
             justify-content: center;"
             data-snippet="${escapeHtml(snippet)}"
             >
-                    <div style="flex-grow: 1;">${escapeHtml(snippet)}</div>
-                    <div class="dialog-delete"  style="width: 24px;text-align: center;">X</div>
+                    <div style="flex-grow: 1;
+                    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    max-height: 2.5em;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    font-weight: normal
+                    
+                    ">${escapeHtml(snippet)}</div>
+                    <div class="dialog-delete"  style="width: 24px;text-align: center;flex-shrink: 0;">X</div>
                 </div>`)
             })
 
@@ -234,6 +244,8 @@ flex-direction: column;
         const textarea = document.getElementById("textarea");
         async function loadData() {
             const res = await fetch('/an');
+            if (res.statusCode !== 200)
+                throw new Error(res.status);
             const data = await res.text();
             return data;
         }
@@ -242,13 +254,15 @@ flex-direction: column;
                 method: 'POST',
                 body: textarea.value
             });
+            if (res.statusCode !== 200)
+                throw new Error(res.status);
             await res.text();
         }
         async function cacheCode() {
             try {
                 textarea.value = await loadData();
             } catch (error) {
-            textarea.value = localStorage.getItem('svg');
+                textarea.value = localStorage.getItem('svg');
             }
 
             document.addEventListener('visibilitychange', async evt => {
@@ -286,13 +300,24 @@ flex-direction: column;
                 loadSnippets();
             })
             document.getElementById('comment').addEventListener('click', evt => {
-                processSelection(s => {
-                    return `<!--
-Math.sin(30*Math.PI/180)*
-/Math.sin(30*Math.PI/180)
-360,360,6,200
--->`
-                })
+                //                 processSelection(s => {
+                //                     return `<!--
+                // Math.sin(30*Math.PI/180)*
+                // /Math.sin(30*Math.PI/180)
+                // 360,360,6,200
+                // -->`
+                //                 })
+                const positions = findExtendPosition(textarea);
+                let s = textarea.value.substring(positions[0], positions[1]);
+                if (s.startsWith('<!--') && s.endsWith('-->')) {
+                    s = s.substring(4);
+                    s = s.substring(0, s.length - 3);
+                }else{
+                    s=`<!--${s}-->`
+                }
+
+                textarea.setRangeText(s, positions[0], positions[1]);
+
             })
             document.getElementById('degree').addEventListener('click', evt => {
                 processSelection(selectedString => {
@@ -533,6 +558,55 @@ fill="freeze"/>
             let v = getNormalPath(path, parseInt(offset))
             return s.replace(/(?<=d=")[^"]+(?=")/, v);
         }
+
+        function findExtendPosition(editor) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            let string = editor.value;
+            let offsetStart = start;
+            while (offsetStart > 0) {
+                if (!/\s/.test(string[offsetStart - 1]))
+                    offsetStart--;
+                else {
+                    let os = offsetStart;
+                    while (os > 0 && /\s/.test(string[os - 1])) {
+                        os--;
+                    }
+                    if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
+                        break;
+                    }
+                    offsetStart = os;
+                }
+            }
+            let offsetEnd = end;
+            while (offsetEnd < string.length) {
+                if (!/\s/.test(string[offsetEnd + 1])) {
+
+                    offsetEnd++;
+                } else {
+
+                    let oe = offsetEnd;
+                    while (oe < string.length && /\s/.test(string[oe + 1])) {
+                        oe++;
+                    }
+                    if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
+                        offsetEnd++;
+
+                        break;
+                    }
+                    offsetEnd = oe + 1;
+
+                }
+            }
+            while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
+                offsetStart--;
+            }
+            // if (/\s/.test(string[offsetEnd])) {
+            //     offsetEnd--;
+            // }
+            return [offsetStart, offsetEnd];
+        }
+
     </script>
 </body>
 

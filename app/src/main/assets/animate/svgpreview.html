@@ -53,11 +53,19 @@
         });
 
         document.addEventListener('visibilitychange', async evt => {
-            document.querySelector('svg').innerHTML = await loadData();
+            try {
+                document.querySelector('svg').innerHTML = await loadData();
+            } catch (error) {
+                document.querySelector('svg').innerHTML = localStorage.getItem('svg');
+            }
             document.querySelector('svg').setCurrentTime(0)
         })
         async function initialize() {
-            document.querySelector('svg').innerHTML = await loadData();
+            try {
+                document.querySelector('svg').innerHTML = await loadData();
+            } catch (error) {
+                document.querySelector('svg').innerHTML = localStorage.getItem('svg');
+            }
         }
         initialize();
 

@@ -176,7 +176,19 @@ function calculateCenterTextPath(s) {
     let text = "<text" + substringAfter(s, "<text");
     let box = getBBox(text, false);
     let v = getCenterPath(path, box.width / 2)
-    return s.replace(/(?<=d=")[^"]+(?=")/, v);
+    return `<defs>
+    <path
+      id="tp1"
+      fill="none"
+      stroke="red"
+      d="${v}" />
+    </defs>
+  
+    <text font-size="36px" font-family="苹方">
+      <textPath href="#tp1">${s.match(/(?<=>)[^<]+(?=<\/text)/)}</textPath>
+    </text>`
+
+    //s.replace(/(?<=d=")[^"]+(?=")/, v);
 }
 function calculateMoveAlongNormalPath(s) {
     let offset = substringBefore(s, "<path").trim();
@@ -338,8 +350,32 @@ function initialize() {
     document.getElementById('help').addEventListener('click', evt => {
         window.open("./svghelper.html", '_blank');
     })
-    document.getElementById('edit_note').addEventListener('click', evt => {
-        window.open("./text-swipe.html", '_blank');
+    document.getElementById('timer').addEventListener('click', evt => {
+        const positions = findExtendPosition(textarea);
+        let s = textarea.value.substring(positions[0], positions[1]);
+        if (!/(?<=id=")[^"]+(?=")/.test(s)) {
+            s = s.replace(/\/*?>/, m => {
+                return ` id="p1" ${m}`
+            });
+        }
+        if (!/(?<=begin=")[^"]+(?=")/.test(s)) {
+            s = s.replace(/\/*?>/, m => {
+                return ` begin="p1.end+.3s" ${m}`
+            });
+        } else {
+            s = s.replace(/(?<=begin=")[^"]+(?=")/, m => {
+                return m.replace(/[0-9.]+(?=s)/, x => {
+                    let f = parseFloat(x);
+                    if (f === 0.3) {
+                        f = 1;
+                    } else {
+                        f = 0.3
+                    }
+                    return f;
+                })
+            });
+        }
+        textarea.setRangeText(s, positions[0], positions[1]);
     })
     document.getElementById('pattern').addEventListener('click', evt => {
         dialog.style.display = 'flex';
@@ -358,8 +394,8 @@ function initialize() {
         if (s.startsWith('<!--') && s.endsWith('-->')) {
             s = s.substring(4);
             s = s.substring(0, s.length - 3);
-        }else{
-            s=`<!--${s}-->`
+        } else {
+            s = `<!--${s}-->`
         }
 
         textarea.setRangeText(s, positions[0], positions[1]);

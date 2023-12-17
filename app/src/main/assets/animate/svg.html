@@ -64,12 +64,16 @@
     <div class="bar-renderer">
         <div class="bar-item-tab" id="copy">
             <span class="material-symbols-outlined">
-                copy
+                content_copy
             </span>
             <div class="pivot-bar-item-title">复制</div>
         </div>
-
-
+        <div class="bar-item-tab" id="timer">
+            <span class="material-symbols-outlined">
+                timer
+            </span>
+            <div class="pivot-bar-item-title">时间轴</div>
+        </div>
 
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
@@ -83,12 +87,7 @@
             </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
-        <div class="bar-item-tab" id="edit_note">
-            <span class="material-symbols-outlined">
-                edit_note
-            </span>
-            <div class="pivot-bar-item-title">注释</div>
-        </div>
+       
         <div class="bar-item-tab" id="help">
             <span class="material-symbols-outlined">
                 help
@@ -177,12 +176,12 @@ flex-direction: column;
                 }
 
             })
-     
- 
+
+
         const textarea = document.getElementById("textarea");
-        
-        
-        
+
+
+
         document.addEventListener('keydown', evt => {
             if (evt.key === 'F1') {
                 evt.preventDefault();
@@ -192,7 +191,7 @@ flex-direction: column;
         cacheCode();
         initialize();
 
-        
+
         document.getElementById('square_foot')
             .addEventListener('click', evt => {
                 processSelection(s => {
@@ -204,8 +203,8 @@ flex-direction: column;
                     }
                 })
             });
-        
-       
+
+
     </script>
 </body>
 

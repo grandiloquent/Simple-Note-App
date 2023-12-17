@@ -66,7 +66,7 @@
                 const first = substringBefore(s, "\n");
                 const second = substringAfter(s, "\n");
                 const regex = new RegExp(`${substringBefore(first, " ")}`, 'g');
-                console.log(regex);
+                
                 textarea.value = first + "\n" +  second.replaceAll(regex,
                     substringAfter(first, " ").trim());
             })

@@ -353,8 +353,18 @@ function initialize() {
     document.getElementById('preview').addEventListener('click', evt => {
         window.open("./svgpreview.html", '_blank');
     })
-    document.getElementById('text_snippet').addEventListener('click', evt => {
-        window.open("./snippets.html", '_blank');
+    document.getElementById('search').addEventListener('click', evt => {
+        const positions = findExtendPosition(textarea);
+        let s = textarea.value.substring(positions[0], positions[1]);
+       
+        const first = substringBefore(s, "\n");
+        const second = substringAfter(s, "\n");
+        //const regex = new RegExp(`\\b${substringBefore(first, " ")}\\b`, 'g');
+        const regex = new RegExp(`${substringBefore(first, " ")}`, 'g');
+        s = first + "\n" + second.replaceAll(regex,
+            substringAfter(first, " ").trim());
+
+        textarea.setRangeText(s, positions[0], positions[1]);
     })
     document.getElementById('help').addEventListener('click', evt => {
         window.open("./svghelper.html", '_blank');
@@ -373,6 +383,16 @@ function initialize() {
             });
         } else {
             s = s.replace(/(?<=begin=")[^"]+(?=")/, m => {
+                return m.replace(/[0-9.]+(?=s)/, x => {
+                    let f = parseFloat(x);
+                    if (f === 0.3) {
+                        f = 1;
+                    } else {
+                        f = 0.3
+                    }
+                    return f;
+                })
+            }).replace(/(?<=dur=")[^"]+(?=")/, m => {
                 return m.replace(/[0-9.]+(?=s)/, x => {
                     let f = parseFloat(x);
                     if (f === 0.3) {

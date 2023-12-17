@@ -150,7 +150,7 @@ function getCenterPath(s, offset) {
     let second = svg.children[0].getPointAtLength(len / 2 + offset)
 
     svg.remove()
-    return `M${first.x} ${first.y}L${second.x} ${second.y}`;
+    return [first, second];
 }
 function getNormalPath(s, offset) {
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -175,7 +175,10 @@ function calculateCenterTextPath(s) {
     let path = substringBefore(s, "<text");
     let text = "<text" + substringAfter(s, "<text");
     let box = getBBox(text, false);
-    let v = getCenterPath(path, box.width / 2)
+    const points = getCenterPath(path, box.width / 2);
+    const first = points[0];
+    const second = points[1];
+    let v = `M${first.x} ${first.y}L${second.x} ${second.y}`
     return `<defs>
     <path
       id="tp1"
@@ -184,9 +187,15 @@ function calculateCenterTextPath(s) {
       d="${v}" />
     </defs>
   
-    <text font-size="36px" font-family="苹方">
-      <textPath href="#tp1">${s.match(/(?<=>)[^<]+(?=<\/text)/)}</textPath>
-    </text>`
+  
+
+    <text font-size="36px" font-family="苹方" mask="url(#m1)">
+      <textPath href="#tp1">${s.match(/(?<=>)[^<]+(?=<\/text)/)}
+      <animate attributeName="startOffset" from="-100%" to ="0%" begin="0s" dur="1s" repeatCount="1"/>
+      </textPath>
+    </text>
+    
+    `
 
     //s.replace(/(?<=d=")[^"]+(?=")/, v);
 }

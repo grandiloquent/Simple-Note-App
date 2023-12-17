@@ -125,7 +125,7 @@
     <rect x="${box.x - box.width}" y="${box.y}" width="${box.width}" height="${box.height}" fill="#fff">
       <animateTransform id="tt1" begin="p1.end+.5s" attributeName="transform" attributeType="XML" type="translate" to="${box.width} 0" dur=".3s" repeatCount="1" fill="freeze" />
     </rect>
-    </clipPath>
+    </mask>
 </g>`
             let index = getRandomInt(0, 100);
             textarea.value = s.replaceAll(/(?<=id=")[^"]+(?=")/g, m => {

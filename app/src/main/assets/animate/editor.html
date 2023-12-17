@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑器</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+
+    <link rel="stylesheet" href="index.css">
+    <script src="custom-toast.js"></script>
+    <script src="shared.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <textarea id="textarea"></textarea>
+    </div>
+
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="cut">
+            <span class="material-symbols-outlined">
+                cut
+            </span>
+            <div class="pivot-bar-item-title">复制</div>
+        </div>
+    </div>
+
+    <script>
+
+        function findExtendPosition(editor) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            let string = editor.value;
+            let offsetStart = start;
+            while (offsetStart > 0) {
+                if (!/\s/.test(string[offsetStart - 1]))
+                    offsetStart--;
+                else {
+                    let os = offsetStart;
+                    while (os > 0 && /\s/.test(string[os - 1])) {
+                        os--;
+                    }
+                    if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
+                        break;
+                    }
+                    offsetStart = os;
+                }
+            }
+            let offsetEnd = end;
+            while (offsetEnd < string.length) {
+                if (!/\s/.test(string[offsetEnd + 1])) {
+
+                    offsetEnd++;
+                } else {
+
+                    let oe = offsetEnd;
+                    while (oe < string.length && /\s/.test(string[oe + 1])) {
+                        oe++;
+                    }
+                    if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
+                        offsetEnd++;
+
+                        break;
+                    }
+                    offsetEnd = oe + 1;
+
+                }
+            }
+            while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
+                offsetStart--;
+            }
+            // if (/\s/.test(string[offsetEnd])) {
+            //     offsetEnd--;
+            // }
+            return [offsetStart, offsetEnd];
+        }
+        const textarea = document.getElementById("textarea");
+        textarea.value = localStorage.getItem('editor');
+        document.addEventListener('visibilitychange', async evt => {
+            localStorage.setItem('editor', textarea.value.trim());
+        });
+        document.getElementById('cut').addEventListener('click', evt => {
+            const positions = findExtendPosition(textarea);
+            let s = textarea.value.substring(positions[0], positions[1]);
+            writeText(s)
+            textarea.setRangeText("", positions[0], positions[1]);
+        })
+
+    </script>
+</body>
+
+</html>

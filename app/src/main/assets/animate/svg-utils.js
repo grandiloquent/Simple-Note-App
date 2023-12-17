@@ -356,7 +356,7 @@ function initialize() {
     document.getElementById('search').addEventListener('click', evt => {
         const positions = findExtendPosition(textarea);
         let s = textarea.value.substring(positions[0], positions[1]);
-       
+
         const first = substringBefore(s, "\n");
         const second = substringAfter(s, "\n");
         //const regex = new RegExp(`\\b${substringBefore(first, " ")}\\b`, 'g');
@@ -372,6 +372,14 @@ function initialize() {
     document.getElementById('timer').addEventListener('click', evt => {
         const positions = findExtendPosition(textarea);
         let s = textarea.value.substring(positions[0], positions[1]);
+        if (!s) {
+            if (textarea.value.indexOf('.1s') == -1) {
+                textarea.value = textarea.value.replaceAll(/(?<=["+])[0-9.]+s(?=")/g, '.1s');
+            } else {
+                textarea.value = textarea.value.replaceAll(/(?<=["+])[0-9.]+s(?=")/g, '1s');
+            }
+            return;
+        }
         if (!/(?<=id=")[^"]+(?=")/.test(s)) {
             s = s.replace(/\/*?>/, m => {
                 return ` id="p1" ${m}`

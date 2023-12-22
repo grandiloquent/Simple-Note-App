@@ -76,11 +76,8 @@
             }
 
             document.addEventListener('visibilitychange', async evt => {
-                try {
-                    await saveData();
-                } catch (error) {
-                    localStorage.setItem('svg', textarea.value.trim());
-                }
+                await saveData();
+                localStorage.setItem('code', textarea.value.trim());
             });
         }
         function initialize() {

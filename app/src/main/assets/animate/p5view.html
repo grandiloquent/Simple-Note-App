@@ -17,21 +17,23 @@
 <body>
     <script>
 
-        var oReq = new XMLHttpRequest();
-        oReq.addEventListener("load", reqListener.bind(this));
-        oReq.open("GET", "../pn");
-        oReq.addEventListener("error", transferFailed);
-        oReq.send();
-        function reqListener() {
-            if (this.status === 200)
-                console.log(eval(this.responseText));
-            else
-                eval(localStorage.getItem('code'))
-        }
-        function transferFailed(evt) {
-            console.log("transferFailed")
-            eval(localStorage.getItem('code'))
-        }
+        // var oReq = new XMLHttpRequest();
+        // oReq.addEventListener("load", reqListener.bind(window));
+        // oReq.open("GET", "../pn");
+        // oReq.addEventListener("error", transferFailed);
+        // oReq.send();
+        // function reqListener() {
+        //     if (this.status === 200)
+        //         console.log(eval(this.responseText));
+        //     else
+        //         eval(localStorage.getItem('code'))
+        // }
+        // function transferFailed(evt) {
+        //     console.log("transferFailed")
+        //     eval(localStorage.getItem('code'))
+        // }
+        eval(localStorage.getItem('code'))
+
 
     </script>
 </body>

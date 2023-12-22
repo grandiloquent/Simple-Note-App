@@ -43,6 +43,8 @@ public class ServerService extends Service {
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
     public static final String ACTION_SHUTDOWN = "psycho.euphoria.app.ServerService.ACTION_SHUTDOWN";
+    public static final String ACTION_BRO = "psycho.euphoria.app.ServerService.ACTION_BRO";
+
 
     static {
 /*
@@ -68,6 +70,8 @@ public class ServerService extends Service {
         notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.app,PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.explorer, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_BRO), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setCustomContentView(notificationLayout )
@@ -163,9 +167,13 @@ public class ServerService extends Service {
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 Utils.takePhoto();
-            } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
+            }else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
+                startActivity(launchIntent);
+            }else if (intent.getAction().equals(ACTION_BRO)) {
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
                 startActivity(launchIntent);
             }
 

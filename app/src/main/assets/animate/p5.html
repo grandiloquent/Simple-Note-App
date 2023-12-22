@@ -52,10 +52,35 @@
     <custom-toast id="toast"></custom-toast>
     <script>
         const textarea = document.getElementById("textarea");
-        function cacheCode() {
-            textarea.value = localStorage.getItem('code');
-            document.addEventListener('visibilitychange', evt => {
-                localStorage.setItem('code', textarea.value.trim());
+        async function loadData() {
+            const res = await fetch('../pn');
+            if (res.status !== 200)
+                throw new Error(res.status);
+            const data = await res.text();
+            return data;
+        }
+        async function saveData() {
+            const res = await fetch('../pn', {
+                method: 'POST',
+                body: textarea.value
+            });
+            if (res.status !== 200)
+                throw new Error(res.status);
+            await res.text();
+        }
+        async function cacheCode() {
+            try {
+                textarea.value = await loadData();
+            } catch (error) {
+                textarea.value = localStorage.getItem('code');
+            }
+
+            document.addEventListener('visibilitychange', async evt => {
+                try {
+                    await saveData();
+                } catch (error) {
+                    localStorage.setItem('svg', textarea.value.trim());
+                }
             });
         }
         function initialize() {

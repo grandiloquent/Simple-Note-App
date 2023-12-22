@@ -189,9 +189,9 @@ function calculateCenterTextPath(s) {
   
   
 
-    <text font-size="36px" font-family="苹方" mask="url(#m1)">
-      <textPath href="#tp1">${s.match(/(?<=>)[^<]+(?=<\/text)/)}
-      <animate attributeName="startOffset" from="-100%" to ="0%" begin="0s" dur="1s" repeatCount="1"/>
+    <text font-size="36px" font-family="苹方">
+      <textPath href="#tp1" startOffset="-100%">${s.match(/(?<=>)[^<]+(?=<\/text)/)}
+      <animate attributeName="startOffset" from="-100%" to ="0%" begin="0s" dur="1s" repeatCount="1" id="t1" fill="freeze"/>
       </textPath>
     </text>
     

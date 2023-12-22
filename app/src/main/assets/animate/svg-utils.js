@@ -371,7 +371,7 @@ function initialize() {
     })
     document.getElementById('timer').addEventListener('click', evt => {
         const positions = findExtendPosition(textarea);
-        let s = textarea.value.substring(positions[0], positions[1]);
+        let s = textarea.value.substring(positions[0], positions[1]).trim();
         if (!s) {
             if (textarea.value.indexOf('.1s') == -1) {
                 textarea.value = textarea.value.replaceAll(/(?<=["+])[0-9.]+s(?=")/g, '.1s');
@@ -380,6 +380,7 @@ function initialize() {
             }
             return;
         }
+
         if (!/(?<=id=")[^"]+(?=")/.test(s)) {
             s = s.replace(/\/*?>/, m => {
                 return ` id="p1" ${m}`

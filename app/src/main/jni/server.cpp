@@ -362,6 +362,36 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                             "text/plain; charset=UTF-8");
 
     });
+    server.Get("/pn", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 2)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view  content;
+
+        if (fetch_row(content)) {
+
+            res.set_content(content.data(),content.size(), "text/plain");
+        }
+    });
+    server.Post("/pn", [](const httplib::Request &req, httplib::Response &res,
+                          const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+
+        static const char query[]
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (2,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body,
+                                                     GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+
+    });
     server.Post("/note", [](const httplib::Request &req, httplib::Response &res,
                             const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");

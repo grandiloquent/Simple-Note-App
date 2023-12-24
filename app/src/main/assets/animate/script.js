@@ -579,8 +579,8 @@ function createEffectLib() {
     var cmnvtxsrc = document.getElementById("fx_common_vsh").textContent;
 
     //background
-    frgsrc = document.getElementById("bg_fsh").textContent;
-    effectLib.sceneBg = createEffectProgram(cmnvtxsrc, frgsrc, ['uTimes'], null);
+    // frgsrc = document.getElementById("bg_fsh").textContent;
+    // effectLib.sceneBg = createEffectProgram(cmnvtxsrc, frgsrc, ['uTimes'], null);
 
     // make brightpixels buffer
     frgsrc = document.getElementById("fx_brightbuf_fsh").textContent;
@@ -661,6 +661,7 @@ function renderPostProcess() {
     //display
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, renderSpec.width, renderSpec.height);
+    gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     useEffect(effectLib.finalComp, renderSpec.mainRT);
@@ -684,7 +685,7 @@ function createScene() {
 }
 
 function initScene() {
-    initBackground();
+    // initBackground();
     initPointFlowers();
     initPostProcess();
 
@@ -703,10 +704,10 @@ function renderScene() {
     //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, renderSpec.mainRT.frameBuffer);
     gl.viewport(0, 0, renderSpec.mainRT.width, renderSpec.mainRT.height);
-    gl.clearColor(0,0,0, 0);
+    gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    renderBackground();
+    //renderBackground();
     renderPointFlowers();
     renderPostProcess();
 }
@@ -723,8 +724,9 @@ function onResize(e) {
 function setViewports() {
     renderSpec.setSize(gl.canvas.width, gl.canvas.height);
 
-    gl.clearColor(0, 0, 0, 0);
     gl.viewport(0, 0, renderSpec.width, renderSpec.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var rtfunc = function (rtname, rtw, rth) {
         var rt = renderSpec[rtname];
@@ -785,7 +787,7 @@ window.addEventListener('load', function (e) {
         return;
     }
 
-    window.addEventListener('resize', onResize);
+    //window.addEventListener('resize', onResize);
 
     setViewports();
     createScene();

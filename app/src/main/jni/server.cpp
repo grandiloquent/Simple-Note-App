@@ -452,6 +452,70 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                         "text/plain; charset=UTF-8");
 
     });
+    server.Get("/jn", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 5)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view content;
+
+        if (fetch_row(content)) {
+
+            res.set_content(content.data(), content.size(), "text/plain");
+        }
+    });
+    server.Post("/jn", [](const httplib::Request &req, httplib::Response &res,
+                          const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+
+        static const char query[]
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (5,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body,
+                                                     GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+
+    });
+    server.Get("/animate/js", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 5)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view vertex;
+
+        fetch_row(vertex);
+
+        std::stringstream ss;
+        ss << R"(<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shader</title>
+    <style>
+        body {
+            margin: 0
+        }
+    </style>
+</head>
+
+<body)";
+        ss << R"(
+</body>
+
+</html>)";
+        auto o = ss.str();
+        res.set_content(o.data(), o.size(), "text/html");
+
+    });
 
 
     server.Get("/animate/shader", [](const httplib::Request &req, httplib::Response &res) {

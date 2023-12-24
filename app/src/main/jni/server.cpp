@@ -337,15 +337,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         static const char query[]
                 = R"(select content from content WHERE id = 1)";
         db::QueryResult fetch_row = db::query<query>();
-        std::string_view  content;
+        std::string_view content;
 
         if (fetch_row(content)) {
 
-            res.set_content(content.data(),content.size(), "text/plain");
+            res.set_content(content.data(), content.size(), "text/plain");
         }
     });
     server.Post("/an", [](const httplib::Request &req, httplib::Response &res,
-                            const httplib::ContentReader &content_reader) {
+                          const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
         std::string body;
@@ -354,12 +354,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             return true;
         });
 
-            static const char query[]
-                    = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (1,?1,?2))";
-            db::QueryResult fetch_row = db::query<query>(body,
-                                                         GetTimeStamp());
-            res.set_content(std::to_string(fetch_row.resultCode()),
-                            "text/plain; charset=UTF-8");
+        static const char query[]
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (1,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body,
+                                                     GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
 
     });
     server.Get("/pn", [](const httplib::Request &req, httplib::Response &res) {
@@ -367,11 +367,11 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         static const char query[]
                 = R"(select content from content WHERE id = 2)";
         db::QueryResult fetch_row = db::query<query>();
-        std::string_view  content;
+        std::string_view content;
 
         if (fetch_row(content)) {
 
-            res.set_content(content.data(),content.size(), "text/plain");
+            res.set_content(content.data(), content.size(), "text/plain");
         }
     });
     server.Post("/pn", [](const httplib::Request &req, httplib::Response &res,
@@ -390,6 +390,188 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                                                      GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
+
+    });
+    server.Get("/vn", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 3)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view content;
+
+        if (fetch_row(content)) {
+
+            res.set_content(content.data(), content.size(), "text/plain");
+        }
+    });
+    server.Post("/vn", [](const httplib::Request &req, httplib::Response &res,
+                          const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+
+        static const char query[]
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (3,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body,
+                                                     GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+
+    });
+    server.Get("/fn", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 4)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view content;
+
+        if (fetch_row(content)) {
+
+            res.set_content(content.data(), content.size(), "text/plain");
+        }
+    });
+    server.Post("/fn", [](const httplib::Request &req, httplib::Response &res,
+                          const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+
+        static const char query[]
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (4,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body,
+                                                     GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+
+    });
+
+
+    server.Get("/animate/shader", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(select content from content WHERE id = 3)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view vertex;
+
+        if (!fetch_row(vertex)) {
+
+            vertex = R"(void main() {
+            gl_Position = vec4( position, 1.0 );
+        })";
+        }
+
+        static const char query1[]
+                = R"(select content from content WHERE id = 4)";
+        db::QueryResult fetch_fragment = db::query<query1>();
+        std::string_view fragment;
+
+        if (!fetch_fragment(fragment)) {
+
+            fragment = "";
+            //res.set_content(content.data(), content.size(), "text/plain");
+        }
+        std::stringstream ss;
+        ss << R"(<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shader</title>
+    <style>
+        body {
+            margin: 0
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script src="https://fastly.jsdelivr.net/npm/three-js@79.0.0/three.js"></script>
+    <script id="vertexShader" type="x-shader/x-vertex">)";
+        ss << vertex;
+        ss << R"(</script>
+    <script id="fragmentShader" type="x-shader/x-fragment">)";
+        ss << fragment;
+        ss << R"(</script>
+    <script>
+        var container;
+        var camera, scene, renderer, clock;
+        var uniforms;
+
+        init();
+        animate();
+
+        function init() {
+            container = document.getElementById('container');
+
+            camera = new THREE.Camera();
+            camera.position.z = 1;
+
+            scene = new THREE.Scene();
+            clock = new THREE.Clock();
+
+            var geometry = new THREE.PlaneBufferGeometry(2, 2);
+
+            uniforms = {
+                u_time: { type: "f", value: 1.0 },
+                u_resolution: { type: "v2", value: new THREE.Vector2() },
+                u_mouse: { type: "v2", value: new THREE.Vector2() }
+            };
+
+            var material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShader').textContent
+            });
+
+            var mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            container.appendChild(renderer.domElement);
+
+            onWindowResize();
+            window.addEventListener('resize', onWindowResize, false);
+
+            document.onmousemove = function (e) {
+                uniforms.u_mouse.value.x = e.pageX
+                uniforms.u_mouse.value.y = e.pageY
+            }
+        }
+
+        function onWindowResize(event) {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.u_resolution.value.x = renderer.domElement.width;
+            uniforms.u_resolution.value.y = renderer.domElement.height;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            uniforms.u_time.value += clock.getDelta();
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+
+</html>)";
+        auto o = ss.str();
+        res.set_content(o.data(), o.size(), "text/html");
 
     });
     server.Post("/note", [](const httplib::Request &req, httplib::Response &res,
@@ -495,7 +677,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get("/zip", [](const httplib::Request &req, httplib::Response &res) {
         auto path = std::filesystem::path{req.get_param_value("path")};
         if (is_directory(path)) {
-            Zipper zipper(path.parent_path().string() + "/" + path.filename().string() + ".epub");
+            Zipper zipper(
+                    path.parent_path().string() + "/" + path.filename().string() + ".epub");
             auto length = path.string().length() + 1;
             for (const fs::directory_entry &dir_entry:
                     fs::recursive_directory_iterator(path)) {

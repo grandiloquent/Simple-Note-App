@@ -259,7 +259,7 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                     new Thread(() -> {
                         String response = "";
                         try {
-                            response = mCurrentString.contains(" ") ? translate("zh", mCurrentString) : translateChineseWord(mCurrentString, mDatabase);
+                            response = mChinese.matcher(mCurrentString).find() ? translate("zh", mCurrentString) : translateChineseWord(mCurrentString, mDatabase);
                             if (response == null) {
                                 response = translateWord(mCurrentString, mDatabase);
                             }

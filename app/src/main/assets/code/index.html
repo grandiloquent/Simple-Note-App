@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="shared.js"></script>
+    <style>
+        html {
+            font-size: 10px;
+            font-family: Roboto, Arial, sans-serif;
+            word-wrap: break-word;
+            color: #0f0f0f;
+            background-color: #fff;
+            -webkit-text-size-adjust: 100%
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            font-size: 1.2rem;
+            overflow-x: hidden
+        }
+
+
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0 0 3px
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .subhead {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            font-weight: normal
+        }
+
+        h2 {
+            font-size: 1.8rem
+        }
+
+        h3 {
+            font-size: 1.4rem
+        }
+
+        h4 {
+            font-size: 1.3rem
+        }
+
+        .subhead {
+            opacity: .6
+        }
+
+        .wrapper {
+            margin: 12px;
+            display: grid;
+            grid-template-columns: 1fr 32px 32px;
+            align-items: center;
+            background: #dadce0;
+            row-gap: 1px;
+        }
+
+        .title,
+        .material-symbols-outlined {
+            background: #fff;
+            margin: 0;
+        }
+
+        .material-symbols-outlined {
+            height: 32px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+    </div>
+
+    <script>
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        let baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "..";
+        async function loadData() {
+            const res = await fetch(`${baseUri}/codes`);
+            if (res.status !== 200)
+                throw new Error(res.status);
+            const data = await res.json();
+            return data;
+        }
+        async function loadCode(id) {
+            const res = await fetch(`${baseUri}/code?id=${id}`);
+            if (res.status !== 200)
+                throw new Error(res.status);
+            return await res.json();
+
+
+        }
+        async function render() {
+            const data = await loadData();
+            const wrapper = document.querySelector('.wrapper')
+            data.forEach(x => {
+                wrapper.insertAdjacentHTML('beforeend', `
+        <h3 class="title" data-id="${x.id}">${escapeHtml(x.title)}</h3>
+        <span class="material-symbols-outlined edit" data-id="${x.id}">
+            edit
+        </span>
+        <span class="material-symbols-outlined content_copy" data-id="${x.id}">
+            content_copy
+        </span>
+                `);
+            });
+            document.querySelectorAll('.content_copy')
+                .forEach(async x => {
+                    x.addEventListener('click', async evt => {
+                        const o = await loadCode(evt.currentTarget.dataset.id);
+                        writeText(o.content);
+                    })
+                })
+            document.querySelectorAll('.edit')
+                .forEach(x => {
+                    x.addEventListener('click', evt => {
+                        location.href = `./editor.html?id=${evt.currentTarget.dataset.id}`;
+                    })
+                })
+            document.querySelectorAll('.title')
+                .forEach(x => {
+                    x.addEventListener('click', evt => {
+                        location.href = `/viewer?id=${evt.currentTarget.dataset.id}`;
+                    })
+                })
+        }
+        async function initialize() {
+            await render();
+        }
+
+        initialize();
+
+    </script>
+</body>
+
+</html>

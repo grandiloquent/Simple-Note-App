@@ -147,7 +147,7 @@ void DrawPetals(vec2 uv, inout vec3 col, float seed, float offset, vec3 petalCol
 void DrawSunFlower(vec2 uv, float seed, inout vec3 col, float mask)
 {
 
-    float noisetexture =  pow((texture(iChannel0,uv*0.8)).x ,   2.)*0.1;
+    float noisetexture =  pow((texture2D(iChannel0,uv*0.8)).x ,   2.)*0.1;
     
     DrawHalfVectorWithLength(vec2(0.), vec2(0.,-1.), 7., uv, 0.15, SunflowerStem + noisetexture, col);
     
@@ -186,7 +186,7 @@ void DrawSunFlowerField(vec2 OG_UV, float seed, vec2 offset, float fieldMask, fl
 
      
      OG_UV += offset;
-     OG_UV.x += iTime *totalMovementSpeed;
+     OG_UV.x += iGlobalTime *totalMovementSpeed;
      vec2  flowerRepeatedSpace = vec2(fract(OG_UV.x*tiling), OG_UV.y*tiling);
      vec2  idFlowerCoord = vec2(floor(OG_UV.x*tiling), seed*21.215);
      flowerRepeatedSpace -= vec2(0.5) + vec2(0.15,0.5) *(randOneD (dot(idFlowerCoord , vec2(1.126, 26.6))) - 0.5) ;
@@ -202,9 +202,9 @@ float mapLinear(float a, float b, float x){ return (b-x)/(b-a);}
 void DrawMountain(float movementSpeed, vec2 uv, inout vec3 col, float amplitude, float period, float translateY, float funcOffset, float translateX , float Seed
 , vec3 mountainColor){
     
-    float movement = iTime  * movementSpeed;
+    float movement = iGlobalTime  * movementSpeed;
     
-    mountainColor +=(1.-texture(iChannel0,(uv + vec2(movement, 0.))*1.5)).x*0.1;
+    mountainColor +=(1.-texture2D(iChannel0,(uv + vec2(movement, 0.))*1.5)).x*0.1;
     
     float mountainOne = ConcateTriangularWaves(amplitude, period, translateX + movement , translateY, Seed, uv.x); 
     col = mix(col, mountainColor ,smoothstep(lineSize, lineSize + smoothing, mountainOne +funcOffset - uv.y));
@@ -216,7 +216,7 @@ void DrawCloudLayer(inout vec3 col, float seed, vec2 uv, float tilingCloud, floa
     
     uv.x += offsetX;
     
-    float noise = pow((texture(iChannel0,uv*1.1)).x ,   2.)*0.1;
+    float noise = pow((texture2D(iChannel0,uv*1.1)).x ,   2.)*0.1;
     
     seed+=floor(uv.x *tilingCloud);
     
@@ -250,7 +250,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
  
     
-    col += pow((texture(iChannel0,uv*1.2)).x ,   2.)*0.05;
+    col += pow((texture2D(iChannel0,uv*1.2)).x ,   2.)*0.05;
 
     
     
@@ -258,7 +258,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
     float totalMovementSpeed = 0.15;
     
-    float movement =  iTime  * totalMovementSpeed;
+    float movement =  iGlobalTime  * totalMovementSpeed;
     
       DrawCloudLayer(col, 12.21, uv,  0.015, 0.5, 5., +0.0 ,movement * 0.1 );
      DrawCloudLayer(col, 0.,     uv,  0.015, 0.7, 8.76, -0.05 ,movement * 0.16 );
@@ -275,11 +275,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
      float fieldMask = smoothstep(lineSize, lineSize + smoothing*4., 0.1 - uv.y);
      
      vec3 fieldBaseColor = col;
-     fieldBaseColor = mix(FieldMid + pow((texture(iChannel0,(uv + vec2(movement * 4.7,0.))*1.2)).x ,   2.)*0.05   ,
-              SunflowerLeavesOne + pow((texture(iChannel0,(uv + vec2(movement*1.,0.))*1.2)).x ,   2.)*0.05
+     fieldBaseColor = mix(FieldMid + pow((texture2D(iChannel0,(uv + vec2(movement * 4.7,0.))*1.2)).x ,   2.)*0.05   ,
+              SunflowerLeavesOne + pow((texture2D(iChannel0,(uv + vec2(movement*1.,0.))*1.2)).x ,   2.)*0.05
               , smoothstep(-0.2, 0.0, uv.y));
      fieldBaseColor = mix(fieldBaseColor,
-     FieldDark + pow((texture(iChannel0,(uv + vec2(movement*6.2,0.))*1.2)).x ,   2.)*0.05
+     FieldDark + pow((texture2D(iChannel0,(uv + vec2(movement*6.2,0.))*1.2)).x ,   2.)*0.05
      , smoothstep(-0.6, -1.4, uv.y));
      
     
@@ -377,10 +377,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     if(max(disToCenter.x, disToCenter.y)> 0.45) col = vec3(0.1);
     
      
-    float curveOne =  sin((uv.x+ iTime) *0.75 )* 0.7 ;
+    float curveOne =  sin((uv.x+ iGlobalTime) *0.75 )* 0.7 ;
     col = mix(vec3(0.1,0.9,0.), col,smoothstep(lineSize, lineSize + smoothing, abs(curveOne + 1.5 - uv.y)));
      
-    float curveTwo =  sin((uv.x+ iTime) *3.)* 0.25 ;
+    float curveTwo =  sin((uv.x+ iGlobalTime) *3.)* 0.25 ;
     col = mix(vec3(0.9,0.3,0.), col,smoothstep(lineSize, lineSize + smoothing, abs(curveTwo + 0.1 - uv.y)));
      
      
@@ -404,7 +404,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 iUV = floor(uv* 16.);
     
     vec3 col = vec3( 0.5);
-     col = mix(col, vec3( iUV.xy/16.,0.), (((iUV.x+8.) + (iUV.y + 7.)*16.)< mod(iTime * 60., 296.)) ? 1.: 0.  );
+     col = mix(col, vec3( iUV.xy/16.,0.), (((iUV.x+8.) + (iUV.y + 7.)*16.)< mod(iGlobalTime * 60., 296.)) ? 1.: 0.  );
 
     vec2 disToCenter = abs( fUV - vec2(0.5));
     
@@ -458,7 +458,41 @@ void main( void ){
   gl_FragColor = color;
 }
 `;
+const startRecording = () => {
+            const canvas = document.querySelector("canvas");
+            const data = []; // here we will store our recorded media chunks (Blobs)
+            const stream = canvas.captureStream(60); // records the canvas in real time at our preferred framerate 30 in this case.
+            const mediaRecorder = new MediaRecorder(stream,
+                {
+                    mimeType: 'video/webm; codecs=vp9'
+                }
+            ); // init the recorder
+            // whenever the recorder has new data, we will store it in our array
+            mediaRecorder.ondataavailable = (e) => {
+                console.log("========", e.data)
+                data.push(e.data)
+            };
+            // only when the recorder stops, we construct a complete Blob from all the chunks
+            mediaRecorder.onstop = (e) =>
+                // , { type: "video/webm;codecs=vp8" }
+                downloadVideo(new Blob(data, { type: "video/webm;codecs=vp9" }));
+            mediaRecorder.start();
+            setTimeout(() => {
+                mediaRecorder.stop();
+            }, 10000); // stop recording in 6s
+        };
 
+        const downloadVideo = async (blob) => {
+            console.log(blob)
+            const div = document.querySelector("body");
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "test.webm";
+            a.className = "button";
+            a.innerText = "click here to download";
+            div.appendChild(a);
+        };
         const $ = document.querySelector.bind(document);
 
         const fieldOfView = 45;
@@ -489,12 +523,13 @@ void main( void ){
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
 
-        var renderer = new THREE.WebGLRenderer();
+        var renderer = new THREE.WebGLRenderer( { alpha: true } );
+        renderer.setClearColor( 0x000000, 0 );
         document.body.appendChild(renderer.domElement);
 
         resize(true);
         render(0);
-
+        startRecording();
         function resize(force) {
             const canvas = renderer.domElement;
             const dpr = 1; //window.devicePixelRatio;  // make 1 or less if too slow
@@ -515,10 +550,13 @@ void main( void ){
             uniforms.iGlobalTime.value = time;
             mesh.rotation.x = time * 0.5;
             mesh.rotation.y = time * 0.6;
-
+            
             renderer.render(scene, camera);
+            
             requestAnimationFrame(render);
         }
+        
+    
     </script>
 </body>
 

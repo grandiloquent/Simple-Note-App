@@ -27,7 +27,7 @@
             </span>
             <div class="pivot-bar-item-title">保存</div>
         </div>
-
+       
         <div class="bar-item-tab" id="format">
             <span class="material-symbols-outlined">
                 code
@@ -41,6 +41,14 @@
             </span>
             <div class="pivot-bar-item-title">计算</div>
         </div>
+        
+        <div class="bar-item-tab" id="text_snippet">
+            <span class="material-symbols-outlined">
+                text_snippet
+            </span>
+            <div class="pivot-bar-item-title">代码段</div>
+        </div>
+        
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
                 preview
@@ -116,6 +124,12 @@ ${data["content"]}`;
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("/animate/shader", '_blank');
             })
+            document.getElementById('text_snippet').addEventListener('click', evt => {
+                textarea.value = HTML;
+            })
+
+
+
         }
         cacheCode();
         initialize();

@@ -27,7 +27,7 @@
             </span>
             <div class="pivot-bar-item-title">保存</div>
         </div>
-       
+
         <div class="bar-item-tab" id="format">
             <span class="material-symbols-outlined">
                 code
@@ -41,14 +41,14 @@
             </span>
             <div class="pivot-bar-item-title">计算</div>
         </div>
-        
+
         <div class="bar-item-tab" id="text_snippet">
             <span class="material-symbols-outlined">
                 text_snippet
             </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
-        
+
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
                 preview
@@ -109,10 +109,14 @@ ${data["content"]}`;
             }
 
         }
+        function formatCode() {
+            const options = { indent_size: 2, space_in_empty_paren: true }
+            textarea.value = html_beautify(textarea.value, options);
+
+        }
         function initialize() {
             document.getElementById('format').addEventListener('click', evt => {
-                const options = { indent_size: 2, space_in_empty_paren: true }
-                textarea.value = html_beautify(textarea.value, options);
+                formatCode();
             })
             document.getElementById('save').addEventListener('click', async evt => {
                 await saveData();
@@ -122,10 +126,24 @@ ${data["content"]}`;
                 window.open("./expression.html", '_blank');
             })
             document.getElementById('preview').addEventListener('click', evt => {
-                window.open("/animate/shader", '_blank');
+                window.open(`/viewer?id=${id}`, '_blank');
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 textarea.value = HTML;
+            })
+            document.addEventListener('keydown', async evt => {
+                if (evt.ctrlKey) {
+                    if (evt.key === 's') {
+                        evt.preventDefault();
+                        saveData();
+                    }
+                } else {
+                    if (evt.key === 'F1') {
+                        evt.preventDefault();
+                        formatCode();
+                    }
+                }
+
             })
 
 

@@ -43,12 +43,20 @@
         </div>
 
 
+        
+        <div class="bar-item-tab" id="close-string">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+            <div class="pivot-bar-item-title">字符</div>
+        </div>
         <div class="bar-item-tab" id="close">
             <span class="material-symbols-outlined">
                 close
             </span>
             <div class="pivot-bar-item-title">空行</div>
         </div>
+
         <div class="bar-item-tab" id="text_snippet">
             <span class="material-symbols-outlined">
                 text_snippet
@@ -110,7 +118,7 @@
                 localStorage.setItem('j5', textarea.value.trim());
             })
             document.getElementById('calculate').addEventListener('click', evt => {
-
+                
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 textarea.value = textarea.value + "\n" + HTML;
@@ -118,17 +126,34 @@
 
             document.getElementById('close').addEventListener('click', evt => {
                 textarea.value = textarea.value.split('\n')
-                    .map(x => x.trim())
-                    .filter(x => x)
+                    .map(x => x)
+                    .filter(x => x.trim())
                     .join('\n');
             })
-
+            document.getElementById('close-string').addEventListener('click', evt => {
+                findStringTemplate(x => '')
+            })
+            
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("js", '_blank');
             })
         }
+        function findStringTemplate(fn) {
+            let start = textarea.selectionStart
+            let end = textarea.selectionEnd;
+            while (start - 1 > -1 && textarea.value[start - 1] != '`') {
+                start--;
+            }
+            while (end + 1 < textarea.value.length && textarea.value[end] != '`') {
+                end++;
+            }
+            const s = textarea.value.substring(start, end);
+            textarea.setRangeText(fn(s), start, end);
+        }
+
         cacheCode();
         initialize();
+
 
     </script>
 </body>

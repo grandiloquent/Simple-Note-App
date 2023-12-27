@@ -1398,7 +1398,7 @@ const PDFViewerApplication = {
     .then(page=>{
       page.getTextContent()
       .then(function(text){ // return content promise
-        writeText(text.items.map(function (s) { return s.str; }).join('\n')); // value page text 
+        writeText(text.items.map(function (s) { return s.str; }).join(' ')); // value page text 
       })
     })
   },

@@ -171,7 +171,7 @@ function findCodeBlock(fn) {
 async function insertLinkWithTitle() {
     let res;
     try {
-        const start=textarea.selectionStart;
+        const start = textarea.selectionStart;
         const str = await readText();
         res = await fetch(`${getBaseUri()}/title?path=${encodeURIComponent(str)}`);
         if (res.status !== 200) {
@@ -350,6 +350,53 @@ function sortLines() {
         })
         .join('\n'), start, end + 1);
 }
+function findExtendPosition(editor) {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    let string = editor.value;
+    let offsetStart = start;
+    while (offsetStart > 0) {
+        if (!/\s/.test(string[offsetStart - 1]))
+            offsetStart--;
+        else {
+            let os = offsetStart;
+            while (os > 0 && /\s/.test(string[os - 1])) {
+                os--;
+            }
+            if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
+                break;
+            }
+            offsetStart = os;
+        }
+    }
+    let offsetEnd = end;
+    while (offsetEnd < string.length) {
+        if (!/\s/.test(string[offsetEnd + 1])) {
+
+            offsetEnd++;
+        } else {
+
+            let oe = offsetEnd;
+            while (oe < string.length && /\s/.test(string[oe + 1])) {
+                oe++;
+            }
+            if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
+                offsetEnd++;
+
+                break;
+            }
+            offsetEnd = oe + 1;
+
+        }
+    }
+    while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
+        offsetStart--;
+    }
+    // if (/\s/.test(string[offsetEnd])) {
+    //     offsetEnd--;
+    // }
+    return [offsetStart, offsetEnd];
+}
 ///////////////////////////////
 const textarea = document.querySelector('textarea');
 const id = new URL(window.location).searchParams.get('id');
@@ -422,10 +469,12 @@ document.querySelector('#save-note').addEventListener('click', evt => {
 document.querySelector('#format-head').addEventListener('click', evt => {
     formatHead(textarea)
 });
-document.querySelector('#format-code').addEventListener('click', evt =>
-{
-    formatCode(textarea);
-
+document.querySelector('#format-code').addEventListener('click', evt => {
+    //formatCode(textarea);
+    const positions = findExtendPosition(textarea);
+    let s = textarea.value.substring(positions[0], positions[1]);
+    s = s.split('\n').map(x => x.trim()).join(' ');
+    textarea.setRangeText(s, positions[0], positions[1]);
 });
 document.querySelector('#code').addEventListener('click', evt => {
     // findCodeBlock((start, end, str) => {

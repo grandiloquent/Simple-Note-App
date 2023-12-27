@@ -166,7 +166,12 @@ const HTML = `<!DOCTYPE html>
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Document</title>
-      <style></style>
+      <style>
+      body {
+        margin: 0;
+        overflow: hidden
+      }
+    </style>
   </head>
   
   <body>
@@ -179,6 +184,8 @@ const HTML = `<!DOCTYPE html>
       }
   }
   </script>
+  
+  <script src="https://unpkg.com/three@0.160.0/build/three.js"></script>
 
   <!--
   https://threejs.org/examples/

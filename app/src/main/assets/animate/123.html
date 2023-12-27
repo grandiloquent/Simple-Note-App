@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Babylon.js sample code</title>
+
+    <!-- Babylon.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+    <script src="https://assets.babylonjs.com/generated/Assets.js"></script>
+    <script src="https://cdn.babylonjs.com/recast.js"></script>
+    <script src="https://cdn.babylonjs.com/ammo.js"></script>
+    <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>
+    <script src="https://cdn.babylonjs.com/cannon.js"></script>
+    <script src="https://cdn.babylonjs.com/Oimo.js"></script>
+    <script src="https://cdn.babylonjs.com/earcut.min.js"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://cdn.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+    <script src="https://cdn.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        #canvasZone {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+
+        var startRenderLoop = function (engine, canvas) {
+            engine.runRenderLoop(function () {
+                if (sceneToRender && sceneToRender.activeCamera) {
+                    sceneToRender.render();
+                }
+            });
+        }
+
+        var engine = null;
+        var scene = null;
+        var sceneToRender = null;
+        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); };
+        var createScene = function () {
+            // scene and lights
+            var scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(.1, .2, .4);
+            var camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, 0, new BABYLON.Vector3(0, 0, -0), scene);
+            camera.setPosition(new BABYLON.Vector3(0, 0, -200));
+            camera.attachControl(canvas, true);
+            var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+            light.intensity = 0.9;
+            var pl = new BABYLON.PointLight("pl", new BABYLON.Vector3(0, 0, 0), scene);
+            pl.diffuse = new BABYLON.Color3(1, 1, 1);
+            pl.specular = new BABYLON.Color3(0.2, 0.2, 0.8);
+            pl.intensity = 0.75;
+
+            // texture and material
+            var url = "http://upload.wikimedia.org/wikipedia/en/8/86/Einstein_tongue.jpg";
+            var mat = new BABYLON.StandardMaterial("mat1", scene);
+            //mat.backFaceCulling = false;
+            var texture = new BABYLON.Texture(url, scene);
+            mat.diffuseTexture = texture;
+
+            // SPS creation
+            var tetra = BABYLON.MeshBuilder.CreatePolyhedron("tetra", { size: 5 }, scene);
+            var box = BABYLON.MeshBuilder.CreateBox("box", { size: 5 }, scene);
+            var SPS = new BABYLON.SolidParticleSystem('SPS', scene);
+            SPS.addShape(tetra, 500);
+            SPS.addShape(box, 500);
+            var mesh = SPS.buildMesh();
+            mesh.material = mat;
+            tetra.dispose();  // free memory
+            box.dispose();
+
+
+            // SPS behavior definition
+            var fact = 200;
+
+            // init
+            SPS.initParticles = function () {
+                // just recycle everything
+                for (var p = 0; p < this.nbParticles; p++) {
+                    this.recycleParticle(this.particles[p]);
+                }
+            };
+
+            // recycle
+            SPS.recycleParticle = function (particle) {
+                // Set particle new scale, color, uvs and rotation
+                // As this function is called for each particle, we don't allocate new
+                // memory by using "new BABYLON.Vector3()" but we set directly the
+                // x, y, z particle properties instead
+                particle.position.x = (Math.random() - 0.5) * fact;
+                particle.position.y = (Math.random() - 0.5) * fact;
+                particle.position.z = (Math.random() - 0.5) * fact;
+                var scale = Math.random() + 0.5;
+                particle.scale.x = scale;
+                particle.scale.y = scale;
+                particle.scale.z = scale;
+                particle.rotation.x = Math.random() * 3.5;
+                particle.rotation.y = Math.random() * 3.5;
+                particle.rotation.z = Math.random() * 3.5;
+                particle.color.r = Math.random() * 0.6 + 0.5;
+                particle.color.g = Math.random() * 0.6 + 0.5;
+                particle.color.b = Math.random() * 0.6 + 0.5;
+                particle.color.a = Math.random() * 0.6 + 0.5;
+                particle.uvs.x = Math.random() * 0.5;
+                particle.uvs.y = Math.random() * 0.5;
+                particle.uvs.z = Math.random() * 0.5 + 0.5;
+                particle.uvs.w = Math.random() * 0.5 + 0.5;
+            };
+
+
+            // init all particle values and set them once to apply textures, colors, etc
+            SPS.initParticles();
+            SPS.setParticles();
+
+            //scene.debugLayer.show();
+            // animation
+            scene.registerBeforeRender(function () {
+                pl.position = camera.position;
+                SPS.mesh.rotation.y += 0.001;
+            });
+
+            return scene;
+        };
+        window.initFunction = async function () {
+
+
+
+            var asyncEngineCreation = async function () {
+                try {
+                    return createDefaultEngine();
+                } catch (e) {
+                    console.log("the available createEngine function failed. Creating the default engine instead");
+                    return createDefaultEngine();
+                }
+            }
+
+            window.engine = await asyncEngineCreation();
+            if (!engine) throw 'engine should not be null.';
+            startRenderLoop(engine, canvas);
+            window.scene = createScene();
+        };
+        initFunction().then(() => {
+            sceneToRender = scene
+        });
+
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+
+</html>

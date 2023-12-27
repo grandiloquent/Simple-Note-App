@@ -42,6 +42,13 @@
             <div class="pivot-bar-item-title">计算</div>
         </div>
 
+
+        <div class="bar-item-tab" id="close">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+            <div class="pivot-bar-item-title">空行</div>
+        </div>
         <div class="bar-item-tab" id="text_snippet">
             <span class="material-symbols-outlined">
                 text_snippet
@@ -103,11 +110,19 @@
                 localStorage.setItem('j5', textarea.value.trim());
             })
             document.getElementById('calculate').addEventListener('click', evt => {
-                window.open("./expression.html", '_blank');
+
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 textarea.value = textarea.value + "\n" + HTML;
             })
+
+            document.getElementById('close').addEventListener('click', evt => {
+                textarea.value = textarea.value.split('\n')
+                    .map(x => x.trim())
+                    .filter(x => x)
+                    .join('\n');
+            })
+
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("js", '_blank');
             })

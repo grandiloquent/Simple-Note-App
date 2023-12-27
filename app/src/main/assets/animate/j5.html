@@ -106,7 +106,7 @@
                 window.open("./expression.html", '_blank');
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
-                textarea.value = HTML;
+                textarea.value = textarea.value + "\n" + HTML;
             })
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("js", '_blank');

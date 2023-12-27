@@ -170,6 +170,21 @@ const HTML = `<!DOCTYPE html>
   </head>
   
   <body>
+
+  <script type="importmap">
+  {
+      "imports": {
+          "three": "https://unpkg.com/three/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+  }
+  </script>
+
+  <!--
+  https://threejs.org/examples/
+  https://github.com/mrdoob/three.js/tree/master/examples
+  -->
+
   <canvas></canvas>
       <script type="module">
   

@@ -474,7 +474,7 @@ document.querySelector('#format-code').addEventListener('click', evt => {
     const positions = findExtendPosition(textarea);
     let s = textarea.value.substring(positions[0], positions[1]);
     s = s.split('\n').map(x => x.trim()).join(' ')
-    .replaceAll(/ - {1,}/g,"");
+    .replaceAll(/\s+-\s+/g,"");
     textarea.setRangeText(s, positions[0], positions[1]);
 });
 document.querySelector('#code').addEventListener('click', evt => {

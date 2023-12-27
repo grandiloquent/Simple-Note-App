@@ -581,32 +581,11 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         static const char query[]
                 = R"(select content from content WHERE id = 5)";
         db::QueryResult fetch_row = db::query<query>();
-        std::string_view vertex;
+        std::string_view o;
 
-        fetch_row(vertex);
+        fetch_row(o);
 
-        std::stringstream ss;
-        ss << R"(<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shader</title>
-    <style>
-        body {
-            margin: 0
-        }
-    </style>
-</head>
-
-<body)";
-        ss << R"(
-</body>
-
-</html>)";
-        auto o = ss.str();
         res.set_content(o.data(), o.size(), "text/html");
 
     });

@@ -9,6 +9,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
     <link rel="stylesheet" href="index.css">
     <script src="custom-toast.js"></script>
     <script src="shared.js"></script>
@@ -39,6 +41,14 @@
             </span>
             <div class="pivot-bar-item-title">计算</div>
         </div>
+
+        <div class="bar-item-tab" id="text_snippet">
+            <span class="material-symbols-outlined">
+                text_snippet
+            </span>
+            <div class="pivot-bar-item-title">代码段</div>
+        </div>
+        
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
                 preview
@@ -80,16 +90,23 @@
                 localStorage.setItem('j5', textarea.value.trim());
             });
         }
+        function formatCode() {
+            const options = { indent_size: 2, space_in_empty_paren: true }
+            textarea.value = html_beautify(textarea.value, options);
+
+        }
         function initialize() {
             document.getElementById('format').addEventListener('click', evt => {
-                const options = { indent_size: 2, space_in_empty_paren: true }
-                textarea.value = js_beautify(textarea.value, options);
+                formatCode()
             })
             document.getElementById('save').addEventListener('click', evt => {
                 localStorage.setItem('j5', textarea.value.trim());
             })
             document.getElementById('calculate').addEventListener('click', evt => {
                 window.open("./expression.html", '_blank');
+            })
+            document.getElementById('text_snippet').addEventListener('click', evt => {
+                textarea.value = HTML;
             })
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("animate/js.html", '_blank');

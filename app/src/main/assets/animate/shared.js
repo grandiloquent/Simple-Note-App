@@ -170,6 +170,7 @@ const HTML = `<!DOCTYPE html>
   </head>
   
   <body>
+  <canvas></canvas>
       <script type="module">
   
       </script>

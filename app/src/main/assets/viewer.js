@@ -1389,10 +1389,18 @@ const PDFViewerApplication = {
     this.pdfPresentationMode?.request();
   },
   triggerPrinting() {
-    if (!this.supportsPrinting) {
-      return;
-    }
-    window.print();
+    // if (!this.supportsPrinting) {
+    //   return;
+    // }
+    // window.print();
+     
+    this.pdfDocument.getPage(this.pdfViewer.currentPageNumber)
+    .then(page=>{
+      page.getTextContent()
+      .then(function(text){ // return content promise
+        writeText(text.items.map(function (s) { return s.str; }).join('\n')); // value page text 
+      })
+    })
   },
   bindEvents() {
     const {

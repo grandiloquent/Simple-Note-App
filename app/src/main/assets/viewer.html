@@ -33,6 +33,18 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     <link rel="stylesheet" href="viewer.css">
 
+    <script>
+      function writeText(message) {
+    const textarea = document.createElement("textarea");
+    textarea.style.position = 'fixed';
+    textarea.style.right = '100%';
+    document.body.appendChild(textarea);
+    textarea.value = message;
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+}
+    </script>
   <script src="viewer.js"></script>
   </head>
 

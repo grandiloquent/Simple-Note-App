@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
@@ -62,20 +63,20 @@ public class ServerService extends Service {
         intent.putExtra(MainActivity.KEY_ADDRESS, address);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_small);
-        notificationLayout.setOnClickPendingIntent(R.id.other,PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+        notificationLayout.setOnClickPendingIntent(R.id.other, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.dismiss,piDismiss);
+        notificationLayout.setOnClickPendingIntent(R.id.dismiss, piDismiss);
         notificationLayout.setOnClickPendingIntent(R.id.translator, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.app,PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.app, PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.explorer, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_BRO), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setCustomContentView(notificationLayout )
-                        .build();
+                .setCustomContentView(notificationLayout)
+                .build();
         context.startForeground(1, notification);
     }
 
@@ -167,13 +168,15 @@ public class ServerService extends Service {
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 Utils.takePhoto();
-            }else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
+            } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
                 startActivity(launchIntent);
-            }else if (intent.getAction().equals(ACTION_BRO)) {
+            } else if (intent.getAction().equals(ACTION_BRO)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+                launchIntent.setData(Uri.parse("http://" +
+                        Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
             }
 

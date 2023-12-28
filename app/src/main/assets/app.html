@@ -31,8 +31,40 @@
     <div style="border-top: 1px solid #ddd;margin: 8px 0;"></div>
     <a href="/code/index.html">代码</a>
     <a href="/code/editor.html">代码编辑器</a>
-    <div style="border-top: 1px solid #ddd;margin: 8px 0;"></div>
-    <a href="https://github.com/mrdoob/three.js/tree/master/examples">Three.js 示列</a>
+
+
+    <script>
+        [[
+
+            {
+                href: "https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API",
+                name: "WebGL: 2D and 3D graphics for the web"
+            },
+            {
+                href: "https://github.com/mrdoob/three.js/tree/master/examples",
+                name: "Three.js 示列"
+            },
+            {
+                href: "https://github.com/WebGLSamples/WebGL2Samples/tree/master",
+                name: "WebGL 2 Samples Pack"
+            }
+        ],
+            [
+                {
+                    href: "https://www.youtube.com/watch?v=3VGN8r88Pkk",
+                    name: "Debugging HLSL & GLSL shaders in VS Code"
+                }
+            ]
+        ].forEach(x => {
+            document.body.insertAdjacentHTML('beforeend',
+                `<div style="border-top: 1px solid #ddd;margin: 8px 0;"></div>`);
+            let buffer = [];
+            x.forEach(y => {
+                buffer.push(`<a href="${y.href}">${y.name}</a>`);
+            });
+            document.body.insertAdjacentHTML('beforeend', buffer.join(''));
+        })
+    </script>
 </body>
 
 </html>

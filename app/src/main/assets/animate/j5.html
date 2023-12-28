@@ -43,7 +43,7 @@
         </div>
 
 
-        
+
         <div class="bar-item-tab" id="close-string">
             <span class="material-symbols-outlined">
                 close
@@ -77,6 +77,8 @@
     <custom-toast id="toast"></custom-toast>
     <script>
         const textarea = document.getElementById("textarea");
+        let baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "..";
+
         async function loadData() {
             const res = await fetch('../jn');
             if (res.status !== 200)
@@ -110,15 +112,39 @@
             textarea.value = html_beautify(textarea.value, options);
 
         }
+        async function saveCodeData() {
+            let s = textarea.value.trim();
+            if (!s) return;
+            let body = {
+                id: 0,
+                title: "WebGL",
+                content: s
+            };
+            // await submitNote(getBaseUri(), JSON.stringify(body));
+            // document.getElementById('toast').setAttribute('message', '成功');
+            let res;
+            try {
+                res = await fetch(`${baseUri}/code`, {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+                if (res.status !== 200) {
+                    throw new Error();
+                }
+                toast.setAttribute('message', '成功');
+            } catch (error) {
+                toast.setAttribute('message', '错误');
+            }
+        }
         function initialize() {
             document.getElementById('format').addEventListener('click', evt => {
                 formatCode()
             })
-            document.getElementById('save').addEventListener('click', evt => {
-                localStorage.setItem('j5', textarea.value.trim());
+            document.getElementById('save').addEventListener('click', async evt => {
+                await saveCodeData()
             })
             document.getElementById('calculate').addEventListener('click', evt => {
-                
+
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 textarea.value = textarea.value + "\n" + HTML;
@@ -133,10 +159,20 @@
             document.getElementById('close-string').addEventListener('click', evt => {
                 findStringTemplate(x => '')
             })
-            
+
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open("js", '_blank');
             })
+            document.addEventListener('keydown', async evt => {
+                if (evt.ctrlKey && evt.key === 's') {
+                    evt.preventDefault();
+                    await saveCodeData()
+                } else if (evt.key === 'F4') {
+                    const s = await navigator.clipboard.readText();
+                    textarea.value = WBEGL[0] + s + WEBGL[1];
+                }
+
+            });
         }
         function findStringTemplate(fn) {
             let start = textarea.selectionStart

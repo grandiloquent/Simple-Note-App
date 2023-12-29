@@ -132,7 +132,7 @@
             data.forEach(x => {
                 wrapper.insertAdjacentHTML('beforeend', `
         <h3 class="title" data-id="${x.id}">${escapeHtml(x.title)}</h3>
-        <span class="material-symbols-outlined preview">
+        <span class="material-symbols-outlined preview" data-id="${x.id}">
 preview
 </span>
         <span class="material-symbols-outlined content_copy" data-id="${x.id}">

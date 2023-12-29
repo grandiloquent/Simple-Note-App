@@ -153,10 +153,117 @@ function writeText(message) {
     document.execCommand('copy');
     textarea.remove();
 }
+function findExtendPosition(editor) {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    let string = editor.value;
+    let offsetStart = start;
+    while (offsetStart > 0) {
+        if (!/\s/.test(string[offsetStart - 1]))
+            offsetStart--;
+        else {
+            let os = offsetStart;
+            while (os > 0 && /\s/.test(string[os - 1])) {
+                os--;
+            }
+            if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
+                break;
+            }
+            offsetStart = os;
+        }
+    }
+    let offsetEnd = end;
+    while (offsetEnd < string.length) {
+        if (!/\s/.test(string[offsetEnd + 1])) {
+
+            offsetEnd++;
+        } else {
+
+            let oe = offsetEnd;
+            while (oe < string.length && /\s/.test(string[oe + 1])) {
+                oe++;
+            }
+            if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
+                offsetEnd++;
+
+                break;
+            }
+            offsetEnd = oe + 1;
+
+        }
+    }
+    while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
+        offsetStart--;
+    }
+    // if (/\s/.test(string[offsetEnd])) {
+    //     offsetEnd--;
+    // }
+    return [offsetStart, offsetEnd];
+}
 function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
+function processSelection(fn) {
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    let selectedString = textarea.value.substring(selectionStart, selectionEnd);
+    if (!selectedString) {
+        selectedString = getLine(textarea);
+        if (textarea.value[selectionStart] !== '\n') {
+            while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart + 1] !== '\n') {
+                selectionStart++;
+            }
+            selectionStart++;
+        }
+
+        selectionEnd = selectionStart
+        textarea.value = `${textarea.value.substring(0, selectionStart)}
+${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
+        return;
+    }
+    textarea.value = `${textarea.value.substring(0, selectionStart)}${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
+
+}
+function getLine(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    if (textarea.value[start] === '\n' && start - 1 > 0) {
+        start--;
+    }
+    if (textarea.value[end] === '\n' && end - 1 > 0) {
+        end--;
+    }
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
+        end++;
+    }
+    return textarea.value.substring(start, end + 1);
+}
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function comment(textarea) {
+    const points = findExtendPosition(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    if (s.startsWith("/*") && s.endsWith("*/")) {
+        s = s.substring(2);
+        s = s.substring(0, s.length - 2);
+    } else {
+        s = `/*
+${s}
+*/`;
+    }
+    textarea.setRangeText(s, points[0], points[1]);
+}
 
 const HTML = `<!DOCTYPE html>
   <html lang="en">
@@ -209,8 +316,8 @@ function formatGlslCode(code) {
     const points = substring(code, `<script id="fs" type="x-shader/x-fragment">`, `</script>`);
     if (points[0] === 0 && points[1] === 0) {
         return code.split('\n')
-        .filter(x => x.trim())
-        .join('\n');
+            .filter(x => x.trim())
+            .join('\n');
     }
     s = code.substring(points[0], points[1]);
     s = GLSLX.format(s);

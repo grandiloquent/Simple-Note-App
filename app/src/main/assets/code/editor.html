@@ -13,12 +13,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
     <link rel="stylesheet" href="index.css">
     <script src="custom-toast.js"></script>
-    <script src="shared.js"></script>
+    <script src="../animate/shared.js"></script>
 </head>
 
 <body>
     <div class="wrapper">
-        <textarea id="textarea"></textarea>
+        <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer">
         <div class="bar-item-tab" id="save">
@@ -49,13 +49,18 @@
             <div class="pivot-bar-item-title">代码段</div>
         </div>
 
+        <div class="bar-item-tab" id="comment">
+            <span class="material-symbols-outlined">
+                comment
+            </span>
+            <div class="pivot-bar-item-title">注释</div>
+        </div>
         <div class="bar-item-tab" id="preview">
             <span class="material-symbols-outlined">
                 preview
             </span>
             <div class="pivot-bar-item-title">预览</div>
         </div>
-
 
 
     </div>
@@ -110,11 +115,13 @@ ${data["content"]}`;
 
         }
         function formatCode() {
-            const options = { indent_size: 2, space_in_empty_paren: true }
-            textarea.value = html_beautify(textarea.value, options);
-
+            textarea.value = formatGlslCode(textarea.value);
         }
         function initialize() {
+            document.addEventListener('visibilitychange', async evt => {
+                await saveData();
+                localStorage.setItem('code.editor', textarea.value.trim());
+            });
             document.getElementById('format').addEventListener('click', evt => {
                 formatCode();
             })
@@ -128,14 +135,14 @@ ${data["content"]}`;
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open(`/viewer?id=${id}`, '_blank');
             })
-            document.getElementById('text_snippet').addEventListener('click', evt => {
-                textarea.value = HTML;
+            document.getElementById('comment').addEventListener('click', evt => {
+                comment(textarea);
             })
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {
                     if (evt.key === 's') {
                         evt.preventDefault();
-                        saveData();
+                        await saveData();
                     }
                 } else {
                     if (evt.key === 'F1') {

@@ -208,13 +208,14 @@ function formatGlslCode(code) {
     code = html_beautify(code, options);
     const points = substring(code, `<script id="fs" type="x-shader/x-fragment">`, `</script>`);
     if (points[0] === 0 && points[1] === 0) {
-        return code;
+        return code.split('\n')
+        .filter(x => x.trim())
+        .join('\n');
     }
     s = code.substring(points[0], points[1]);
     s = GLSLX.format(s);
     s = code.substring(0, points[0]) + s + code.substring(points[1]);
     return s.split('\n')
-        .map(x => x)
         .filter(x => x.trim())
         .join('\n');
 }

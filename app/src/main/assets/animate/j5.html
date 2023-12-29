@@ -203,7 +203,6 @@
 
             document.getElementById('close').addEventListener('click', evt => {
                 textarea.value = textarea.value.split('\n')
-                    .map(x => x)
                     .filter(x => x.trim())
                     .join('\n');
             })

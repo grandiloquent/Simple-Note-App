@@ -214,8 +214,7 @@ function formatGlslCode(code) {
     s = GLSLX.format(s);
     s = code.substring(0, points[0]) + s + code.substring(points[1]);
     return s.split('\n')
-        .map(x => x)
-        .filter(x => x.trim())
+        .filter(v => v.trim())
         .join('\n');
 }
 

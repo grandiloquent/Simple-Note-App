@@ -66,6 +66,7 @@
                 }
             ],
 
+
         ].forEach(x => {
             document.body.insertAdjacentHTML('beforeend',
                 `<div style="border-top: 1px solid #ddd;margin: 8px 0;"></div>`);
@@ -75,7 +76,14 @@
             });
             document.body.insertAdjacentHTML('beforeend', buffer.join(''));
         })
-    </script>
+        ["https://medium.com/@526482943/one-article-to-understand-the-texture-map-in-three-js-7f258ad534a6"]
+        .forEach(x => {
+            document.body.insertAdjacentHTML('beforeend', `<a href="${x}">${x}</a>`);
+        })
+
+</script>
+
+
 </body>
 
 </html>

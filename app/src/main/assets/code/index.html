@@ -132,9 +132,9 @@
             data.forEach(x => {
                 wrapper.insertAdjacentHTML('beforeend', `
         <h3 class="title" data-id="${x.id}">${escapeHtml(x.title)}</h3>
-        <span class="material-symbols-outlined edit" data-id="${x.id}">
-            edit
-        </span>
+        <span class="material-symbols-outlined preview">
+preview
+</span>
         <span class="material-symbols-outlined content_copy" data-id="${x.id}">
             content_copy
         </span>
@@ -147,16 +147,16 @@
                         writeText(o.content);
                     })
                 })
-            document.querySelectorAll('.edit')
+            document.querySelectorAll('.preview')
                 .forEach(x => {
                     x.addEventListener('click', evt => {
-                        location.href = `./editor.html?id=${evt.currentTarget.dataset.id}`;
+                        location.href = `/viewer?id=${evt.currentTarget.dataset.id}`;
                     })
                 })
             document.querySelectorAll('.title')
                 .forEach(x => {
                     x.addEventListener('click', evt => {
-                        location.href = `/viewer?id=${evt.currentTarget.dataset.id}`;
+                        location.href = `./editor.html?id=${evt.currentTarget.dataset.id}`;
                     })
                 })
         }

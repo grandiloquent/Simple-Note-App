@@ -105,8 +105,10 @@
             }
 
             document.addEventListener('visibilitychange', async evt => {
-                await saveData();
-                localStorage.setItem('j5', textarea.value.trim());
+                if (document.visibilityState !== "visible") {
+                    await saveData();
+                    localStorage.setItem('j5', textarea.value.trim());
+                }
             });
         }
         function formatCode() {

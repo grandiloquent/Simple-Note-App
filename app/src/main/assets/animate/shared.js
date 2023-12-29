@@ -240,7 +240,7 @@ function getLine(textarea) {
     while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
         end++;
     }
-    return textarea.value.substring(start, end + 1);
+    return [start, end + 1];
 }
 function escapeHtml(unsafe) {
     return unsafe
@@ -265,6 +265,18 @@ ${s}
     textarea.setRangeText(s, points[0], points[1]);
 }
 
+function deleteBlock(textarea){
+    const points = findExtendPosition(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    writeText(s);
+    textarea.setRangeText("", points[0], points[1]);
+}
+function deleteLine(textarea){
+    const points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    writeText(s);
+    textarea.setRangeText("", points[0], points[1]);
+}
 const HTML = `<!DOCTYPE html>
   <html lang="en">
   

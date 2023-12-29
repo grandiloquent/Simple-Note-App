@@ -17,10 +17,10 @@
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="wrapper" style="padding: 49px 0 0 0;">
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
-    <div class="bar-renderer">
+    <div class="bar-renderer" style="top: 0;">
         <div class="bar-item-tab" id="save">
             <span class="material-symbols-outlined">
                 save
@@ -35,18 +35,18 @@
             <div class="pivot-bar-item-title">格式化</div>
         </div>
 
-        <div class="bar-item-tab" id="calculate">
+        <div class="bar-item-tab" id="close">
             <span class="material-symbols-outlined">
-                calculate
+                close
             </span>
-            <div class="pivot-bar-item-title">计算</div>
+            <div class="pivot-bar-item-title">剪行</div>
         </div>
 
-        <div class="bar-item-tab" id="text_snippet">
+        <div class="bar-item-tab" id="close-block">
             <span class="material-symbols-outlined">
-                text_snippet
+                close
             </span>
-            <div class="pivot-bar-item-title">代码段</div>
+            <div class="pivot-bar-item-title">剪块</div>
         </div>
 
         <div class="bar-item-tab" id="comment">
@@ -119,8 +119,10 @@ ${data["content"]}`;
         }
         function initialize() {
             document.addEventListener('visibilitychange', async evt => {
-                await saveData();
-                localStorage.setItem('code.editor', textarea.value.trim());
+                if (document.visibilityState !== "visible") {
+                    await saveData();
+                    localStorage.setItem('code.editor', textarea.value.trim());
+                }
             });
             document.getElementById('format').addEventListener('click', evt => {
                 formatCode();
@@ -129,8 +131,11 @@ ${data["content"]}`;
                 await saveData();
                 localStorage.setItem('code.editor', textarea.value.trim());
             })
-            document.getElementById('calculate').addEventListener('click', evt => {
-                window.open("./expression.html", '_blank');
+            document.getElementById('close').addEventListener('click', evt => {
+                deleteLine(textarea)
+            })
+            document.getElementById('close-block').addEventListener('click', evt => {
+                deleteBlock(textarea)
             })
             document.getElementById('preview').addEventListener('click', evt => {
                 window.open(`/viewer?id=${id}`, '_blank');

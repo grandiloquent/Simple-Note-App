@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Test Babylon Roller Coaster</title>
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+        "use strict";
+        // Roller Coaster
+        // ==================
+        //
+        // author : Jérôme Bousquié
+        var createScene = function (canvas, engine) {
+            // image resources for textures
+            var urlGrass = "grass.jpg";
+            var urlSkyBox = "skybox";
+            // let's create a scene with a hemispheric light
+            var scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(.4, .6, 1);
+            var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0.2), scene);
+            light.intensity = 0.7;
+            // then the sky with a Skybox
+            var skybox = BABYLON.Mesh.CreateBox("skyBox", 2000.0, scene, false, BABYLON.Mesh.BACKSIDE);
+            var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+            skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(urlSkyBox, scene);
+            skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+            skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            skybox.material = skyboxMaterial;
+            // then the ground with a textured big disc
+            var ground = BABYLON.Mesh.CreateDisc("ground", 800, 60, scene);
+            ground.rotation.x = Math.PI / 2;
+            var matGround = new BABYLON.StandardMaterial("mg", scene);
+            ground.material = matGround;
+            var groundTexture = new BABYLON.Texture(urlGrass, scene);
+            groundTexture.uScale = 100;
+            groundTexture.vScale = 100;
+            matGround.diffuseTexture = groundTexture;
+            matGround.specularColor = BABYLON.Color3.Black();
+            // Now we will draw the roller coaster rails
+            // We set a closed curve by concatenating 5 different curves :
+            // 1 - a set of three chained loops
+            // 2 - a  left turn
+            // 3 - a hill
+            // 4 - a  right turn
+            // 5 - a tiny hermite spline to close the curve
+            // curve computation ============================================
+            var points;
+            var continued;
+            var x, y, z;
+            // loops : cosinus and sinus
+            var loops = [];
+            var nbpt = 200;
+            var pi6 = Math.PI * 6;
+            for (var lp = 0; lp < nbpt; lp++) {
+                x = lp - nbpt / 2 + (nbpt / 5 - lp / 8) * Math.cos(pi6 * lp / nbpt);
+                y = nbpt / 5 + (nbpt / 5 - lp / 8) * Math.sin(pi6 * lp / nbpt);
+                z = lp - nbpt;
+                loops.push(new BABYLON.Vector3(x, y, z));
+            }
+            // first turn : cosinus and sinus
+            var turn1 = [];
+            var ang = Math.PI;
+            nbpt = 40;
+            for (var tp = 0; tp < nbpt; tp++) {
+                x = 30 * Math.cos(ang * tp / nbpt - 0.8);
+                y = 30 * Math.sin(ang * tp / nbpt);
+                z = 30 * Math.sin(ang * tp / nbpt - 0.8);
+                turn1.push(new BABYLON.Vector3(x, y, z));
+            }
+            // hill : exponential
+            var hill = [];
+            nbpt = 80;
+            for (var hp = 0; hp < nbpt; hp++) {
+                x = -hp * 2;
+                y = 80 * Math.exp(-(hp - nbpt / 3) * (hp - nbpt / 3) / (nbpt * 5));
+                z = -hp * 3.2;
+                hill.push(new BABYLON.Vector3(x, y, z));
+            }
+            // second turn : cosinus and sinus
+            var turn2 = [];
+            nbpt = 60;
+            ang = -Math.PI * 3 / 2;
+            for (tp = 0; tp < nbpt; tp++) {
+                x = 30 * Math.cos(ang * tp / nbpt - 0.6);
+                y = -tp / 2.5;
+                z = 30 * Math.sin(ang * tp / nbpt - 0.6);
+                turn2.push(new BABYLON.Vector3(x, y, z));
+            }
+            // close rails with hermite
+            var curloops = new BABYLON.Curve3(loops);
+            var curturn1 = new BABYLON.Curve3(turn1);
+            var curhill = new BABYLON.Curve3(hill);
+            var curturn2 = new BABYLON.Curve3(turn2);
+            continued = (curloops).continue(curturn1).continue(curhill).continue(curturn2);
+            points = continued.getPoints();
+            var p1 = points[points.length - 1];
+            var t1 = (p1.subtract(points[points.length - 2])).scale(10);
+            var p2 = points[0];
+            var t2 = (points[1].subtract(p2)).scale(30);
+            var hermite = BABYLON.Curve3.CreateHermiteSpline(p1, t1, p2, t2, 15);
+            // full final curve
+            continued = hermite.continue(continued);
+            points = continued.getPoints();
+            // curve computed ===========================================
+            // let's now define a simple triangular shape for the rails
+            var shape = [
+                new BABYLON.Vector3(0, 2, 0),
+                new BABYLON.Vector3(-1, 0, 0),
+                new BABYLON.Vector3(0, -2, 0),
+            ];
+            shape.push(shape[0]);
+            // Let's now extrude this shape along the curve to draw
+            // the whole roller coaster
+            var origin = BABYLON.Vector3.Zero();
+            var rollerCoaster = BABYLON.Mesh.ExtrudeShape("rc", shape, points, 4, 0, BABYLON.Mesh.NO_CAP, scene);
+            var mat = new BABYLON.StandardMaterial("mat1", scene);
+            mat.diffuseColor = new BABYLON.Color3(1, 0.8, 1.0);
+            mat.wireframe = true;
+            rollerCoaster.material = mat;
+            rollerCoaster.position = origin;
+
+            // All immobile meshes can be now frozen to avoid
+            // un-needed matrix computations
+            skybox.freezeWorldMatrix();
+            ground.freezeWorldMatrix();
+            // house.freezeWorldMatrix();
+            // roof.freezeWorldMatrix();
+            // We've got the rails, we need now a wagon !
+            var faceUV = new Array(6);
+
+            for (var i = 0; i < 6; i++) {
+                faceUV[i] = new BABYLON.Vector4(0, 0, 0, 0);
+            }
+            faceUV[0] = new BABYLON.Vector4(0, 0, 0.25, 1);
+            faceUV[1] = new BABYLON.Vector4(0.75, 0, 1, 1);
+            faceUV[2] = new BABYLON.Vector4(0.5, 0, 0.75, 1);
+            faceUV[3] = new BABYLON.Vector4(0.75, 0, 1, 1);
+            faceUV[4] = new BABYLON.Vector4(0.25, 0, 0.5, 1);
+            faceUV[5] = new BABYLON.Vector4(0, 0, 0.25, 1);
+
+            var wagon = BABYLON.MeshBuilder.CreateBox("wagon", { size: 8, faceUV: faceUV }, scene);
+            //wagon.scaling.x = 2;
+            // var matWagon = new BABYLON.StandardMaterial("mw", scene);
+            // matWagon.diffuseColor = new BABYLON.Color3(1, 0, .8);
+            // wagon.material = matWagon;
+            wagon.position = origin;
+            let pbrMat = new BABYLON.PBRMaterial("pbrMat", scene);
+            pbrMat.metallic = 0;
+            pbrMat.albedoTexture = new BABYLON.Texture("1.png", scene);
+            //pbrMat.metallicReflectanceTexture = new BABYLON.Texture("1.jpg", scene);
+            wagon.material = pbrMat;
+            // Just in case you want to set the roller coaster somewhere else
+            // translate the relative curve points to the same origin than the mesh
+            var lg = points.length;
+            for (var pt = 0; pt < lg; pt++) {
+                points[pt].addInPlace(origin);
+            }
+            // Let's add a Follow Camera.
+            // It is set initially very far from the roller-coaster
+            // in order to get an "approach"" effect on start 
+            var followCam = new BABYLON.FollowCamera("fcam", new BABYLON.Vector3(20, 200, -300), scene);
+            followCam.lockedTarget = wagon;
+            followCam.radius = 50;
+            followCam.maxCameraSpeed = 1;
+            scene.activeCamera = followCam;
+            // All the meshes and the cam are set, so now let's handle the wagon trajectory
+            // Let's create a Path3D object with the curve
+            var path3d = new BABYLON.Path3D(points);
+            var tgts = path3d.getTangents();
+            var norms = path3d.getNormals();
+            var binorms = path3d.getBinormals();
+            // let's scale the normals, where the wagon will be attached, 
+            // to be a little farther from the rails
+            var shift = 4;
+            for (var n = 0; n < lg; n++) {
+                norms[n].scaleInPlace(shift);
+            }
+            // let's initialize now some variables for updating
+            // the wagon position each frame
+            var i = 0; // curve current point 
+            var j = 1; // curve next current point
+            var curvect = points[j].subtract(points[i]); // curve current segment
+            var rot = BABYLON.Vector3.RotationFromAxis(tgts[i], norms[i], binorms[i]); // wagon current rotation
+            var pos = BABYLON.Vector3.Zero(); // wagon current position
+            var scaled = BABYLON.Vector3.Zero(); // current scaled segment
+            var step = 3; // nb steps on each segment
+            var k = 0; // counter
+            // Animation
+            // the wagon slides many steps on each curve segment
+            scene.registerBeforeRender(function () {
+                curvect.scaleToRef(k / step, scaled);
+                points[i].addToRef(scaled, pos);
+                pos.addInPlace(norms[i]);
+                wagon.position = pos;
+                wagon.rotation = rot;
+                k++;
+                // next segment
+                if (k == step) {
+                    i = (i + 1) % lg;
+                    j = (i + 1) % lg;
+                    rot = BABYLON.Vector3.RotationFromAxis(tgts[i], norms[i], binorms[i]);
+                    points[j].subtractToRef(points[i], curvect);
+                    k = 0;
+                    if (i == 0) {
+                        followCam.radius = 50 + 200 * Math.random();
+                    }
+                }
+            });
+            return scene;
+        };
+        var init = function () {
+            var canvas = document.querySelector('#renderCanvas');
+            var engine = new BABYLON.Engine(canvas, true);
+            var scene = createScene(canvas, engine);
+            window.addEventListener("resize", function () {
+                engine.resize();
+            });
+            engine.runRenderLoop(function () {
+                scene.render();
+            });
+            startRecording();
+        };
+        const startRecording = () => {
+            const canvas = document.querySelector("canvas");
+            const data = []; // here we will store our recorded media chunks (Blobs)
+            const stream = canvas.captureStream(30); // records the canvas in real time at our preferred framerate 30 in this case.
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: "video/webm; codecs=vp9"
+            }); // init the recorder
+            // whenever the recorder has new data, we will store it in our array
+            mediaRecorder.ondataavailable = (e) => data.push(e.data);
+            // only when the recorder stops, we construct a complete Blob from all the chunks
+            mediaRecorder.onstop = (e) =>
+                downloadVideo(new Blob(data, { type: "video/webm;codecsvp9" }));
+            mediaRecorder.start();
+            setTimeout(() => {
+                mediaRecorder.stop();
+            }, 30000); // stop recording in 6s
+        };
+
+        const downloadVideo = async (blob) => {
+            const div = document.querySelector("body");
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "test.webm";
+            a.className = "button";
+            a.innerText = "click here to download";
+            div.appendChild(a);
+        };
+    </script>
+</head>
+
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+        window.onload = init;
+    </script>
+</body>
+
+</html>

@@ -82,14 +82,28 @@
                 buffer.push(`<a href="${y.href}">${y.name}</a>`);
             });
             document.body.insertAdjacentHTML('beforeend', buffer.join(''));
-        })
+        });
+        document.body.insertAdjacentHTML('beforeend',
+                `<div style="border-top: 1px solid #ddd;margin: 8px 0;"></div>`);
+           
         ["https://medium.com/@526482943/one-article-to-understand-the-texture-map-in-three-js-7f258ad534a6",
-        "https://doc.babylonjs.com/guidedLearning/workshop/Track",
-            "https://jerome.bousquie.fr/BJS/demos/"
-        ]
-            .forEach(x => {
-                document.body.insertAdjacentHTML('beforeend', `<a href="${x}">${x}</a>`);
-            })
+            "https://doc.babylonjs.com/guidedLearning/workshop/Track",
+            "https://jerome.bousquie.fr/BJS/demos/",
+            "https://medium.com/@dtinth/spring-animation-in-css-2039de6e1a03",
+            "https://discourse.threejs.org/t/using-three-js-routines-to-compute-aircraft-rotation/32707/5",
+            "https://tympanus.net/codrops/2016/04/26/the-aviator-animating-basic-3d-scene-threejs/",
+            "https://discourse.threejs.org/t/how-to-render-text-containing-math-equations-generated-from-latex/20716/4",
+            "https://www.mathjax.org/",
+            "https://www.craftonhills.edu/current-students/tutoring-center/mathematics-tutoring/trig_formula_sheet.pdf",
+            "",
+            "",
+            "",
+            "",
+            ""
+
+        ].forEach(x => {
+            document.body.insertAdjacentHTML('beforeend', `<a href="${x}">${x}</a>`);
+        })
 
     </script>
 

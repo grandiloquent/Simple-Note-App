@@ -177,15 +177,7 @@
             });
         }
 
-        function findStringTemplate(fn) {
-            let start = textarea.selectionStart
-            let end = textarea.selectionEnd;
-            while (start - 1 > -1 && textarea.value[start - 1] != '`') {
-                start--;
-            }
-            while (end + 1 < textarea.value.length && textarea.value[end] != '`') { end++; } const
-                s = textarea.value.substring(start, end); textarea.setRangeText(fn(s), start, end);
-        }
+       
         cacheCode();
         initialize();
 

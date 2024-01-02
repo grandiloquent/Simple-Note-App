@@ -120,7 +120,7 @@
                 document.title = data["title"];
                 textarea.value = `${data["title"]}
     
-${data["content"]}`;
+${content}`;
             } catch (error) {
                 textarea.value = localStorage.getItem('code.editor');
             }

@@ -259,23 +259,52 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/codes", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
-        db::QueryResult fetch_row = db::query<query>();
-        std::string_view id, title, update_at;
 
-        nlohmann::json doc = nlohmann::json::array();
-        while (fetch_row(id, title, update_at)) {
-            nlohmann::json j = {
+        auto q = req.get_param_value("q");
 
-                    {"id",        id},
-                    {"title",     title},
-                    {"update_at", update_at},
+        if (q.empty()) {
+            static const char query[]
+                    = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
+            db::QueryResult fetch_row = db::query<query>();
+            std::string_view id, title, update_at;
+            nlohmann::json doc = nlohmann::json::array();
+            while (fetch_row(id, title, update_at)) {
+                nlohmann::json j = {
 
-            };
-            doc.push_back(j);
+                        {"id",        id},
+                        {"title",     title},
+                        {"update_at", update_at},
+
+                };
+                doc.push_back(j);
+            }
+            res.set_content(doc.dump(), "application/json");
+
+        } else {
+
+            static const char query[]
+                    = R"(SELECT id,title,content,update_at FROM code ORDER BY update_at DESC)";
+            db::QueryResult fetch_row = db::query<query>();
+            std::string id, title, content, update_at;
+
+            nlohmann::json doc = nlohmann::json::array();
+            std::regex q_regex(q);
+            while (fetch_row(id, title, content, update_at)) {
+                if (std::regex_search(title, q_regex) || std::regex_search(content, q_regex)) {
+                    nlohmann::json j = {
+
+                            {"id",        id},
+                            {"title",     title},
+                            {"update_at", update_at},
+
+                    };
+                    doc.push_back(j);
+                }
+
+            }
+            res.set_content(doc.dump(), "application/json");
         }
-        res.set_content(doc.dump(), "application/json");
+
     });
     server.Get("/code", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
@@ -348,6 +377,30 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         }
+    });
+    server.Post("/codes", [](const httplib::Request &req, httplib::Response &res,
+                             const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        for (auto &d: doc) {
+            static const char query[]
+                    = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+            db::QueryResult fetch_row = db::query<query>("WebGL Three.js Babylon.js",
+                                                         d.get<std::string>().c_str(),
+                                                         GetTimeStamp(),
+                                                         GetTimeStamp()
+            );
+
+        }
+        res.set_content("OK",
+                        "text/plain; charset=UTF-8");
+
     });
     server.Get("/fav/list", [](const httplib::Request &req, httplib::Response &res) {
 

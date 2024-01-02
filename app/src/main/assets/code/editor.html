@@ -113,6 +113,10 @@
         async function cacheCode() {
             try {
                 const data = await loadData();
+                let content = data["content"];
+                if (content.startsWith('"') && content.endsWith('"')) {
+                    content = JSON.parse(content)
+                }
                 document.title = data["title"];
                 textarea.value = `${data["title"]}
     

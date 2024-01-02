@@ -436,7 +436,9 @@ function showSnippetsDialog() {
                         textarea.selectionEnd
                     )
                 } else if (id === "6") {
-                    const str = `window.onerror = function(errMsg, url, line, column, error) {
+                    const str = `
+                    <script>
+                    window.onerror = function(errMsg, url, line, column, error) {
                         var result = !column ? '' : 'column: ' + column;
                         result += !error;
                         document.write("\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result);
@@ -448,6 +450,7 @@ function showSnippetsDialog() {
                             location.reload();
                         }
                     });
+                    </script>
                      `;
                     textarea.setRangeText(
                         str,

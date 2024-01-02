@@ -441,7 +441,7 @@ function showSnippetsDialog() {
                     window.onerror = function(errMsg, url, line, column, error) {
                         var result = !column ? '' : 'column: ' + column;
                         result += !error;
-                        document.write("\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result);
+                        document.write("\\nError= " + errMsg + "url= " + url + "\\nline= " + line + result);
                         var suppressErrorAlert = true;
                         return suppressErrorAlert;
                      };

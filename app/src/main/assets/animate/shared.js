@@ -369,6 +369,7 @@ function showSnippetsDialog() {
                 <div data-id="6">错误</div>
                 <div data-id="7">GLSL 简化</div>
                 <div data-id="8">GLSL 变量</div>
+                <div data-id="9">Three.js 导入</div>
                 `;
 
     dialog.appendChild(div);
@@ -486,6 +487,22 @@ gl.uniform1i(frameLocation, frame);
                     textarea.selectionStart,
                     textarea.selectionEnd
                     )
+                }
+                else if(id==='9'){
+                    textarea.setRangeText(`
+                    <script type="importmap">
+                    {
+                    "imports": {
+                      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+                    }
+                  }
+                </script>
+                  <script type="module">
+                    import * as THREE from 'three';
+                    `,
+                    textarea.selectionStart,
+                    textarea.selectionEnd);
                 }
                 dialog.remove();
             });

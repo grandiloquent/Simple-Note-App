@@ -132,6 +132,12 @@ ${data["content"]}`;
                     localStorage.setItem('code.editor', textarea.value.trim());
                 }
             });
+            window.addEventListener("beforeunload", async evt => {
+                if (document.visibilityState !== "visible") {
+                    await saveData();
+                    localStorage.setItem('code.editor', textarea.value.trim());
+                }
+            });
             document.getElementById('format').addEventListener('click', evt => {
                 formatCode();
             })

@@ -167,15 +167,23 @@ ${content}`;
                 localStorage.setItem('code.editor', textarea.value.trim());
             })
             document.getElementById('variables').addEventListener('click', evt => {
-                processSelection(v => {
-                    return `let v = 0;`
-                })
+                let selectionStart = textarea.selectionStart;
+                let selectionEnd = textarea.selectionEnd;
+                let s = `let v = 0;`;
+                textarea.setRangeText(s, selectionStart, selectionEnd)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
-                processSelection(v => {
-                    return `if(x === undefined){
-}`
-                })
+
+
+                let selectionStart = textarea.selectionStart;
+                let selectionEnd = textarea.selectionEnd;
+                let s = `if(x === undefined){
+}
+else if(x !== undefined){
+}
+else{
+}`;
+                textarea.setRangeText(s, selectionStart, selectionEnd)
             })
             document.getElementById('preview').addEventListener('click', async evt => {
                 try {

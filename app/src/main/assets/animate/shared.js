@@ -298,7 +298,7 @@ ${s}
 async function translate(baseUri, textarea) {
     const points = getWord(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    let t = 'zh';
+    let t = 'zh-CN';
     if (/[\u3400-\u9FBF]/.test(s)) {
         t = 'en'
     }
@@ -308,7 +308,9 @@ async function translate(baseUri, textarea) {
             throw new Error(`${response.status}: ${response.statusText}`)
         }
         const results = await response.json();
-        console.log(results);
+        const trans = results.sentences.map(x => x.trans);
+        const name = camel(trans.join(' '));
+        textarea.setRangeText(`${name.slice(0, 1).toLowerCase()}${name.slice(1)}`, points[0], points[1]);
     } catch (error) {
         console.log(error);
     }

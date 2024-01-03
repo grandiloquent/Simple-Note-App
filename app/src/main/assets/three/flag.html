@@ -111,9 +111,10 @@
                 const time = Date.now() * s / 50;
                 vertex.z = Math.sin(h * x + v * y - time) * w * x / 4;
             }
-            angle += frequency / 1500;
-            setCamera();
+
         }
+        angle += frequency / 1500;
+        setCamera();
         flag.geometry.verticesNeedUpdate = true;
         renderer.render(scene, camera);
         window.requestAnimationFrame(update);

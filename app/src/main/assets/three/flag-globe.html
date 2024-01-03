@@ -5,26 +5,31 @@
     <title>
         flags waves
     </title>
-    <script src="http://unpkg.com/three"></script>
-    <script src="http://unpkg.com/three-globe"></script>
 </head>
 
-<body >
+<body>
 </body>
 
 
 </html>
+
+
 <script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
+
 <script type="module">
+    import * as THREE from 'three';
     import { TrackballControls } from '//unpkg.com/three/examples/jsm/controls/TrackballControls.js';
     Object.assign(THREE, { TrackballControls });
+    import { ThreeGlobe } from "http://unpkg.com/three-globe"
     let scene, camera, renderer, angle = 0;
     const [width, height] = [800, 800];
     let flag;
+    let pos;
     let analyser;
     let frequency = 1;
     let flagColor = "#ffffff";
     let flagTexture = null;
+    let vv = new THREE.Vector3();
     const [sizeW, sizeH, segW, segH] = [30, 20, 30, 20];
     const init = () => {
         scene = new THREE.Scene();
@@ -52,18 +57,31 @@
         */
         const pole = new THREE.Mesh(geometry, material);
         pole.position.set(-15, -10, 0);
-        scene.add(pole);
+        //scene.add(pole);
         geometry = new THREE.PlaneGeometry(sizeW, sizeH, segW, segH);
         material = new THREE.MeshLambertMaterial({
             color: flagColor,
             side: THREE.DoubleSide
         });
         flag = new THREE.Mesh(geometry, material);
-        scene.add(flag);
+        pos = flag.geometry.attributes.position;
+        flag.userData = {
+            init: []
+        }
+        for (let i = 0; i < pos.count; i++) {
+            flag.userData.init.push(new THREE.Vector3().fromBufferAttribute(pos, i));
+        }
+        //scene.add(flag);
         const Globe = new ThreeGlobe()
             .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-            .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+            .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+            .ringAltitude(0.25)
+            .ringColor(() => 'lightblue')
+            .ringMaxRadius(180)
+            .ringPropagationSpeed(20)
+            .ringRepeatPeriod(200);
         scene.add(Globe);
+        console.log(Globe);
         loadTexture();
         update();
     }
@@ -101,14 +119,20 @@
         for (let y = 0; y < segH + 1; y++) {
             for (let x = 0; x < segW + 1; x++) {
                 const index = x + y * (segW + 1);
-                const vertex = flag.geometry.vertices[index];
+                const vertex = flag.userData.init[index];//flag.geometry.vertices[index];
+                vv.copy(vertex);
                 const time = Date.now() * s / 50;
-                vertex.z = Math.sin(h * x + v * y - time) * w * x / 4;
+                vv.z = Math.sin(h * x + v * y - time) * w * x / 4;
+                pos.setXYZ(index, vv.x, vv.y, vv.z);
             }
-            angle += frequency / 1500;
-            setCamera();
+
         }
-        flag.geometry.verticesNeedUpdate = true;
+        flag.geometry.computeVertexNormals();
+        pos.needsUpdate = true;
+        angle += frequency / 1500;
+        setCamera();
+        //flag.geometry.verticesNeedUpdate = true;
+
         renderer.render(scene, camera);
         window.requestAnimationFrame(update);
     }

@@ -155,10 +155,10 @@ ${content}`;
             //         localStorage.setItem('code.editor', textarea.value.trim());
             //     }
             // });
-            window.addEventListener("beforeunload", async evt => {
-                await saveData();
-                localStorage.setItem('code.editor', textarea.value.trim());
-            });
+            // window.addEventListener("beforeunload", async evt => {
+            //     await saveData();
+            //     localStorage.setItem('code.editor', textarea.value.trim());
+            // });
             document.getElementById('format').addEventListener('click', evt => {
                 formatCode();
             })

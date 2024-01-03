@@ -19,24 +19,56 @@
 </head>
 
 <body>
-    <div class="wrapper" style="padding: 49px 0 0 0;">
+    <div class="wrapper" style="padding: 49px 0 49px 0;">
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer" style="top: 0;">
-        <div class="bar-item-tab" id="save">
-            <span class="material-symbols-outlined">
-                save
-            </span>
-            <div class="pivot-bar-item-title">保存</div>
-        </div>
-
         <div class="bar-item-tab" id="format">
             <span class="material-symbols-outlined">
                 code
             </span>
             <div class="pivot-bar-item-title">格式化</div>
         </div>
+        <div class="bar-item-tab" id="comment">
+            <span class="material-symbols-outlined">
+                comment
+            </span>
+            <div class="pivot-bar-item-title">注释</div>
+        </div>
+        <div class="bar-item-tab" id="translate">
+            <span class="material-symbols-outlined">
+                translate
+            </span>
+            <div class="pivot-bar-item-title">翻译</div>
+        </div>
+        <div class="bar-item-tab" id="function">
+            <span class="material-symbols-outlined">
+                function
+            </span>
+            <div class="pivot-bar-item-title">函数</div>
+        </div>
+        <div class="bar-item-tab" id="preview">
+            <span class="material-symbols-outlined">
+                preview
+            </span>
+            <div class="pivot-bar-item-title">预览</div>
+        </div>
 
+
+    </div>
+    <div class="bar-renderer">
+        <div class="bar-item-tab" id="save">
+            <span class="material-symbols-outlined">
+                save
+            </span>
+            <div class="pivot-bar-item-title">保存</div>
+        </div>
+        <div class="bar-item-tab" id="text_snippet">
+            <span class="material-symbols-outlined">
+                text_snippet
+            </span>
+            <div class="pivot-bar-item-title">代码段</div>
+        </div>
         <div class="bar-item-tab" id="close">
             <span class="material-symbols-outlined">
                 close
@@ -51,27 +83,8 @@
             <div class="pivot-bar-item-title">剪块</div>
         </div>
 
-        <div class="bar-item-tab" id="comment">
-            <span class="material-symbols-outlined">
-                comment
-            </span>
-            <div class="pivot-bar-item-title">注释</div>
-        </div>
-        <div class="bar-item-tab" id="text_snippet">
-            <span class="material-symbols-outlined">
-                text_snippet
-            </span>
-            <div class="pivot-bar-item-title">代码段</div>
-        </div>
-        <div class="bar-item-tab" id="preview">
-            <span class="material-symbols-outlined">
-                preview
-            </span>
-            <div class="pivot-bar-item-title">预览</div>
-        </div>
-
-
     </div>
+
     <custom-toast id="toast"></custom-toast>
     <script>
         let baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "..";
@@ -165,6 +178,13 @@ ${content}`;
             document.getElementById('comment').addEventListener('click', evt => {
                 comment(textarea);
             })
+            document.getElementById('function').addEventListener('click', evt => {
+                functions(textarea);
+            })
+            document.getElementById('translate').addEventListener('click', evt => {
+                translate(baseUri,textarea);
+            })
+            
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 showSnippetsDialog();
             })

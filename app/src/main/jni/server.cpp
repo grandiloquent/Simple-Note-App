@@ -282,15 +282,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
         } else {
 
-            static const char query[]
-                    = R"(SELECT id,title,content,update_at FROM code ORDER BY update_at DESC)";
-            db::QueryResult fetch_row = db::query<query>();
-            std::string id, title, content, update_at;
+            static const char queryv[]
+                    = R"(SELECT id,title,content,update_at FROM code)";
+            db::QueryResult fetch_row_v = db::query<queryv>();
+            std::string_view id, title, content, update_at;
 
             nlohmann::json doc = nlohmann::json::array();
             std::regex q_regex(q);
-            while (fetch_row(id, title, content, update_at)) {
-                if (std::regex_search(title, q_regex) || std::regex_search(content, q_regex)) {
+            while (fetch_row_v(id, title, content, update_at)) {
+                if (std::regex_search(std::string{title}, q_regex) || std::regex_search(std::string{content}, q_regex)) {
                     nlohmann::json j = {
 
                             {"id",        id},

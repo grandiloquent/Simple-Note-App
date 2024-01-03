@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
     <link rel="stylesheet" href="index.css">
-    <script src="custom-toast.js"></script>
+    <script src="../animate/custom-toast.js"></script>
     <script src="../animate/shared.js"></script>
     <script src="../animate/glslx.js"></script>
     <script src="../animate/custom-dialog.js"></script>
@@ -130,12 +130,12 @@ ${content}`;
             textarea.value = formatGlslCode(textarea.value);
         }
         function initialize() {
-            document.addEventListener('visibilitychange', async evt => {
-                if (document.visibilityState !== "visible") {
-                    await saveData();
-                    localStorage.setItem('code.editor', textarea.value.trim());
-                }
-            });
+            // document.addEventListener('visibilitychange', async evt => {
+            //     if (document.visibilityState !== "visible") {
+            //         await saveData();
+            //         localStorage.setItem('code.editor', textarea.value.trim());
+            //     }
+            // });
             window.addEventListener("beforeunload", async evt => {
                 await saveData();
                 localStorage.setItem('code.editor', textarea.value.trim());
@@ -153,7 +153,13 @@ ${content}`;
             document.getElementById('close-block').addEventListener('click', evt => {
                 deleteBlock(textarea)
             })
-            document.getElementById('preview').addEventListener('click', evt => {
+            document.getElementById('preview').addEventListener('click', async evt => {
+                try {
+                    await saveData();
+                    localStorage.setItem('code.editor', textarea.value.trim());
+                } catch (error) {
+
+                }
                 window.open(`/viewer?id=${id}`, '_blank');
             })
             document.getElementById('comment').addEventListener('click', evt => {

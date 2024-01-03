@@ -82,6 +82,12 @@
             </span>
             <div class="pivot-bar-item-title">剪块</div>
         </div>
+        <div class="bar-item-tab" id="find_replace">
+            <span class="material-symbols-outlined">
+                find_replace
+            </span>
+            <div class="pivot-bar-item-title">替换</div>
+        </div>
 
     </div>
 
@@ -182,9 +188,11 @@ ${content}`;
                 functions(textarea);
             })
             document.getElementById('translate').addEventListener('click', evt => {
-                translate(baseUri,textarea);
+                translate(baseUri, textarea);
             })
-            
+            document.getElementById('find_replace').addEventListener('click', evt => {
+                findReplace(textarea);
+            })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 showSnippetsDialog();
             })

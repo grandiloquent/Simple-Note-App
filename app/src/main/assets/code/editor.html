@@ -69,18 +69,18 @@
             </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
-        <div class="bar-item-tab" id="close">
+        <div class="bar-item-tab" id="variables">
             <span class="material-symbols-outlined">
-                close
+                variables
             </span>
-            <div class="pivot-bar-item-title">剪行</div>
+            <div class="pivot-bar-item-title">变量</div>
         </div>
 
-        <div class="bar-item-tab" id="close-block">
+        <div class="bar-item-tab" id="javascript">
             <span class="material-symbols-outlined">
-                close
+                javascript
             </span>
-            <div class="pivot-bar-item-title">剪块</div>
+            <div class="pivot-bar-item-title">语句</div>
         </div>
         <div class="bar-item-tab" id="find_replace">
             <span class="material-symbols-outlined">
@@ -166,11 +166,16 @@ ${content}`;
                 await saveData();
                 localStorage.setItem('code.editor', textarea.value.trim());
             })
-            document.getElementById('close').addEventListener('click', evt => {
-                deleteLine(textarea)
+            document.getElementById('variables').addEventListener('click', evt => {
+                processSelection(v => {
+                    return `let v = 0;`
+                })
             })
-            document.getElementById('close-block').addEventListener('click', evt => {
-                deleteBlock(textarea)
+            document.getElementById('javascript').addEventListener('click', evt => {
+                processSelection(v => {
+                    return `if(x === undefined){
+}`
+                })
             })
             document.getElementById('preview').addEventListener('click', async evt => {
                 try {

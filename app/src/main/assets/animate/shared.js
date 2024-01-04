@@ -444,7 +444,7 @@ function showSnippetsDialog() {
                     </head>
                     <body>
                     </body>
-                    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
+                    <script type="importmap">{ "imports": { "three": "https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/": "https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/" }}</script>
                     <script type="module">
                       import * as THREE from 'three';
                       let scene, camera, renderer, angle = 0,
@@ -587,7 +587,9 @@ function showSnippetsDialog() {
 void main(){
 vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
     `
-                    }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '');
+                    }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
+                    .replace('https://unpkg.com/three@0.160.0/build/three.module.js','https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
+                    .replace('https://unpkg.com/three@0.160.0/examples/jsm/','https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/');
 
                     textarea.value = formatGlslCode(WEBGL1[0] + s + WEBGL1[1]);
 
@@ -610,8 +612,8 @@ gl.uniform1i(frameLocation, frame);
                     <script type="importmap">
                     {
                     "imports": {
-                      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+                      "three": "https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                      "three/addons/": "https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
                     }
                   }
                 </script>

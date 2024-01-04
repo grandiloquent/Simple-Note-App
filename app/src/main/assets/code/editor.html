@@ -186,13 +186,7 @@ else{
                 textarea.setRangeText(s, selectionStart, selectionEnd)
             })
             document.getElementById('preview').addEventListener('click', async evt => {
-                try {
-                    await saveData();
-                    localStorage.setItem('code.editor', textarea.value.trim());
-                } catch (error) {
-
-                }
-                window.open(`/viewer?id=${id}`, '_blank');
+                await preview();
             })
             document.getElementById('comment').addEventListener('click', evt => {
                 comment(textarea);
@@ -219,6 +213,10 @@ else{
                     if (evt.key === 'F1') {
                         evt.preventDefault();
                         formatCode();
+                    } else if (evt.key === 'F2') {
+                        await preview();
+                    } else if (evt.key === 'F3') {
+                        window.location.href = `/editor.html?id=${parseInt(id) + 1}`
                     } else if (evt.key === 'F4') {
                         evt.preventDefault();
                         await glslTemplate();
@@ -229,6 +227,16 @@ else{
 
 
 
+        }
+
+        async function preview() {
+            try {
+                await saveData();
+                localStorage.setItem('code.editor', textarea.value.trim());
+            } catch (error) {
+
+            }
+            window.open(`/viewer?id=${id}`, '_blank');
         }
         cacheCode();
         initialize();

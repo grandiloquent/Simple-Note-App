@@ -375,19 +375,23 @@ function formatGlslCode(code) {
     const options = { indent_size: 2, space_in_empty_paren: true }
     code = html_beautify(code, options);
     const points = substring(code, `type="x-shader/x-fragment">`, `</script>`);
+    let s = "";
     if (points[0] === 0 && points[1] === 0) {
-        return code.split('\n')
+        s = code.split('\n')
+            .filter(x => x.trim())
+            .join('\n');
+    } else {
+        s = code.substring(points[0], points[1]);
+        s = GLSLX.format(s);
+        s = code.substring(0, points[0]) + s + code.substring(points[1]);
+        s = s.split('\n')
             .filter(x => x.trim())
             .join('\n');
     }
-    s = code.substring(points[0], points[1]);
-    s = GLSLX.format(s);
-    s = code.substring(0, points[0]) + s + code.substring(points[1]);
-    return s.split('\n')
-        .filter(x => x.trim())
-        .join('\n') .replace('https://unpkg.com/three@0.160.0/build/three.module.js','https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
-        .replace('https://unpkg.com/three@0.160.0/examples/jsm/','https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/');
-;
+    return s.replace('https://unpkg.com/three@0.160.0/build/three.module.js', 'https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
+        .replace('https://unpkg.com/three/build/three.module.js', 'https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
+        .replace('https://unpkg.com/three@0.160.0/examples/jsm/', 'https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/');
+    ;
 }
 
 const BABYLON = ["<!DOCTYPE html>\r\n<html>\r\n    <head>\r\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n        <title>Babylon.js sample code</title>\r\n\r\n        <!-- Babylon.js -->\r\n        <script src=\"https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js\"></script>\r\n        <script src=\"https://assets.babylonjs.com/generated/Assets.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/recast.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/ammo.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/havok/HavokPhysics_umd.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/cannon.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/Oimo.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/earcut.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/babylon.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/loaders/babylonjs.loaders.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/gui/babylon.gui.min.js\"></script>\r\n        <script src=\"https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js\"></script>\r\n\r\n        <style>\r\n            html, body {\r\n                overflow: hidden;\r\n                width: 100%;\r\n                height: 100%;\r\n                margin: 0;\r\n                padding: 0;\r\n            }\r\n\r\n            #renderCanvas {\r\n                width: 100%;\r\n                height: 100%;\r\n                touch-action: none;\r\n            }\r\n            \r\n            #canvasZone {\r\n                width: 100%;\r\n                height: 100%;\r\n            }\r\n        </style>\r\n    </head>\r\n<body>\r\n    <div id=\"canvasZone\"><canvas id=\"renderCanvas\"></canvas></div>\r\n    <script>\r\n        var canvas = document.getElementById(\"renderCanvas\");\r\n\r\n        var startRenderLoop = function (engine, canvas) {\r\n            engine.runRenderLoop(function () {\r\n                if (sceneToRender && sceneToRender.activeCamera) {\r\n                    sceneToRender.render();\r\n                }\r\n            });\r\n        }\r\n\r\n        var engine = null;\r\n        var scene = null;\r\n        var sceneToRender = null;\r\n        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };\r\n        ", "\n                window.initFunction = async function() {\n                    \n                    \n                    \n                    var asyncEngineCreation = async function() {\n                        try {\n                        return createDefaultEngine();\n                        } catch(e) {\n                        console.log(\"the available createEngine function failed. Creating the default engine instead\");\n                        return createDefaultEngine();\n                        }\n                    }\n\n                    window.engine = await asyncEngineCreation();\r\n        if (!engine) throw 'engine should not be null.';\r\n        startRenderLoop(engine, canvas);\r\n        window.scene = createScene();};\r\n        initFunction().then(() => {sceneToRender = scene                    \r\n        });\r\n\r\n        // Resize\r\n        window.addEventListener(\"resize\", function () {\r\n            engine.resize();\r\n        });\r\n    </script>\r\n</body>\r\n</html>\r\n"]
@@ -438,7 +442,7 @@ function showSnippetsDialog() {
                     textarea.value = textarea.value + "\n\n" + formatGlslCode(WEBGL[0] + s + WEBGL[1]);
                 } else if (id === "2") {
                     textarea.value = textarea.value + "\n\n" + HTML;
-                }else if (id === "3") {
+                } else if (id === "3") {
                     textarea.value = textarea.value + "\n\n" + `测试
                     <html>
                     <head>
@@ -590,7 +594,7 @@ void main(){
 vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
     `
                     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
-                   
+
                     textarea.value = formatGlslCode(WEBGL1[0] + s + WEBGL1[1]);
 
                 } else if (id === '8') {
@@ -633,7 +637,7 @@ function findReplace(textarea) {
     const second = substringAfter(s, "\n");
     const pieces = first.split(' ');
     textarea.value = `${first}  
-${second.replaceAll(new RegExp("\\b"+pieces[0]+"\\b",'g'), pieces[1])}`;
+${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
 
 }
 const WEBGL1 = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charset='UTF-8' />\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n  \r\n#version 300 es\r\nprecision highp float;\r\nuniform vec3 iResolution;\r\nuniform float iTime;\r\n\r\n", "\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.innerHTML=log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001; // convert to seconds\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]

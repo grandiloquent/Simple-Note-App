@@ -288,7 +288,8 @@ function functions(textarea) {
     let s = textarea.value.substring(points[0], points[1]).trim();
     s = `
     
-    function doSomething (){
+    async function doSomething (){
+        // const result = await ;
 ${s}
     }
     
@@ -435,6 +436,77 @@ function showSnippetsDialog() {
                     textarea.value = textarea.value + "\n\n" + formatGlslCode(WEBGL[0] + s + WEBGL[1]);
                 } else if (id === "2") {
                     textarea.value = textarea.value + "\n\n" + HTML;
+                }else if (id === "3") {
+                    textarea.value = textarea.value + "\n\n" + `测试
+                    <html>
+                    <head>
+                      <meta charset="UTF-8">
+                    </head>
+                    <body>
+                    </body>
+                    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
+                    <script type="module">
+                      import * as THREE from 'three';
+                      let scene, camera, renderer, angle = 0,
+                        fov = 10,
+                        dir = true;
+                      const [width, height] = [800, 800];
+                      const init = async () => {
+                        scene = new THREE.Scene();
+                        camera = new THREE.PerspectiveCamera(10, width / height, 1, 1000);
+                        camera.position.set(0, 0, 40);
+                        camera.lookAt(new THREE.Vector3(0, 0.0));
+                        renderer = new THREE.WebGLRenderer({
+                          antialias: true
+                        });
+                        renderer.setSize(width, height);
+                        document.body.appendChild(renderer.domElement);
+                        setLight();
+                        setShape();
+                        update();
+                      }
+                      async function loadTexture() {
+                        const loader = new THREE.TextureLoader();
+                        const texture = await loader.loadAsync("");
+                        texture.magFilter = THREE.LinearFilter;
+                        texture.minFilter = THREE.LinearFilter;
+                        const material = new THREE.MeshStandardMaterial({
+                          map: texture
+                        });
+                        return material;
+                      }
+                      const setCamera = () => {
+                        camera.position.x = 40 * Math.sin(angle * Math.PI / 180);
+                        camera.position.z = 40 * Math.cos(angle * Math.PI / 180);
+                        camera.lookAt(new THREE.Vector3(0, 0, 0));
+                        camera.setFocalLength(fov);
+                      }
+                      const update = () => {
+                        setCamera();
+                        renderer.render(scene, camera);
+                        window.requestAnimationFrame(update);
+                      }
+                      function setLight() {
+                        const light = new THREE.DirectionalLight("#FFFFFF");
+                        light.position.set(10, 50, 100);
+                        scene.add(light);
+                        const ambientLight = new THREE.AmbientLight("#999999");
+                        scene.add(ambientLight);
+                      }
+                      function setShape() {
+                        let geometry = new THREE.SphereGeometry(16, 32,16);
+                        let material = new THREE.MeshStandardMaterial({
+                          color: '#FFF',
+                          roughness: 0.2,
+                          metalness: 0.3
+                        })
+                        const s = new THREE.Mesh(geometry, material);
+                        s.position.set(0, 0, 0);
+                        scene.add(s);
+                      }
+                      init()
+                    </script>
+                    </html>`;
                 } else if (id === "4") {
                     let s = "";
                     try {

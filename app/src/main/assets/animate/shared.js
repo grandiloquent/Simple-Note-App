@@ -402,7 +402,7 @@ async function glslTemplate() {
         s = await navigator.clipboard.readText();
     } catch (error) {
     }
-    textarea.value = formatGlslCode(WEBGL[0] + s + WEBGL[1]);
+    textarea.value = "WebGL \n"+formatGlslCode(WEBGL[0] + s + WEBGL[1]);
 }
 function showSnippetsDialog() {
     const dialog = document.createElement('custom-dialog');

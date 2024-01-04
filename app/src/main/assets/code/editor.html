@@ -219,6 +219,9 @@ else{
                     if (evt.key === 'F1') {
                         evt.preventDefault();
                         formatCode();
+                    } else if (evt.key === 'F4') {
+                        evt.preventDefault();
+                        await glslTemplate();
                     }
                 }
 

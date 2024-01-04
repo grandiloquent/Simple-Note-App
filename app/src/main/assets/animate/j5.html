@@ -181,14 +181,7 @@
         cacheCode();
         initialize();
 
-        async function glslTemplate() {
-            let s = "";
-            try {
-                s = await navigator.clipboard.readText();
-            } catch (error) {
-            }
-            textarea.value = formatGlslCode(WEBGL[0] + s + WEBGL[1]);
-        }
+       
     </script>
 </body>
 

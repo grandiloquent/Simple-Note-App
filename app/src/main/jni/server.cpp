@@ -184,13 +184,9 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //    );
 
     static const char contentTableSql[]
-            = R"(CREATE TABLE IF NOT EXISTS "code" (
+            = R"(CREATE TABLE IF NOT EXISTS "snippet" (
 	"id"	INTEGER,
-	"title"	TEXT,
 	"content"	TEXT,
-	"views"	INTEGER,
-	"create_at"	INTEGER,
-	"update_at"	INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
 ))";
     db::QueryResult fetch_row = db::query<contentTableSql>();
@@ -307,6 +303,50 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         }
 
     });
+    server.Get("/snippets", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        static const char query[]
+                = R"(SELECT content FROM snippet)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view content;
+        nlohmann::json doc = nlohmann::json::array();
+        while (fetch_row(content)) {
+            doc.push_back(content);
+        }
+        res.set_content(doc.dump(), "application/json");
+    });
+    server.Post("/snippet", [](const httplib::Request &req, httplib::Response &res,
+                               const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        static const char query[]
+                = R"(INSERT INTO snippet (content) VALUES(?1))";
+        db::QueryResult fetch_row = db::query<query>(body);
+
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+    });
+    server.Post("/snippet/delete", [](const httplib::Request &req, httplib::Response &res,
+                               const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        static const char query[]
+                = R"(DELETE FROM snippet WHERE content = ?1)";
+        db::QueryResult fetch_row = db::query<query>(body);
+
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+    });
     server.Get("/code", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto id = req.get_param_value("id");
@@ -356,36 +396,69 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (doc.contains("content")) {
             content = doc["content"];
         }
-        if (doc.contains("id") ) {
-            int id = doc["id"];
-            // code SET title=coalesce(?1,title),content=coalesce(?2,content),update_at=?3 where id =?4)
-            static const char query[]
-                    = R"(INSERT OR REPLACE INTO code (id,title,content,update_at) VALUES(?1,?2,?3,?4)";
-            db::QueryResult fetch_row = db::query<query>(id, title,
-                                                         content,
-                                                         GetTimeStamp()
+        int id = 0;
+        bool isUpdate = doc.contains("id") && doc["id"] > -1;
+        if (isUpdate) {
+            id = doc["id"];
+            static const char queryw[]
+                    = R"(SELECT id from code where id = ?1)";
+            db::QueryResult fetch_w = db::query<queryw>(id);
+            std::string_view idw;
+            if (!fetch_w(idw)) {
+                isUpdate = false;
+            }
 
-            );
-            res.set_content(std::to_string(id),
-                            "text/plain; charset=UTF-8");
-        } else {
+        }
+
+        if (isUpdate) {
+
             static const char query[]
-                    = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+                    = R"(UPDATE code SET title=coalesce(?1,title),content=coalesce(?2,content),update_at=?3 where id =?4)";
             db::QueryResult fetch_row = db::query<query>(title,
                                                          content,
                                                          GetTimeStamp(),
-                                                         GetTimeStamp()
+                                                         id
             );
-            static const char queryv[]
-                    = R"(SELECT last_insert_rowid())";
-            db::QueryResult fetch_id = db::query<queryv>();
-            std::string_view id;
-            if (fetch_id(id)) {
-                res.set_content(id.data(), id.size(),
-                                "text/plain; charset=UTF-8");
-            } else
-                res.set_content(std::to_string(fetch_row.resultCode()),
-                                "text/plain; charset=UTF-8");
+            res.set_content(std::to_string(fetch_row.resultCode()),
+                            "text/plain; charset=UTF-8");
+        } else {
+            if (id == 0) {
+                static const char query[]
+                        = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+                db::QueryResult fetch_row = db::query<query>(title,
+                                                             content,
+                                                             GetTimeStamp(),
+                                                             GetTimeStamp()
+                );
+                static const char queryv[]
+                        = R"(SELECT last_insert_rowid())";
+                db::QueryResult fetch_id = db::query<queryv>();
+                std::string_view idv;
+                if (fetch_id(idv)) {
+                    res.set_content(idv.data(), idv.size(),
+                                    "text/plain; charset=UTF-8");
+                } else
+                    res.set_content(std::to_string(fetch_row.resultCode()),
+                                    "text/plain; charset=UTF-8");
+            } else {
+                static const char query[]
+                        = R"(INSERT INTO code (id,title,content,create_at,update_at) VALUES(?1,?2,?3,?4,?5))";
+                db::QueryResult fetch_row = db::query<query>(id, title,
+                                                             content,
+                                                             GetTimeStamp(),
+                                                             GetTimeStamp()
+                );
+                static const char queryv[]
+                        = R"(SELECT last_insert_rowid())";
+                db::QueryResult fetch_id = db::query<queryv>();
+                std::string_view idv;
+                if (fetch_id(idv)) {
+                    res.set_content(idv.data(), idv.size(),
+                                    "text/plain; charset=UTF-8");
+                } else
+                    res.set_content(std::to_string(fetch_row.resultCode()),
+                                    "text/plain; charset=UTF-8");
+            }
         }
     });
     server.Post("/codes", [](const httplib::Request &req, httplib::Response &res,

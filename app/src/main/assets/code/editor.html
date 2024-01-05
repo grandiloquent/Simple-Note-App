@@ -65,6 +65,11 @@
             align-items: center;
             row-gap: 8px;
             justify-content: center;
+            overflow-y: scroll;
+        }
+
+        .items::-webkit-scrollbar {
+            display: none;
         }
 
         .item {
@@ -75,8 +80,25 @@
             align-items: center;
             flex-direction: column;
         }
+
+        .title {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 1;
+            overflow: hidden;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            font-weight: normal
+        }
     </style>
     <div class="items">
+        <div id="code_snippet" class="item">
+            <span class="material-symbols-outlined">
+                text_snippet
+            </span>
+            <div class="pivot-bar-item-title">代码</div>
+        </div>
         <div class="item" id="comment">
             <span class="material-symbols-outlined">
                 comment
@@ -90,6 +112,19 @@
             </span>
             <div class="pivot-bar-item-title">预览</div>
         </div>
+        <div id="close-line" class="item">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+            <div class="pivot-bar-item-title">剪行</div>
+        </div>
+        <div id="close-block" class="item">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+            <div class="pivot-bar-item-title">剪块</div>
+        </div>
+        
         <div id="save" class="item">
             <span class="material-symbols-outlined">
                 save
@@ -137,8 +172,8 @@
                 title: substringBefore(s, "\n").trim(),
                 content: substringAfter(s, "\n").trim()
             };
-            if(id){
-                body.id=parseInt(id, 10)
+            if (id) {
+                body.id = parseInt(id, 10)
             }
             // await submitNote(getBaseUri(), JSON.stringify(body));
             // document.getElementById('toast').setAttribute('message', '成功');
@@ -172,7 +207,7 @@
     
 ${content}`;
             } catch (error) {
-                textarea.value = localStorage.getItem('code.editor');
+                //textarea.value = localStorage.getItem('code.editor');
             }
 
         }
@@ -195,7 +230,7 @@ ${content}`;
             })
             document.getElementById('save').addEventListener('click', async evt => {
                 await saveData();
-                localStorage.setItem('code.editor', textarea.value.trim());
+                // localStorage.setItem('code.editor', textarea.value.trim());
             })
             document.getElementById('variables').addEventListener('click', evt => {
                 let selectionStart = textarea.selectionStart;
@@ -234,6 +269,15 @@ else{
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 showSnippetsDialog();
             })
+            document.getElementById('code_snippet').addEventListener('click', evt => {
+                showSnippetDialog(baseUri, textarea);
+            })
+            document.getElementById('close-line').addEventListener('click', evt => {
+                deleteLine(textarea)
+            });
+            document.getElementById('close-block').addEventListener('click', evt => {
+                deleteBlock(textarea)
+            });
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {
                     if (evt.key === 's') {
@@ -271,7 +315,7 @@ else{
         async function preview() {
             try {
                 await saveData();
-                localStorage.setItem('code.editor', textarea.value.trim());
+                //localStorage.setItem('code.editor', textarea.value.trim());
             } catch (error) {
 
             }

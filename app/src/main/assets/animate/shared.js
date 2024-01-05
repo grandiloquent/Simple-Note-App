@@ -1,3 +1,170 @@
+
+class CustomSelect extends HTMLElement {
+
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        });
+        const wrapper = document.createElement("div");
+        wrapper.setAttribute("class", "wrapper");
+        const style = document.createElement('style');
+        style.textContent = `.btn {
+    font-weight: 500;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    height: 36px;
+    font-size: 14px;
+    line-height: 36px;
+    border-radius: 18px;
+  }
+  
+  .dialog-buttons {
+    flex-shrink: 0;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: end;
+    justify-content: flex-end;
+    margin-top: 12px
+  }
+  
+  .dialog-body {
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 50vh;
+    /*white-space: pre-wrap*/
+  }
+  
+  .modern-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3)
+  }
+  
+  h2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    max-height: 2.5em;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    font-weight: normal;
+    font-size: 1.8rem
+  }
+  
+  .dialog-header {
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    flex-shrink: 0
+  }
+  
+  .dialog {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    max-height: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 1.3rem;
+    color: #0f0f0f;
+    border: none;
+    min-width: 250px;
+    max-width: 356px;
+    box-shadow: 0 0 24px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    background-color: #fff
+  }
+  
+  .dialog-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    z-index: 4;
+    margin: 0 40px;
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
+  }
+  
+  `;
+        this.wrapper = wrapper;
+        this.shadowRoot.append(style, wrapper);
+    }
+
+
+
+
+    connectedCallback() {
+        this.wrapper.innerHTML = `<div class="dialog-container">
+    <div class="dialog">
+      <div class="dialog-header">
+        <h2 bind="header">${this.getAttribute("title") || '代码'}</h2>
+      </div>
+      <div class="dialog-body">
+        <slot></slot>
+      </div>
+      <div class="dialog-buttons">
+        <div class="btn close">
+          删除
+        </div>
+        <div class="btn submit" style="color: #909090">
+          导入
+        </div>
+      </div>
+    </div>
+    <div  class="modern-overlay close">
+    </div>
+  </div>`;
+        this.wrapper.querySelectorAll('.close')
+            .forEach(element => {
+                element.addEventListener('click', () => {
+                    this.remove();
+
+                })
+            });
+        this.wrapper.querySelector('.submit').addEventListener('click', () => {
+            this.remove();
+            this.dispatchEvent(new CustomEvent('submit'));
+        })
+        this.wrapper.querySelector('.btn.close').addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('close'));
+        })
+    }
+
+    static get observedAttributes() {
+        return ['title'];
+    }
+
+    attributeChangedCallback(attrName, oldVal, newVal) {
+
+    }
+}
+
+customElements.define('custom-select', CustomSelect);
+
 /*
 绑定元素和事件
 例如：<div bind="div" @click="click"></div>
@@ -271,15 +438,20 @@ function escapeHtml(unsafe) {
 }
 
 function comment(textarea) {
-    const points = findExtendPosition(textarea);
+    const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    if (s.startsWith("/*") && s.endsWith("*/")) {
+    //     if (s.startsWith("/*") && s.endsWith("*/")) {
+    //         s = s.substring(2);
+    //         s = s.substring(0, s.length - 2);
+    //     } else {
+    //         s = `/*
+    // ${s}
+    // */`;
+    //     }
+    if (s.startsWith("//")) {
         s = s.substring(2);
-        s = s.substring(0, s.length - 2);
     } else {
-        s = `/*
-${s}
-*/`;
+        s = `// ${s}`;
     }
     textarea.setRangeText(s, points[0], points[1]);
 }
@@ -652,4 +824,39 @@ ${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
 }
 const WEBGL1 = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charset='UTF-8' />\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n  \r\n#version 300 es\r\nprecision highp float;\r\nuniform vec3 iResolution;\r\nuniform float iTime;\r\n\r\n", "\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.innerHTML=log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001; // convert to seconds\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
 
-const THREE1 = ["<!DOCTYPE html>\r\n<html lang=\"en\">\r\n\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Document</title>\r\n    <style>\r\n        body {\r\n            margin: 0;\r\n            overflow: hidden\r\n        }\r\n    </style>\r\n    <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n        varying vec2 vUv;\r\n        void main() {\r\n            vUv = uv;\r\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\r\n        }\r\n    </script>\r\n    <script id=\"ba\" type=\"x-shader/x-fragment\">\r\n        uniform vec3      iResolution;       \r\n        uniform float     iTime;           \r\n        uniform float     iTimeDelta;      \r\n        uniform float     iFrameRate;       \r\n        uniform int       iFrame;            \r\n        uniform vec4      iMouse;  \r\n        uniform sampler2D iChannel0;\r\n        \r\n           ","\r\n         \r\n        void main() {\r\n          mainImage(gl_FragColor, gl_FragCoord.xy);\r\n        }\r\n    </script>\r\n    <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n\r\n    uniform sampler2D iChannel0;\r\n    uniform vec3      iResolution;  \r\n    uniform float     iTime;      \r\n    uniform vec4      iMouse;  \r\n     \r\n    void main() {\r\n      mainImage(gl_FragColor, gl_FragCoord.xy);\r\n    }\r\n    </script>\r\n    <script>\r\n        window.getShaderSource = function (id) {\r\n            return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n        };\r\n    </script>\r\n</head>\r\n\r\n<body>\r\n    <script>\r\n\r\n        class App {\r\n            constructor() {\r\n                this.width = 300;\r\n                this.height = 300;\r\n                this.renderer = new THREE.WebGLRenderer();\r\n                this.loader = new THREE.TextureLoader();\r\n                this.mousePosition = new THREE.Vector4();\r\n                this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);\r\n                this.counter = 0;\r\n                this.renderer.setSize(this.width, this.height);\r\n                document.body.appendChild(this.renderer.domElement);\r\n                this.renderer.domElement.addEventListener('mousedown', () => {\r\n                    this.mousePosition.setZ(1);\r\n                    this.counter = 0;\r\n                });\r\n                this.renderer.domElement.addEventListener('mouseup', () => {\r\n                    this.mousePosition.setZ(0);\r\n                });\r\n                this.renderer.domElement.addEventListener('mousemove', event => {\r\n                    this.mousePosition.setX(event.clientX);\r\n                    this.mousePosition.setY(this.height - event.clientY);\r\n                });\r\n                this.targetA = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n                this.targetC = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n            }\r\n            start() {\r\n                const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);\r\n\r\n                this.bufferA = new BufferShader(getShaderSource('ba'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iFrame: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.bufferImage = new BufferShader(getShaderSource('fs'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.animate();\r\n            }\r\n            animate() {\r\n                requestAnimationFrame(() => {\r\n                    const time = performance.now() / 1000;\r\n                    this.bufferA.uniforms['iFrame'].value = this.counter++;\r\n                    this.bufferA.uniforms['iTime'].value = time;\r\n                    this.bufferA.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.targetA.render(this.bufferA.scene, this.orthoCamera);\r\n                    this.bufferImage.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.bufferImage.uniforms['iTime'].value = time;\r\n                    this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);\r\n                    this.animate();\r\n                });\r\n            }\r\n        }\r\n        class BufferShader {\r\n            constructor(fragmentShader, uniforms = {}) {\r\n                this.uniforms = uniforms;\r\n                this.material = new THREE.ShaderMaterial({\r\n                    fragmentShader: fragmentShader,\r\n                    vertexShader: getShaderSource('vs'),\r\n                    uniforms: uniforms\r\n                });\r\n                this.scene = new THREE.Scene();\r\n                this.scene.add(\r\n                    new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)\r\n                );\r\n            }\r\n        }\r\n        class BufferManager {\r\n            constructor(renderer, size) {\r\n                this.renderer = renderer;\r\n                this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {\r\n                    minFilter: THREE.LinearFilter,\r\n                    magFilter: THREE.LinearFilter,\r\n                    format: THREE.RGBAFormat,\r\n                    type: THREE.FloatType,\r\n                    stencilBuffer: false\r\n                });\r\n                this.writeBuffer = this.readBuffer.clone();\r\n            }\r\n            swap() {\r\n                const temp = this.readBuffer;\r\n                this.readBuffer = this.writeBuffer;\r\n                this.writeBuffer = temp;\r\n            }\r\n            render(scene, camera, toScreen = false) {\r\n                if (toScreen) {\r\n                    this.renderer.render(scene, camera);\r\n                } else {\r\n                    this.renderer.setRenderTarget(this.writeBuffer);\r\n                    this.renderer.clear();\r\n                    this.renderer.render(scene, camera)\r\n                    this.renderer.setRenderTarget(null);\r\n                }\r\n                this.swap();\r\n            }\r\n        }\r\n        document.addEventListener('DOMContentLoaded', () => {\r\n            (new App()).start();\r\n        });\r\n    </script>\r\n    <script src=\"https://fastly.jsdelivr.net/npm/three@0.121.1/build/three.js\">\r\n    </script>\r\n</body>\r\n\r\n</html>"]
+const THREE1 = ["<!DOCTYPE html>\r\n<html lang=\"en\">\r\n\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Document</title>\r\n    <style>\r\n        body {\r\n            margin: 0;\r\n            overflow: hidden\r\n        }\r\n    </style>\r\n    <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n        varying vec2 vUv;\r\n        void main() {\r\n            vUv = uv;\r\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\r\n        }\r\n    </script>\r\n    <script id=\"ba\" type=\"x-shader/x-fragment\">\r\n        uniform vec3      iResolution;       \r\n        uniform float     iTime;           \r\n        uniform float     iTimeDelta;      \r\n        uniform float     iFrameRate;       \r\n        uniform int       iFrame;            \r\n        uniform vec4      iMouse;  \r\n        uniform sampler2D iChannel0;\r\n        \r\n           ", "\r\n         \r\n        void main() {\r\n          mainImage(gl_FragColor, gl_FragCoord.xy);\r\n        }\r\n    </script>\r\n    <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n\r\n    uniform sampler2D iChannel0;\r\n    uniform vec3      iResolution;  \r\n    uniform float     iTime;      \r\n    uniform vec4      iMouse;  \r\n     \r\n    void main() {\r\n      mainImage(gl_FragColor, gl_FragCoord.xy);\r\n    }\r\n    </script>\r\n    <script>\r\n        window.getShaderSource = function (id) {\r\n            return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n        };\r\n    </script>\r\n</head>\r\n\r\n<body>\r\n    <script>\r\n\r\n        class App {\r\n            constructor() {\r\n                this.width = 300;\r\n                this.height = 300;\r\n                this.renderer = new THREE.WebGLRenderer();\r\n                this.loader = new THREE.TextureLoader();\r\n                this.mousePosition = new THREE.Vector4();\r\n                this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);\r\n                this.counter = 0;\r\n                this.renderer.setSize(this.width, this.height);\r\n                document.body.appendChild(this.renderer.domElement);\r\n                this.renderer.domElement.addEventListener('mousedown', () => {\r\n                    this.mousePosition.setZ(1);\r\n                    this.counter = 0;\r\n                });\r\n                this.renderer.domElement.addEventListener('mouseup', () => {\r\n                    this.mousePosition.setZ(0);\r\n                });\r\n                this.renderer.domElement.addEventListener('mousemove', event => {\r\n                    this.mousePosition.setX(event.clientX);\r\n                    this.mousePosition.setY(this.height - event.clientY);\r\n                });\r\n                this.targetA = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n                this.targetC = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n            }\r\n            start() {\r\n                const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);\r\n\r\n                this.bufferA = new BufferShader(getShaderSource('ba'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iFrame: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.bufferImage = new BufferShader(getShaderSource('fs'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.animate();\r\n            }\r\n            animate() {\r\n                requestAnimationFrame(() => {\r\n                    const time = performance.now() / 1000;\r\n                    this.bufferA.uniforms['iFrame'].value = this.counter++;\r\n                    this.bufferA.uniforms['iTime'].value = time;\r\n                    this.bufferA.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.targetA.render(this.bufferA.scene, this.orthoCamera);\r\n                    this.bufferImage.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.bufferImage.uniforms['iTime'].value = time;\r\n                    this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);\r\n                    this.animate();\r\n                });\r\n            }\r\n        }\r\n        class BufferShader {\r\n            constructor(fragmentShader, uniforms = {}) {\r\n                this.uniforms = uniforms;\r\n                this.material = new THREE.ShaderMaterial({\r\n                    fragmentShader: fragmentShader,\r\n                    vertexShader: getShaderSource('vs'),\r\n                    uniforms: uniforms\r\n                });\r\n                this.scene = new THREE.Scene();\r\n                this.scene.add(\r\n                    new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)\r\n                );\r\n            }\r\n        }\r\n        class BufferManager {\r\n            constructor(renderer, size) {\r\n                this.renderer = renderer;\r\n                this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {\r\n                    minFilter: THREE.LinearFilter,\r\n                    magFilter: THREE.LinearFilter,\r\n                    format: THREE.RGBAFormat,\r\n                    type: THREE.FloatType,\r\n                    stencilBuffer: false\r\n                });\r\n                this.writeBuffer = this.readBuffer.clone();\r\n            }\r\n            swap() {\r\n                const temp = this.readBuffer;\r\n                this.readBuffer = this.writeBuffer;\r\n                this.writeBuffer = temp;\r\n            }\r\n            render(scene, camera, toScreen = false) {\r\n                if (toScreen) {\r\n                    this.renderer.render(scene, camera);\r\n                } else {\r\n                    this.renderer.setRenderTarget(this.writeBuffer);\r\n                    this.renderer.clear();\r\n                    this.renderer.render(scene, camera)\r\n                    this.renderer.setRenderTarget(null);\r\n                }\r\n                this.swap();\r\n            }\r\n        }\r\n        document.addEventListener('DOMContentLoaded', () => {\r\n            (new App()).start();\r\n        });\r\n    </script>\r\n    <script src=\"https://fastly.jsdelivr.net/npm/three@0.121.1/build/three.js\">\r\n    </script>\r\n</body>\r\n\r\n</html>"]
+
+async function showSnippetDialog(baseUri, textarea) {
+    const snippet = document.createElement('custom-select');
+    const div = document.createElement('div');
+    snippet.appendChild(div);
+    const res = await fetch(`${baseUri}/snippets`);
+    const snippets = await res.json();
+    snippets.forEach(snippetv => {
+        const d = document.createElement('div');
+        d.textContent = snippetv;
+        d.className = 'title';
+        div.appendChild(d);
+        d.addEventListener('click', () => {
+            let selectionStart = textarea.selectionStart;
+            let selectionEnd = textarea.selectionEnd;
+            textarea.setRangeText(snippetv, selectionStart, selectionEnd)
+            snippet.remove();
+        })
+    });
+    document.body.appendChild(snippet);
+    snippet.addEventListener('submit', async () => {
+        const s = await readText();
+        const res = await fetch(`${baseUri}/snippet`, {
+            method: 'POST',
+            body: s.trim()
+        });
+    });
+    snippet.addEventListener('close', async () => {
+        const s = await readText();
+        const res = await fetch(`${baseUri}/snippet/delete`, {
+            method: 'POST',
+            body: s.trim()
+        });
+    });
+}

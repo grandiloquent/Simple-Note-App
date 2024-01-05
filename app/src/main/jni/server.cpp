@@ -360,7 +360,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             int id = doc["id"];
             // code SET title=coalesce(?1,title),content=coalesce(?2,content),update_at=?3 where id =?4)
             static const char query[]
-                    = R"(INSERT OR REPLACE INTO code (id,title,content,uupdate_at) VALUES(?1,?2,?3,?4)";
+                    = R"(INSERT OR REPLACE INTO code (id,title,content,update_at) VALUES(?1,?2,?3,?4)";
             db::QueryResult fetch_row = db::query<query>(id, title,
                                                          content,
                                                          GetTimeStamp()

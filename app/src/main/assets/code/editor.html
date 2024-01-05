@@ -22,7 +22,7 @@
     <div class="wrapper" style="padding: 0px 0 49px 0;">
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
-    
+
     <div class="bar-renderer">
 
         <div class="bar-item-tab" id="text_snippet">
@@ -83,7 +83,7 @@
             </span>
             <div class="pivot-bar-item-title">注释</div>
         </div>
-        
+
         <div id="preview" class="item">
             <span class="material-symbols-outlined">
                 preview
@@ -102,7 +102,7 @@
             </span>
             <div class="pivot-bar-item-title">格式化</div>
         </div>
-        
+
         <div class="item" id="translate">
             <span class="material-symbols-outlined">
                 translate
@@ -243,10 +243,16 @@ else{
                         await preview();
                     } else if (evt.key === 'F4') {
                         evt.preventDefault();
-                        window.location.href = `?id=${parseInt(id) + 1}`
+                        if (id)
+                            window.location.href = `?id=${parseInt(id) + 1}`
+                        else
+                            window.location.reload();
                     } else if (evt.key === 'F2') {
                         evt.preventDefault();
-                        await glslTemplate();
+                        await glslTemplate(0);
+                    } else if (evt.key === 'F5') {
+                        evt.preventDefault();
+                        await glslTemplate(1);
                     }
                 }
 

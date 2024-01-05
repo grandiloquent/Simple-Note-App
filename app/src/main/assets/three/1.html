@@ -1,3 +1,4 @@
+WebGL
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,34 +14,255 @@
         }
     </style>
     <script id="vs" type="x-shader/x-vertex">
-        varying vec2 vUv;
+    varying vec2 vUv;
         void main() {
             vUv = uv;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
         }
     </script>
-    <script id="ba" type="x-shader/x-fragment">
-        uniform vec3      iResolution;       
-        uniform float     iTime;           
-        uniform float     iTimeDelta;      
-        uniform float     iFrameRate;       
-        uniform int       iFrame;            
-        uniform vec4      iMouse;  
-        uniform sampler2D iChannel0;
-        
-           {{shader}}
-         
-        void main() {
-          mainImage(gl_FragColor, gl_FragCoord.xy);
-        }
-    </script>
+  
     <script id="fs" type="x-shader/x-fragment">
+        
+
 
     uniform sampler2D iChannel0;
+    uniform sampler2D iChannel2;
     uniform vec3      iResolution;  
     uniform float     iTime;      
     uniform vec4      iMouse;  
-     
+// Brick dimensions.
+const vec3 brickDims = vec3(1, .9, 1);
+const float studHeight = .07;
+const float bevel = .014;
+const float studRadius = .15;
+const float cam_zoom = 9.;
+
+// Ray-box intersection.
+vec2 box(vec3 ro,vec3 rd,vec3 p0,vec3 p1)
+{
+    vec3 t0 = (mix(p1, p0, step(0., rd * sign(p1 - p0))) - ro) / rd;
+    vec3 t1 = (mix(p0, p1, step(0., rd * sign(p1 - p0))) - ro) / rd;
+    return vec2(max(t0.x, max(t0.y, t0.z)),min(t1.x, min(t1.y, t1.z)));
+}
+
+mat3 rotX(float a)
+{
+    return mat3(1., 0., 0.,
+                0., cos(a), sin(a),
+                0., -sin(a), cos(a));
+}
+
+mat3 rotY(float a)
+{
+    return mat3(cos(a), 0., sin(a),
+                0., 1., 0.,
+                -sin(a), 0., cos(a));
+}
+
+mat3 rotZ(float a)
+{
+    return mat3(cos(a), sin(a), 0.,
+                -sin(a), cos(a), 0.,
+                0., 0., 1.);
+}
+
+float sdRoundBox(vec3 p, vec3 s)
+{
+    return length(max(abs(p) - s, 0.));
+}
+
+float sdRoundRect(vec2 p, vec2 s)
+{
+    return length(max(abs(p) - s, 0.));
+}
+
+mat3 cameraOrientation(float time, vec3 mouse)
+{
+    if(mouse.z > .5)
+    	return rotY(2.8 + mouse.x * 2.) * rotX(0. + mouse.y * 2.);
+    else
+	    return rotY(-time / 4. + 5.5 + 3.14) * rotX(-.2);
+}
+
+vec3 cameraPosition(float time, vec3 mouse)
+{
+    vec3 pos = vec3(0, 0, 2.);
+    return cameraOrientation(time, mouse) * pos;
+}
+
+// Mario fan-art, made of isometric voxel sprites looking a bit like lego bricks. Click and drag to rotate.
+// Super Mario is © Nintendo
+//
+// An individual brick is rendered in Buffer A using the current camera orientation, then
+// that rendered buffer is used in the final image as a sprite texture. The sprites are rendered
+// from front-to-back in a 3D grid, the sorting is done by inverting voxel coordinates according to
+// the signs of the camera direction vector coordinates.
+//
+// The voxel data is stored in a column-major format, so that voxels are pre-sorted by column and each column can move independently
+// of any other. This allows the building animation to work without breaking the sort order.
+//
+// The sprite texture stores diffuse light in the R channel, specular light in the G channel,
+// an M logo image in the B channel (only used on one brick in the hat), and a coverage alpha mask in the A channel.
+//
+// The sprites are carefully composited so that no over-brightening or darkening occurs when they overlap.
+//
+// The voxel data itself was converted by my own Blender script from this source model:
+//	https://3dwarehouse.sketchup.com/model/u708722ae-48d2-442b-9f34-52e56deddde6/3D-8-Bit-Mario?hl=en&login=true
+// The model conversion itself was just as difficult as writing this whole shader...
+//
+
+// 16x10x16 voxels, 2 bits per voxel (3 colours and solid/empty)
+const uint voxelData[160] = uint[160](0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x2800U, 0x2b00U, 0xfc0U, 0xf00U,
+0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x50U, 0x2050U, 0x2850U, 0xa800U, 0xa800U, 0xa800U, 0xab00U, 0x2fc0U, 0xf00U,
+0x0U, 0x0U, 0x0U, 0x0U, 0x80000U, 0x80000U, 0x43c0054U, 0x4ec0554U, 0x6ac2514U, 0x2ac8254U, 0xf08854U, 0xa820U, 0xa828U, 0xa828U, 0x2000U, 0x0U,
+0x0U, 0x0U, 0x0U, 0x80000U, 0x280000U, 0x43f0054U, 0x13f30754U, 0x13031014U, 0x10034005U, 0x40c4005U, 0x2885555U, 0x280054U, 0x28U, 0x28U, 0xaU, 0x0U,
+0x0U, 0x0U, 0x380000U, 0x43b0000U, 0x43f0550U, 0x1ab32554U, 0x1000a014U, 0x10008014U, 0x10000005U, 0x10038005U, 0x6082505U, 0xa80155U, 0x28U, 0x28U, 0xaU, 0x0U,
+0xa80U, 0x300080U, 0x4380040U, 0x4fb0350U, 0x7f32410U, 0x1bf08014U, 0x10000014U, 0x10000014U, 0x10000014U, 0x10038014U, 0x6082554U, 0xa80054U, 0x0U, 0x0U, 0x0U, 0x0U,
+0x2aa0U, 0xf00002a0U, 0xf0380150U, 0x42b1510U, 0x4285410U, 0x1abc0014U, 0x10300014U, 0x10000014U, 0x10000014U, 0x100f8550U, 0x6882550U, 0xa80000U, 0x0U, 0x0U, 0x0U, 0x0U,
+0xfe800a80U, 0xfea80080U, 0xfeaa0040U, 0xaa9550U, 0x2a9550U, 0x4380154U, 0x1bfc0554U, 0x1bff5554U, 0x1aefa550U, 0x6bc2540U, 0x2a80000U, 0x280000U, 0x0U, 0x0U, 0x0U, 0x0U,
+0xfea00000U, 0xfea80000U, 0xfeaa0000U, 0xaa8040U, 0xaa550U, 0xaa950U, 0x42da554U, 0x4ec5554U, 0x6ac0550U, 0x2ac0000U, 0xf00000U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U,
+0x0U, 0x2a00000U, 0x2a80000U, 0x2a0000U, 0xa8000U, 0x2a000U, 0x8000U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U
+);
+
+const vec3 pallette[4] = vec3[4]( vec3(0), vec3(.7,.005,.005), vec3(.2,.08,0.005), vec3(1.,.5,.3) * 1.2 );
+
+const float alpha_threshold = .01;
+
+mat3 camera_to_world;
+mat3 world_to_camera;
+vec3 camera_position;
+vec2 frag_uv;
+
+vec4 sprite2D(vec2 p)
+{
+    if(abs(p.x) >= .5 / cam_zoom || abs(p.y) > 1. / cam_zoom)
+        return vec4(0);
+    return textureLod(iChannel0, p.xy * .5 + .5, 0.);
+}
+
+float signNoZero(float x)
+{
+    return (x < 0.) ? -1. : +1.;
+}
+
+vec3 signNoZero(vec3 x)
+{
+    return vec3(signNoZero(x.x), signNoZero(x.y), signNoZero(x.z));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec3 mouse = vec3(iMouse.xy / iResolution.xy * 2. - 1., iMouse.z);
+    
+    float time = iTime + texelFetch(iChannel2, ivec2(fragCoord.xy) & 1023, 0).r / 60.;
+    
+    camera_to_world = cameraOrientation(time, mouse);
+    world_to_camera = transpose(camera_to_world);
+    camera_position = cameraPosition(time, mouse);
+    
+    vec2 uv = fragCoord / iResolution.xy * 2. - 1.;
+
+    frag_uv = uv;
+
+    uv.x *= iResolution.x / iResolution.y;    
+
+    vec3 rd = vec3(0, 0, -1.);
+    vec3 ro = vec3(uv * cam_zoom, 0.);
+    
+    mat3 camrot = cameraOrientation(time, mouse);
+    
+    ro = camrot * ro;
+    rd = camrot * rd;
+    
+    ro += cameraPosition(time, mouse);
+
+    // Do bounding box test.
+    
+    vec2 bi = box(ro, rd, -brickDims * 8.1, +brickDims * 8.1 + vec3(0, 2, 0));
+    
+    vec4 col = vec4(mix(vec3(.8), vec3(.85,.59,.01), .97), 0.);
+    
+    if(bi.x < bi.y)
+    {
+        vec3 sns = -signNoZero(camera_to_world[2]);
+
+		vec2 u = world_to_camera[0].xy * vec2(iResolution.y / iResolution.x, 1.) / cam_zoom * brickDims.x;
+		vec2 v = world_to_camera[1].xy * vec2(iResolution.y / iResolution.x, 1.) / cam_zoom * brickDims.y;
+		vec2 w = world_to_camera[2].xy * vec2(iResolution.y / iResolution.x, 1.) / cam_zoom * brickDims.z;
+
+        float alpha = 1.;
+        vec3 mario_col = vec3(0);
+        
+        // Composite the brick sprites in front-to-back order.
+        
+        for(int z = 9; z >= 0; --z)
+        {
+            int z2 = (sns.z < 0.) ? z : (9 - z);
+            for(int x = 15; x >= 0; --x)
+            {                
+                int x2 = (sns.x < 0.) ? x : (15 - x);
+                           
+                // Fetch a whole column of voxels. There are 16 voxels per column, 2 bits per voxel.
+                uint voxel_pack = voxelData[z2 * 16 + x2];
+
+                if(voxel_pack != 0U)
+                    for(int y = 15; y >= 0; --y)
+                    {
+                		int y2 = (sns.y < 0.) ? y : (15 - y);
+                    
+                        vec3 q = vec3(float(x) - 15. / 2., float(y) - 15. / 2., float(z) - 9. / 2.) * sns;
+                        uint vx = (voxel_pack >> (y2 * 2)) & 3U;
+                        if(vx != 0U)
+                        {
+                            // Falling bricks animation
+                            q.y += -20. * (1. - smoothstep(0., 1., time * 1. - q.x * .059 - q.z * 1.75 - 8.7 + q.y * 1.3));
+
+                            if(q.y > -10.)
+                            {
+                                vec2 p = u * q.x + v * q.y + w * q.z + frag_uv;                        
+                                vec4 s = sprite2D(p);
+                                
+                                // Make the bricks a little bit translucent, and also make them fade when falling.
+                                s.a *= .87 * (1. - smoothstep(-9., -10., q.y));
+
+                                vec3 pc = pallette[vx & 3U];
+                                
+                                // Special hard-coded hat brick with the "M" logo on it.
+                                if(x2 == 5 && y2 == 14 && z2 == 5)
+                                	pc = mix(pc, vec3(1), s.b);
+                                
+                                vec3 sc = pc * s.r;
+
+                                sc += s.g * vec3(1) * mix(pc, vec3(1.), .9);
+                                
+                                // Perform compositing operation.
+                                mario_col += sc * alpha * s.a;
+                                alpha *= 1. - s.a;
+                            }
+                        }
+                        
+                        if(alpha < alpha_threshold)
+                     		break;
+                    }
+                if(alpha < alpha_threshold)
+                    break;
+            }
+            if(alpha < alpha_threshold)
+                break;
+        }
+
+        mario_col *= 1.05;
+        
+        // Composite with background.
+        col.rgb = mario_col + col.rgb * alpha;
+    }
+
+    // Tonemap.
+    col.rgb /= (col.rgb + 2.) / 2.9;
+    
+    // Clamp + Gamma.
+    fragColor = vec4(pow(clamp(col.rgb, 0., 1.), vec3(1. / 2.2)), 1.0);
+}
     void main() {
       mainImage(gl_FragColor, gl_FragCoord.xy);
     }
@@ -54,7 +276,6 @@
 
 <body>
     <script>
-
         class App {
             constructor() {
                 this.width = 300;
@@ -88,7 +309,6 @@
             }
             start() {
                 const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);
-
                 this.bufferA = new BufferShader(getShaderSource('ba'), {
                     iTime: {
                         value: 0

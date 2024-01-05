@@ -117,12 +117,12 @@
 
         }
         async function saveCodeData() {
-            let s = textarea.value.trim();
+          let s = textarea.value.trim();
             if (!s) return;
             let body = {
-                id: 0,
-                title: "WebGL Three.js",
-                content: s
+                id:  0,
+                title: substringBefore(s, "\n").trim(),
+                content: substringAfter(s, "\n").trim()
             };
             // await submitNote(getBaseUri(), JSON.stringify(body));
             // document.getElementById('toast').setAttribute('message', '成功');
@@ -176,6 +176,10 @@
                 } else if (evt.key === 'F5') {
                     evt.preventDefault();
                     await glslTemplate(1);
+                } else if (evt.key === 'F3') {
+                    evt.preventDefault();
+                    await saveData();
+                    window.open("js", '_blank');
                 }
 
             });

@@ -134,10 +134,12 @@
             let s = textarea.value.trim();
             if (!s) return;
             let body = {
-                id: id ? parseInt(id, 10) : 0,
                 title: substringBefore(s, "\n").trim(),
                 content: substringAfter(s, "\n").trim()
             };
+            if(id){
+                body.id=parseInt(id, 10)
+            }
             // await submitNote(getBaseUri(), JSON.stringify(body));
             // document.getElementById('toast').setAttribute('message', '成功');
             let res;
@@ -148,6 +150,10 @@
                 });
                 if (res.status !== 200) {
                     throw new Error();
+                }
+                if (!id) {
+                    location.href = `/code/editor.html?id=${await res.text()}`;
+                    return;
                 }
                 toast.setAttribute('message', '成功');
             } catch (error) {

@@ -290,7 +290,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             nlohmann::json doc = nlohmann::json::array();
             std::regex q_regex(q);
             while (fetch_row_v(id, title, content, update_at)) {
-                if (std::regex_search(std::string{title}, q_regex) || std::regex_search(std::string{content}, q_regex)) {
+                if (std::regex_search(std::string{title}, q_regex) ||
+                    std::regex_search(std::string{content}, q_regex)) {
                     nlohmann::json j = {
 
                             {"id",        id},
@@ -355,16 +356,17 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (doc.contains("content")) {
             content = doc["content"];
         }
-        if (doc.contains("id") && doc["id"] > 0) {
+        if (doc.contains("id") ) {
             int id = doc["id"];
+            // code SET title=coalesce(?1,title),content=coalesce(?2,content),update_at=?3 where id =?4)
             static const char query[]
-                    = R"(UPDATE code SET title=coalesce(?1,title),content=coalesce(?2,content),update_at=?3 where id =?4)";
-            db::QueryResult fetch_row = db::query<query>(title,
+                    = R"(INSERT OR REPLACE INTO code (id,title,content,uupdate_at) VALUES(?1,?2,?3,?4)";
+            db::QueryResult fetch_row = db::query<query>(id, title,
                                                          content,
-                                                         GetTimeStamp(),
-                                                         id
+                                                         GetTimeStamp()
+
             );
-            res.set_content(std::to_string(fetch_row.resultCode()),
+            res.set_content(std::to_string(id),
                             "text/plain; charset=UTF-8");
         } else {
             static const char query[]
@@ -374,8 +376,16 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                                                          GetTimeStamp(),
                                                          GetTimeStamp()
             );
-            res.set_content(std::to_string(fetch_row.resultCode()),
-                            "text/plain; charset=UTF-8");
+            static const char queryv[]
+                    = R"(SELECT last_insert_rowid())";
+            db::QueryResult fetch_id = db::query<queryv>();
+            std::string_view id;
+            if (fetch_id(id)) {
+                res.set_content(id.data(), id.size(),
+                                "text/plain; charset=UTF-8");
+            } else
+                res.set_content(std::to_string(fetch_row.resultCode()),
+                                "text/plain; charset=UTF-8");
         }
     });
     server.Post("/codes", [](const httplib::Request &req, httplib::Response &res,

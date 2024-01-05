@@ -170,18 +170,22 @@
                 if (evt.ctrlKey && evt.key === 's') {
                     evt.preventDefault();
                     await saveCodeData()
-                } else if (evt.key === 'F4') {
-                    await glslTemplate();
+                } else if (evt.key === 'F2') {
+                    evt.preventDefault();
+                    await glslTemplate(0);
+                } else if (evt.key === 'F5') {
+                    evt.preventDefault();
+                    await glslTemplate(1);
                 }
 
             });
         }
 
-       
+
         cacheCode();
         initialize();
 
-       
+
     </script>
 </body>
 

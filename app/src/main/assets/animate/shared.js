@@ -577,7 +577,7 @@ async function glslTemplate(t) {
     if (t === 1)
         textarea.value = "WebGL \n" + formatGlslCode(THREE1[0] + s + THREE1[1]);
     else
-        textarea.value = "WebGL \n" + formatGlslCode(WEBGL[0] + s + WEBGL[1]);
+        textarea.value = "WebGL \n" + formatGlslCode(WEBGL2[0] + s + WEBGL2[1]);
 }
 function showSnippetsDialog() {
     const dialog = document.createElement('custom-dialog');
@@ -601,6 +601,7 @@ function showSnippetsDialog() {
                 <div data-id="7">GLSL 简化</div>
                 <div data-id="8">GLSL 变量</div>
                 <div data-id="9">Three.js 导入</div>
+                <div data-id="10">GLSL 纹理</div>
                 `;
 
     dialog.appendChild(div);
@@ -808,6 +809,86 @@ gl.uniform1i(frameLocation, frame);
                     `,
                         textarea.selectionStart,
                         textarea.selectionEnd);
+                } else if (id === '10') {
+                    textarea.value = textarea.value
+                        .replace("uniform sampler2D iChannel0;", `uniform sampler2D iChannel0;
+                        uniform sampler2D iChannel1;`)
+                        .replace(`</script>
+                        <script>`,`//
+                        // Initialize a texture and load an image.
+                        // When the image finished loading copy it into the texture.
+                        //
+                        function loadTexture(gl, url, offset) {
+                          const texture = gl.createTexture();
+                          gl.activeTexture(gl.TEXTURE0 + offset);
+                          gl.bindTexture(gl.TEXTURE_2D, texture);
+                          // Because images have to be downloaded over the internet
+                          // they might take a moment until they are ready.
+                          // Until then put a single pixel in the texture so we can
+                          // use it immediately. When the image has finished downloading
+                          // we'll update the texture with the contents of the image.
+                          const level = 0;
+                          const internalFormat = gl.RGBA;
+                          const width = 1;
+                          const height = 1;
+                          const border = 0;
+                          const srcFormat = gl.RGBA;
+                          const srcType = gl.UNSIGNED_BYTE;
+                          const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+                          gl.texImage2D(
+                            gl.TEXTURE_2D,
+                            level,
+                            internalFormat,
+                            width,
+                            height,
+                            border,
+                            srcFormat,
+                            srcType,
+                            pixel,
+                          );
+                          const image = new Image();
+                          image.onload = () => {
+                            gl.activeTexture(gl.TEXTURE0 + offset);
+                            gl.bindTexture(gl.TEXTURE_2D, texture);
+                            gl.texImage2D(
+                              gl.TEXTURE_2D,
+                              level,
+                              internalFormat,
+                              srcFormat,
+                              srcType,
+                              image,
+                            );
+                            // WebGL1 has different requirements for power of 2 images
+                            // vs. non power of 2 images so check if the image is a
+                            // power of 2 in both dimensions.
+                            if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+                              // Yes, it's a power of 2. Generate mips.
+                              gl.generateMipmap(gl.TEXTURE_2D);
+                            } else {
+                              // No, it's not a power of 2. Turn off mips and set
+                              // wrapping to clamp to edge
+                              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                            }
+                          };
+                          image.src = url;
+                          return texture;
+                        }
+                        function isPowerOf2(value) {
+                          return (value & (value - 1)) === 0;
+                        }
+                        </script>
+                        <script>`)
+                        .replace(`const timeLocation = gl.getUniformLocation(program, "iTime");`,
+                        `const timeLocation = gl.getUniformLocation(program, "iTime");
+                        const iChannel0Location = gl.getUniformLocation(program, "iChannel0");
+                        const iChannel1Location = gl.getUniformLocation(program, "iChannel1");`)
+                        .replace("function render(time) {",`gl.uniform1i(iChannel0Location, 0);
+                        gl.uniform1i(iChannel1Location, 1);
+                        loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/001.jpg", 0);
+                        loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/002.jpg", 1);
+                        function render(time) {`);
                 }
                 dialog.remove();
             });
@@ -824,6 +905,7 @@ ${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
 }
 const WEBGL1 = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charset='UTF-8' />\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n  \r\n#version 300 es\r\nprecision highp float;\r\nuniform vec3 iResolution;\r\nuniform float iTime;\r\n\r\n", "\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.innerHTML=log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001; // convert to seconds\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
 
+const WEBGL2 = ["<html lang='en'>\r\n<head>\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">#version 300 es\r\nprecision highp float;\r\nprecision highp sampler2D;\r\nuniform vec3 iResolution;\r\nuniform vec4 iMouse;\r\nuniform float iTime;\r\nuniform sampler2D iChannel0;\r\nuniform int iFrame;\r\n", "\r\nout vec4 outColor;\r\nvoid main() {\r\n  mainImage(outColor, gl_FragCoord.xy);\r\n}\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.textContent = log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n    window.onerror = function(errMsg, url, line, column, error) {\r\n      var result = !column ? '' : 'column: ' + column;\r\n      result += !error;\r\n      document.write(\"\\nError= \" + errMsg + \"\\nurl= \" + url + \"\\nline= \" + line + result);\r\n      var suppressErrorAlert = true;\r\n      return suppressErrorAlert;\r\n    };\r\n    document.addEventListener('visibilitychange', async evt => {\r\n      if (document.visibilityState === \"visible\") {\r\n        location.reload();\r\n      }\r\n    })\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const mouseLocation = gl.getUniformLocation(program, \"iMouse\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const frameLocation = gl.getUniformLocation(program, \"iFrame\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([\r\n      -1, -1,\r\n      1, -1,\r\n      -1, 1,\r\n      -1, 1,\r\n      1, -1,\r\n      1, 1,\r\n    ]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(\r\n      positionAttributeLocation,\r\n      2,\r\n      gl.FLOAT,\r\n      false,\r\n      0,\r\n      0,\r\n    );\r\n    let mouseX = 0;\r\n    let mouseY = 0;\r\n    function setMousePosition(e) {\r\n      const rect = canvas.getBoundingClientRect();\r\n      mouseX = e.clientX - rect.left;\r\n      mouseY = rect.height - (e.clientY - rect.top) - 1;\r\n    }\r\n    canvas.addEventListener('mousemove', setMousePosition);\r\n    canvas.addEventListener('touchstart', (e) => {\r\n      e.preventDefault();\r\n    }, {\r\n      passive: false\r\n    });\r\n    canvas.addEventListener('touchmove', (e) => {\r\n      e.preventDefault();\r\n      setMousePosition(e.touches[0]);\r\n    }, {\r\n      passive: false\r\n    });\r\n    let frame = 0;\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001;\r\n      frame++;\r\n      gl.clearColor(0., 0., 0., 1.0);\r\n      gl.clear(gl.COLOR_BUFFER_BIT);\r\n      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.uniform1i(frameLocation, frame);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
 const THREE1 = ["<!DOCTYPE html>\r\n<html lang=\"en\">\r\n\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Document</title>\r\n    <style>\r\n        body {\r\n            margin: 0;\r\n            overflow: hidden\r\n        }\r\n    </style>\r\n    <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n        varying vec2 vUv;\r\n        void main() {\r\n            vUv = uv;\r\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\r\n        }\r\n    </script>\r\n    <script id=\"ba\" type=\"x-shader/x-fragment\">\r\n        uniform vec3      iResolution;       \r\n        uniform float     iTime;           \r\n        uniform float     iTimeDelta;      \r\n        uniform float     iFrameRate;       \r\n        uniform int       iFrame;            \r\n        uniform vec4      iMouse;  \r\n        uniform sampler2D iChannel0;\r\n        \r\n           ", "\r\n         \r\n        void main() {\r\n          mainImage(gl_FragColor, gl_FragCoord.xy);\r\n        }\r\n    </script>\r\n    <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n\r\n    uniform sampler2D iChannel0;\r\n    uniform vec3      iResolution;  \r\n    uniform float     iTime;      \r\n    uniform vec4      iMouse;  \r\n     \r\n    void main() {\r\n      mainImage(gl_FragColor, gl_FragCoord.xy);\r\n    }\r\n    </script>\r\n    <script>\r\n        window.getShaderSource = function (id) {\r\n            return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n        };\r\n    </script>\r\n</head>\r\n\r\n<body>\r\n    <script>\r\n\r\n        class App {\r\n            constructor() {\r\n                this.width = 300;\r\n                this.height = 300;\r\n                this.renderer = new THREE.WebGLRenderer();\r\n                this.loader = new THREE.TextureLoader();\r\n                this.mousePosition = new THREE.Vector4();\r\n                this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);\r\n                this.counter = 0;\r\n                this.renderer.setSize(this.width, this.height);\r\n                document.body.appendChild(this.renderer.domElement);\r\n                this.renderer.domElement.addEventListener('mousedown', () => {\r\n                    this.mousePosition.setZ(1);\r\n                    this.counter = 0;\r\n                });\r\n                this.renderer.domElement.addEventListener('mouseup', () => {\r\n                    this.mousePosition.setZ(0);\r\n                });\r\n                this.renderer.domElement.addEventListener('mousemove', event => {\r\n                    this.mousePosition.setX(event.clientX);\r\n                    this.mousePosition.setY(this.height - event.clientY);\r\n                });\r\n                this.targetA = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n                this.targetC = new BufferManager(this.renderer, {\r\n                    width: this.width,\r\n                    height: this.height\r\n                });\r\n            }\r\n            start() {\r\n                const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);\r\n\r\n                this.bufferA = new BufferShader(getShaderSource('ba'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iFrame: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.bufferImage = new BufferShader(getShaderSource('fs'), {\r\n                    iTime: {\r\n                        value: 0\r\n                    },\r\n                    iResolution: {\r\n                        value: resolution\r\n                    },\r\n                    iMouse: {\r\n                        value: this.mousePosition\r\n                    },\r\n                    iChannel0: {\r\n                        value: null\r\n                    },\r\n                    iChannel1: {\r\n                        value: null\r\n                    }\r\n                });\r\n                this.animate();\r\n            }\r\n            animate() {\r\n                requestAnimationFrame(() => {\r\n                    const time = performance.now() / 1000;\r\n                    this.bufferA.uniforms['iFrame'].value = this.counter++;\r\n                    this.bufferA.uniforms['iTime'].value = time;\r\n                    this.bufferA.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.targetA.render(this.bufferA.scene, this.orthoCamera);\r\n                    this.bufferImage.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n                    this.bufferImage.uniforms['iTime'].value = time;\r\n                    this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);\r\n                    this.animate();\r\n                });\r\n            }\r\n        }\r\n        class BufferShader {\r\n            constructor(fragmentShader, uniforms = {}) {\r\n                this.uniforms = uniforms;\r\n                this.material = new THREE.ShaderMaterial({\r\n                    fragmentShader: fragmentShader,\r\n                    vertexShader: getShaderSource('vs'),\r\n                    uniforms: uniforms\r\n                });\r\n                this.scene = new THREE.Scene();\r\n                this.scene.add(\r\n                    new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)\r\n                );\r\n            }\r\n        }\r\n        class BufferManager {\r\n            constructor(renderer, size) {\r\n                this.renderer = renderer;\r\n                this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {\r\n                    minFilter: THREE.LinearFilter,\r\n                    magFilter: THREE.LinearFilter,\r\n                    format: THREE.RGBAFormat,\r\n                    type: THREE.FloatType,\r\n                    stencilBuffer: false\r\n                });\r\n                this.writeBuffer = this.readBuffer.clone();\r\n            }\r\n            swap() {\r\n                const temp = this.readBuffer;\r\n                this.readBuffer = this.writeBuffer;\r\n                this.writeBuffer = temp;\r\n            }\r\n            render(scene, camera, toScreen = false) {\r\n                if (toScreen) {\r\n                    this.renderer.render(scene, camera);\r\n                } else {\r\n                    this.renderer.setRenderTarget(this.writeBuffer);\r\n                    this.renderer.clear();\r\n                    this.renderer.render(scene, camera)\r\n                    this.renderer.setRenderTarget(null);\r\n                }\r\n                this.swap();\r\n            }\r\n        }\r\n        document.addEventListener('DOMContentLoaded', () => {\r\n            (new App()).start();\r\n        });\r\n    </script>\r\n    <script src=\"https://fastly.jsdelivr.net/npm/three@0.121.1/build/three.js\">\r\n    </script>\r\n</body>\r\n\r\n</html>"]
 
 async function showSnippetDialog(baseUri, textarea) {
@@ -846,14 +928,20 @@ async function showSnippetDialog(baseUri, textarea) {
     });
     document.body.appendChild(snippet);
     snippet.addEventListener('submit', async () => {
-        const s = await readText();
+        let selectionStart = textarea.selectionStart;
+        let selectionEnd = textarea.selectionEnd;
+        const s = textarea.value.substring(selectionStart, selectionEnd).trim();
         const res = await fetch(`${baseUri}/snippet`, {
             method: 'POST',
             body: s.trim()
         });
+
     });
     snippet.addEventListener('close', async () => {
-        const s = await readText();
+        let selectionStart = textarea.selectionStart;
+        let selectionEnd = textarea.selectionEnd;
+        const s = textarea.value.substring(selectionStart, selectionEnd).trim();
+
         const res = await fetch(`${baseUri}/snippet/delete`, {
             method: 'POST',
             body: s.trim()

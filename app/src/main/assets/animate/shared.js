@@ -931,7 +931,11 @@ async function showSnippetDialog(baseUri, textarea) {
     snippet.addEventListener('submit', async () => {
         let selectionStart = textarea.selectionStart;
         let selectionEnd = textarea.selectionEnd;
-        const s = textarea.value.substring(selectionStart, selectionEnd).trim();
+        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
+        if (!s) {
+            const points = getLine(textarea);
+            s = textarea.value.substring(points[0], points[1]).trim();
+        }
         const res = await fetch(`${baseUri}/snippet`, {
             method: 'POST',
             body: s.trim()
@@ -942,7 +946,10 @@ async function showSnippetDialog(baseUri, textarea) {
         let selectionStart = textarea.selectionStart;
         let selectionEnd = textarea.selectionEnd;
         const s = textarea.value.substring(selectionStart, selectionEnd).trim();
-
+        if (!s) {
+            const points = getLine(textarea);
+            s = textarea.value.substring(points[0], points[1]).trim();
+        }
         const res = await fetch(`${baseUri}/snippet/delete`, {
             method: 'POST',
             body: s.trim()
@@ -952,16 +959,25 @@ async function showSnippetDialog(baseUri, textarea) {
 
 function decreaseCode(textarea) {
     let s = textarea.value;
-    s = removeSubstring(s,`<!DOCTYPE html>`, `<html lang='en'>`);
-    s = removeSubstring(s,`<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
-    s = removeSubstring(s,`uniform vec4 iMouse;`, `uniform float iTime;`);
-    s = removeSubstring(s,`window.loadImage = function(url, onload) {`, `})();`);
-    s = removeSubstring(s,` // const channel0Location = gl.getUniformLocation(program, 'iChannel0');`, ` const timeLocation = gl.getUniformLocation(program, "iTime");`);
-    s = removeSubstring(s,`let mouseX = 0;`, `let frame = 0;`);
-    s = removeSubstring(s,`// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
-    s = removeSubstring(s,`gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
+    s = removeSubstring(s, `<!DOCTYPE html>`, `<html lang='en'>`);
+    s = removeSubstring(s, `<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
+    s = removeSubstring(s, `uniform vec4 iMouse;`, `uniform float iTime;`);
+    s = removeSubstring(s, `window.loadImage = function(url, onload) {`, `})();`);
+    s = removeSubstring(s, ` // const channel0Location = gl.getUniformLocation(program, 'iChannel0');`, ` const timeLocation = gl.getUniformLocation(program, "iTime");`);
+    s = removeSubstring(s, `let mouseX = 0;`, `let frame = 0;`);
+    s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
+    s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
+    s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
     //s = removeSubstring(s,``, ``);
-   
+    s = s.replace(/void mainImage\([^)]+\)[\r\n ]+\{/, m => {
+        return `
+        
+out vec4 ${m.match(/(?<=out vec4 )[^,]+/)};                                          
+void main(){
+vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
+`
+    }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
+
 
     textarea.value = s;
 }
@@ -970,8 +986,8 @@ function removeSubstring(strings, prefix, suffix) {
     if (start === -1) {
         return strings
     }
-     
-    let end = strings.indexOf(suffix, start+prefix.length);
+
+    let end = strings.indexOf(suffix, start + prefix.length);
     if (end === -1) {
         return strings
     }
@@ -982,9 +998,9 @@ function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
-  }
-  function getRandomInt(min, max) {
+}
+function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-  }
+}

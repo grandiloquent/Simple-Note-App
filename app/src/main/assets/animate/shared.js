@@ -813,8 +813,10 @@ gl.uniform1i(frameLocation, frame);
                     textarea.value = textarea.value
                         .replace("uniform sampler2D iChannel0;", `uniform sampler2D iChannel0;
                         uniform sampler2D iChannel1;`)
-                        .replace(`</script>
-                        <script>`,`//
+                        .replace(`<body>`,`
+                        <body>
+                        <script>
+                        //
                         // Initialize a texture and load an image.
                         // When the image finished loading copy it into the texture.
                         //
@@ -878,8 +880,7 @@ gl.uniform1i(frameLocation, frame);
                         function isPowerOf2(value) {
                           return (value & (value - 1)) === 0;
                         }
-                        </script>
-                        <script>`)
+                        </script>`)
                         .replace(`const timeLocation = gl.getUniformLocation(program, "iTime");`,
                         `const timeLocation = gl.getUniformLocation(program, "iTime");
                         const iChannel0Location = gl.getUniformLocation(program, "iChannel0");

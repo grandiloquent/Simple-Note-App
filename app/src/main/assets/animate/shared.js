@@ -813,7 +813,7 @@ gl.uniform1i(frameLocation, frame);
                     textarea.value = textarea.value
                         .replace("uniform sampler2D iChannel0;", `uniform sampler2D iChannel0;
                         uniform sampler2D iChannel1;`)
-                        .replace(`<body>`,`
+                        .replace(`<body>`, `
                         <body>
                         <script>
                         //
@@ -882,10 +882,10 @@ gl.uniform1i(frameLocation, frame);
                         }
                         </script>`)
                         .replace(`const timeLocation = gl.getUniformLocation(program, "iTime");`,
-                        `const timeLocation = gl.getUniformLocation(program, "iTime");
+                            `const timeLocation = gl.getUniformLocation(program, "iTime");
                         const iChannel0Location = gl.getUniformLocation(program, "iChannel0");
                         const iChannel1Location = gl.getUniformLocation(program, "iChannel1");`)
-                        .replace("function render(time) {",`gl.uniform1i(iChannel0Location, 0);
+                        .replace("function render(time) {", `gl.uniform1i(iChannel0Location, 0);
                         gl.uniform1i(iChannel1Location, 1);
                         loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/001.jpg", 0);
                         loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/002.jpg", 1);
@@ -948,4 +948,32 @@ async function showSnippetDialog(baseUri, textarea) {
             body: s.trim()
         });
     });
+}
+
+function decreaseCode(textarea) {
+    let s = textarea.value;
+    s = removeSubstring(s,`<!DOCTYPE html>`, `<html lang='en'>`);
+    s = removeSubstring(s,`<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
+    s = removeSubstring(s,`uniform vec4 iMouse;`, `uniform float iTime;`);
+    s = removeSubstring(s,`window.loadImage = function(url, onload) {`, `})();`);
+    s = removeSubstring(s,` // const channel0Location = gl.getUniformLocation(program, 'iChannel0');`, ` const timeLocation = gl.getUniformLocation(program, "iTime");`);
+    s = removeSubstring(s,`let mouseX = 0;`, `let frame = 0;`);
+    s = removeSubstring(s,`// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
+    s = removeSubstring(s,`gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
+    //s = removeSubstring(s,``, ``);
+   
+
+    textarea.value = s;
+}
+function removeSubstring(strings, prefix, suffix) {
+    let start = strings.indexOf(prefix);
+    if (start === -1) {
+        return strings
+    }
+     
+    let end = strings.indexOf(suffix, start+prefix.length);
+    if (end === -1) {
+        return strings
+    }
+    return `${strings.substring(0, start)}${strings.substring(end)}`;
 }

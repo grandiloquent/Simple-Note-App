@@ -58,18 +58,22 @@
             right: 0;
             top: 0;
             bottom: 0;
-            width: 48px;
             z-index: 100001;
             display: flex;
             flex-direction: column;
             align-items: center;
-            row-gap: 8px;
             justify-content: center;
             overflow-y: scroll;
         }
 
         .items::-webkit-scrollbar {
             display: none;
+        }
+
+        .items-wrapper {
+            display: grid;
+            row-gap: 8px;
+            grid-template-columns: 48px 48px;
         }
 
         .item {
@@ -93,64 +97,71 @@
         }
     </style>
     <div class="items">
-        <div class="item" id="format">
-            <span class="material-symbols-outlined">
-                code
-            </span>
-            <div class="pivot-bar-item-title">格式化</div>
-        </div>
-        <div id="close-line" class="item">
-            <span class="material-symbols-outlined">
-                close
-            </span>
-            <div class="pivot-bar-item-title">剪行</div>
-        </div>
-        <div class="item" id="comment">
-            <span class="material-symbols-outlined">
-                comment
-            </span>
-            <div class="pivot-bar-item-title">注释</div>
-        </div>
-
-        <div id="preview" class="item">
-            <span class="material-symbols-outlined">
-                preview
-            </span>
-            <div class="pivot-bar-item-title">预览</div>
-        </div>
-        
-        <div id="code_snippet" class="item">
-            <span class="material-symbols-outlined">
-                text_snippet
-            </span>
-            <div class="pivot-bar-item-title">代码</div>
-        </div>
-        <div id="close-block" class="item">
-            <span class="material-symbols-outlined">
-                close
-            </span>
-            <div class="pivot-bar-item-title">剪块</div>
-        </div>
-
-        <div id="save" class="item">
-            <span class="material-symbols-outlined">
-                save
-            </span>
-            <div class="pivot-bar-item-title">保存</div>
-        </div>
+        <div class="items-wrapper">
+            <div id="preview" class="item">
+                <span class="material-symbols-outlined">
+                    preview
+                </span>
+                <div class="pivot-bar-item-title">预览</div>
+            </div>
+            <div class="item" id="format">
+                <span class="material-symbols-outlined">
+                    code
+                </span>
+                <div class="pivot-bar-item-title">格式化</div>
+            </div>
+            <div id="close-line" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪行</div>
+            </div>
+            <div class="item" id="comment">
+                <span class="material-symbols-outlined">
+                    comment
+                </span>
+                <div class="pivot-bar-item-title">注释</div>
+            </div>
 
 
-        <div class="item" id="translate">
-            <span class="material-symbols-outlined">
-                translate
-            </span>
-            <div class="pivot-bar-item-title">翻译</div>
-        </div>
-        <div class="item" id="function">
-            <span class="material-symbols-outlined">
-                function
-            </span>
-            <div class="pivot-bar-item-title">函数</div>
+
+            <div id="code_snippet" class="item">
+                <span class="material-symbols-outlined">
+                    text_snippet
+                </span>
+                <div class="pivot-bar-item-title">代码</div>
+            </div>
+            <div id="close-block" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪块</div>
+            </div>
+
+            <div id="save" class="item">
+                <span class="material-symbols-outlined">
+                    save
+                </span>
+                <div class="pivot-bar-item-title">保存</div>
+            </div>
+            <div class="item" id="translate">
+                <span class="material-symbols-outlined">
+                    translate
+                </span>
+                <div class="pivot-bar-item-title">翻译</div>
+            </div>
+            <div class="item" id="function">
+                <span class="material-symbols-outlined">
+                    function
+                </span>
+                <div class="pivot-bar-item-title">函数</div>
+            </div>
+            <div class="item" id="decimal_decrease">
+                <span class="material-symbols-outlined">
+                    decimal_decrease
+                </span>
+                <div class="pivot-bar-item-title">简化</div>
+            </div>
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -279,6 +290,9 @@ else{
             });
             document.getElementById('close-block').addEventListener('click', evt => {
                 deleteBlock(textarea)
+            });
+            document.getElementById('decimal_decrease').addEventListener('click', evt => {
+                decreaseCode(textarea)
             });
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {

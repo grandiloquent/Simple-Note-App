@@ -162,6 +162,19 @@
                 </span>
                 <div class="pivot-bar-item-title">简化</div>
             </div>
+
+            <div class="item" id="shuffle">
+                <span class="material-symbols-outlined">
+                    shuffle
+                </span>
+                <div class="pivot-bar-item-title">随机</div>
+            </div>
+            <div class="item" id="navigate_next">
+                <span class="material-symbols-outlined">
+                    navigate_next
+                </span>
+                <div class="pivot-bar-item-title">前进</div>
+            </div>
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -294,6 +307,20 @@ else{
             document.getElementById('decimal_decrease').addEventListener('click', evt => {
                 decreaseCode(textarea)
             });
+            document.getElementById('navigate_next').addEventListener('click', evt => {
+                if (id)
+                    window.location.href = `?id=${parseInt(id) + 1}`
+                else
+                    window.location.reload();
+            });
+            document.getElementById('shuffle').addEventListener('click', evt => {
+                if (id) {
+                    window.location.href = `?id=${parseInt(id) + getRandomInt(-25, 25)}`
+                }
+                else
+                    window.location.reload();
+            });
+
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {
                     if (evt.key === 's') {

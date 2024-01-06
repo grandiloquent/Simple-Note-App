@@ -945,7 +945,7 @@ async function showSnippetDialog(baseUri, textarea) {
     snippet.addEventListener('close', async () => {
         let selectionStart = textarea.selectionStart;
         let selectionEnd = textarea.selectionEnd;
-        const s = textarea.value.substring(selectionStart, selectionEnd).trim();
+        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
         if (!s) {
             const points = getLine(textarea);
             s = textarea.value.substring(points[0], points[1]).trim();

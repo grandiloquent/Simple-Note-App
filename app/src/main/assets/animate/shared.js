@@ -1025,18 +1025,37 @@ function variables(textarea) {
     let s = textarea.value.substring(selectionStart, selectionEnd + 1);
     let name = `${s[0]}0`;
 
-    let str = `float ${name}0 = ${s};
-`;
+
     let i = 0;
     while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
         i++
         name = `${s[0]}${i}`;
     }
-    textarea.setRangeText(`${name}0`, selectionStart, selectionEnd + 1);
-
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
-        selectionStart--;
-    }
+    textarea.setRangeText(`${name}`, selectionStart, selectionEnd + 1);
+    let str = `float ${name} = ${s};
+    `;
+    
     textarea.setRangeText(str, selectionStart, selectionStart);
+
+}
+function copyLine(textarea) {
+    const points = getLine(textarea);
+    s = textarea.value.substring(points[0], points[1]).trim();
+    let name = /[a-zA-Z0-9_]+(?= =)/.exec(s);
+
+
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${/[a-zA-Z]+/.exec(name)}${i}`;
+    }
+     let str = `
+${s.replace(/[a-zA-Z0-9_]+(?= =)/,name)}`;
+     let selectionEnd = textarea.selectionEnd;
+  
+     while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+         selectionEnd++;
+     }
+    textarea.setRangeText(str, selectionEnd,selectionEnd);
 
 }

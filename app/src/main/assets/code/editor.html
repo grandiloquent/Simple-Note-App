@@ -31,7 +31,7 @@
             </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
-        
+
 
         <div class="bar-item-tab" id="javascript">
             <span class="material-symbols-outlined">
@@ -39,7 +39,7 @@
             </span>
             <div class="pivot-bar-item-title">语句</div>
         </div>
-       
+
     </div>
     <style>
         .items {
@@ -123,7 +123,12 @@
                 </span>
                 <div class="pivot-bar-item-title">替换</div>
             </div>
-    
+            <div class="item" id="content_copy">
+                <span class="material-symbols-outlined">
+                    content_copy
+                </span>
+                <div class="pivot-bar-item-title">复行</div>
+            </div>
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -259,6 +264,10 @@ ${content}`;
             })
             document.getElementById('variables').addEventListener('click', evt => {
                 variables(textarea)
+            })
+
+            document.getElementById('content_copy').addEventListener('click', evt => {
+                copyLine(textarea)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
 

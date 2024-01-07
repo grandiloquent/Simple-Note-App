@@ -438,6 +438,20 @@ function escapeHtml(unsafe) {
 }
 
 function comment(textarea) {
+    const points = findExtendPosition(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+        if (s.startsWith("/*") && s.endsWith("*/")) {
+            s = s.substring(2);
+            s = s.substring(0, s.length - 2);
+        } else {
+            s = `/*
+    ${s}
+    */`;
+        }
+
+    textarea.setRangeText(s, points[0], points[1]);
+}
+function commentLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
     //     if (s.startsWith("/*") && s.endsWith("*/")) {

@@ -1005,6 +1005,7 @@ void main(){
 vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
+        .replace(`</html>`, '')
         + `<body>
     <script src="/file?path=/storage/emulated/0/.editor/gl.js"></script>
   </body>
@@ -1137,14 +1138,22 @@ ${s}
 function goToLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    let i = parseInt(s);
+    let i = parseInt(s)-1;
     const p1 = `type="x-shader/x-fragment">`;
     const start = textarea.value.indexOf(p1);
     if (start === -1) return;
     const end = textarea.value.indexOf("</script>", start + p1.length);
     let array = textarea.value.substring(start + p1.length, end).split('\n');
-    textarea.setRangeText(array[i], textarea.selectionStart, textarea.selectionEnd)
+    let index = textarea.value.indexOf(array[i]);
+    textarea.focus();
 
+    const fullText =  textarea.value;
+    textarea.value = fullText.substring(0, index+array[i].length);
+    textarea.scrollTop =  textarea.scrollHeight;
+    textarea.value = fullText;
+    
+    textarea.selectionStart = index;
+    textarea.selectionEnd=index+array[i].length;
 
 }
 function copyWord(textarea) {

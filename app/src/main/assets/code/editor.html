@@ -139,12 +139,7 @@
                 </span>
                 <div class="pivot-bar-item-title">函数</div>
             </div>
-            <div class="item" id="decimal_decrease">
-                <span class="material-symbols-outlined">
-                    decimal_decrease
-                </span>
-                <div class="pivot-bar-item-title">简化</div>
-            </div>
+            
 
             <div class="item" id="shuffle">
                 <span class="material-symbols-outlined">
@@ -164,12 +159,7 @@
                 </span>
                 <div class="pivot-bar-item-title">替换</div>
             </div>
-            <div id="go_to_line" class="item">
-                <span class="material-symbols-outlined">
-                    go_to_line
-                </span>
-                <div class="pivot-bar-item-title">调试</div>
-            </div>
+           
         </div>
         <div class="items-wrapper selected">
 
@@ -214,20 +204,18 @@
                 <div class="pivot-bar-item-title">代码</div>
             </div>
 
-            <div id="text_increase" class="item">
+            <div class="item" id="decimal_decrease">
                 <span class="material-symbols-outlined">
-                    text_increase
+                    decimal_decrease
                 </span>
-                <div class="pivot-bar-item-title">递增</div>
+                <div class="pivot-bar-item-title">简化</div>
             </div>
-            <div id="text_decrease" class="item">
+            <div id="go_to_line" class="item">
                 <span class="material-symbols-outlined">
-                    text_decrease
+                    go_to_line
                 </span>
-                <div class="pivot-bar-item-title">递减</div>
+                <div class="pivot-bar-item-title">调试</div>
             </div>
-
-
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -328,16 +316,6 @@ ${content}`;
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 copyWord(textarea)
-            })
-            document.getElementById('text_decrease').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                numberFormat(textarea,false)
-            })
-            document.getElementById('text_increase').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                numberFormat(textarea,true)
             })
 
             document.getElementById('content_cut').addEventListener('click', evt => {

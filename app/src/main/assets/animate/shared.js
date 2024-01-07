@@ -1078,3 +1078,29 @@ function cutLine(textarea) {
     textarea.setRangeText("", selectionStart, selectionEnd);
 
 }
+function copyBlock(textarea) {
+    const points = findExtendPosition(textarea);
+    s = textarea.value.substring(points[0], points[1]).trim();
+    const buf = [];
+    s = s.replaceAll(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/g, m => {
+        let name = m;
+        let i = 0;
+        while (buf.indexOf(name) !== -1 || new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+            i++
+            name = `${/[a-zA-Z]+/.exec(name)}${i}`;
+        }
+        buf.push(name);
+        return name;
+    });
+
+    let selectionEnd = points[1];
+
+    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+        selectionEnd++;
+    }
+    textarea.setRangeText(`
+
+${s}
+`, selectionEnd, selectionEnd);
+
+}

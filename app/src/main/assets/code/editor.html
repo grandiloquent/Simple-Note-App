@@ -135,6 +135,12 @@
                     </span>
                 <div class="pivot-bar-item-title">剪行</div>
             </div>
+            <div class="item" id="content_copy_block">
+                <span class="material-symbols-outlined">
+                    content_copy
+                </span>
+                <div class="pivot-bar-item-title">复块</div>
+            </div>
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -278,7 +284,9 @@ ${content}`;
             document.getElementById('content_cut').addEventListener('click', evt => {
                 cutLine(textarea)
             })
-            
+            document.getElementById('content_copy_block').addEventListener('click', evt => {
+                copyBlock(textarea)
+            })
             document.getElementById('javascript').addEventListener('click', evt => {
 
 

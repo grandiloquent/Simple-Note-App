@@ -364,6 +364,9 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
     });
+
+
+
     server.Get("/code", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto id = req.get_param_value("id");

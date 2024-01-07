@@ -358,7 +358,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             return true;
         });
         static const char query[]
-                = R"(UPDATE snippet SET views = views + 1 WHERE content = ?1)";
+                = R"(UPDATE snippet SET views = COALESCE(views,0) + 1 WHERE content = ?1)";
         db::QueryResult fetch_row = db::query<query>(body);
 
         res.set_content(std::to_string(fetch_row.resultCode()),

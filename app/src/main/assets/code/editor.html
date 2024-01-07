@@ -31,12 +31,7 @@
             </span>
             <div class="pivot-bar-item-title">代码段</div>
         </div>
-        <div class="bar-item-tab" id="variables">
-            <span class="material-symbols-outlined">
-                variables
-            </span>
-            <div class="pivot-bar-item-title">变量</div>
-        </div>
+        
 
         <div class="bar-item-tab" id="javascript">
             <span class="material-symbols-outlined">
@@ -44,13 +39,7 @@
             </span>
             <div class="pivot-bar-item-title">语句</div>
         </div>
-        <div class="bar-item-tab" id="find_replace">
-            <span class="material-symbols-outlined">
-                find_replace
-            </span>
-            <div class="pivot-bar-item-title">替换</div>
-        </div>
-
+       
     </div>
     <style>
         .items {
@@ -122,6 +111,19 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
+            <div class="item" id="variables">
+                <span class="material-symbols-outlined">
+                    variables
+                </span>
+                <div class="pivot-bar-item-title">变量</div>
+            </div>
+            <div class="item" id="find_replace">
+                <span class="material-symbols-outlined">
+                    find_replace
+                </span>
+                <div class="pivot-bar-item-title">替换</div>
+            </div>
+    
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -256,10 +258,7 @@ ${content}`;
                 // localStorage.setItem('code.editor', textarea.value.trim());
             })
             document.getElementById('variables').addEventListener('click', evt => {
-                let selectionStart = textarea.selectionStart;
-                let selectionEnd = textarea.selectionEnd;
-                let s = `let v = 0;`;
-                textarea.setRangeText(s, selectionStart, selectionEnd)
+                variables(textarea)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
 

@@ -231,7 +231,7 @@
         async function render() {
             const notesWrapper = document.getElementById('notes-wrapper');
             const data = await loadData();
-            notesWrapper.innerHTML = data.map(x => {
+            notesWrapper.innerHTML = data.reverse().map(x => {
                 return `<div>${escapeHtml(x)}</div>`;
             }).join('');
             notesWrapper.querySelectorAll('div')

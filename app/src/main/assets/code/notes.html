@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root {
+            display: block
+        }
+
+        * {
+            -ms-flex: 0 1 auto
+        }
+
+        html {
+            word-wrap: break-word;
+            color: #0f0f0f;
+            background-color: #fff;
+            -webkit-text-size-adjust: 100%
+        }
+
+        html {
+            color: #0f0f0f;
+            background-color: #fff;
+            font-size: 10px;
+            font-family: Roboto, Arial, sans-serif
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            font-size: 1.2rem;
+            overflow-x: hidden
+        }
+
+        input,
+        textarea {
+            background-color: transparent;
+            padding-bottom: 4px;
+            outline: none;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 1px;
+            font: inherit;
+            color: #0f0f0f
+        }
+
+        input::-webkit-input-placeholder,
+        textarea::-webkit-input-placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #606060;
+            opacity: 1
+        }
+
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 8.4rem;
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px
+        }
+
+        input {
+            border-bottom: 1px solid #737373;
+            text-overflow: ellipsis
+        }
+
+        input:focus {
+            margin-bottom: 0;
+            border-bottom-width: 2px;
+            border-bottom-color: #0f0f0f
+        }
+
+        form {
+            margin: 0
+        }
+
+        a {
+            color: currentColor;
+            text-decoration: none
+        }
+
+        strong,
+        b {
+            font-weight: 500
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0 0 3px
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .subhead {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            font-weight: normal
+        }
+
+        h2 {
+            font-size: 1.8rem
+        }
+
+        h3 {
+            font-size: 1.4rem
+        }
+
+        h4 {
+            font-size: 1.3rem
+        }
+
+        .subhead {
+            opacity: .6
+        }
+
+        img {
+            min-width: 1px;
+            min-height: 1px;
+            -webkit-filter: none;
+            filter: none
+        }
+
+        #items-wraper {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            background-color: #dadce0;
+            gap: 1px;
+            font-size: 13px;
+            line-height: 24px;
+        }
+
+        #items-wraper>div {
+            background-color: #fff;
+            padding-left: 8px;
+        }
+
+        #inputs-wraper {
+            display: grid;
+            grid-template-columns: 1fr 48px 48px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        #inputs-wraper>div {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #notes-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            background-color: #dadce0;
+            gap: 1px;
+            line-height: 24px;
+        }
+
+        #notes-wrapper>div {
+            background-color: #fff;
+            padding-left: 8px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            max-height: 2.5em;
+            -webkit-line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: normal
+        }
+    </style>
+    <script src="../animate/shared.js"></script>
+</head>
+
+<body>
+    <div id="notes-wrapper">
+
+    </div>
+    <div id="inputs-wraper">
+        <textarea id="textarea"></textarea>
+        <div id="submit">导入</div>
+        <div id="close">删除</div>
+    </div>
+    <div id="items-wraper">
+
+    </div>
+    <script>
+        // console.error(JSON.stringify([...$0.querySelectorAll('.symbols+a')]
+        // .map(x=>{
+        //     return {
+        //         name:x.textContent,
+        //         href:x.href
+        //     }
+        // })));
+        let baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "..";
+
+        async function loadData() {
+            try {
+                const response = await fetch(`${baseUri}/snippets`);
+                if (response.status > 399 || response.status < 200) {
+                    throw new Error(`${response.status}: ${response.statusText}`)
+                }
+                return await response.json();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+
+        async function render() {
+            const notesWrapper = document.getElementById('notes-wrapper');
+            const data = await loadData();
+            notesWrapper.innerHTML = data.map(x => {
+                return `<div>${escapeHtml(x)}</div>`;
+            }).join('');
+            notesWrapper.querySelectorAll('div')
+                .forEach(x => {
+                    x.addEventListener('click', async e => {
+                        const element = e.currentTarget;
+                        const s = element.textContent;
+                        const res = await fetch(`${baseUri}/snippet/hit`, {
+                            method: 'POST',
+                            body: s
+                        });
+                        writeText(s);
+                    })
+                })
+
+        }
+        render()
+        function initialize() {
+            document.getElementById('submit')
+                .addEventListener('click', async e => {
+                    const s = document.getElementById('textarea').value.trim();
+                    if (!s) return
+                    const res = await fetch(`${baseUri}/snippet`, {
+                        method: 'POST',
+                        body: s
+                    });
+                });
+            document.getElementById('close')
+                .addEventListener('click', async e => {
+                    const s = document.getElementById('textarea').value.trim();
+                    if (!s) return
+                    const res = await fetch(`${baseUri}/snippet/delete`, {
+                        method: 'POST',
+                        body: s
+                    });
+                });
+        }
+        initialize();
+        const itemsWrapper = document.getElementById('items-wraper');
+        const items = [{ "name": "abs", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/abs.xhtml" }, { "name": "acos", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/acos.xhtml" }, { "name": "acosh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/acosh.xhtml" }, { "name": "all", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/all.xhtml" }, { "name": "any", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/any.xhtml" }, { "name": "asin", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/asin.xhtml" }, { "name": "asinh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/asinh.xhtml" }, { "name": "atan", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atan.xhtml" }, { "name": "atanh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atanh.xhtml" }, { "name": "atomicAdd", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicAdd.xhtml" }, { "name": "atomicAnd", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicAnd.xhtml" }, { "name": "atomicCompSwap", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicCompSwap.xhtml" }, { "name": "atomicCounter", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicCounter.xhtml" }, { "name": "atomicCounterDecrement", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicCounterDecrement.xhtml" }, { "name": "atomicCounterIncrement", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicCounterIncrement.xhtml" }, { "name": "atomicExchange", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicExchange.xhtml" }, { "name": "atomicMax", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicMax.xhtml" }, { "name": "atomicMin", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicMin.xhtml" }, { "name": "atomicOr", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicOr.xhtml" }, { "name": "atomicXor", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/atomicXor.xhtml" }, { "name": "barrier", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/barrier.xhtml" }, { "name": "bitCount", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/bitCount.xhtml" }, { "name": "bitfieldExtract", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/bitfieldExtract.xhtml" }, { "name": "bitfieldInsert", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/bitfieldInsert.xhtml" }, { "name": "bitfieldReverse", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/bitfieldReverse.xhtml" }, { "name": "ceil", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/ceil.xhtml" }, { "name": "clamp", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/clamp.xhtml" }, { "name": "cos", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/cos.xhtml" }, { "name": "cosh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/cosh.xhtml" }, { "name": "cross", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/cross.xhtml" }, { "name": "degrees", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/degrees.xhtml" }, { "name": "determinant", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/determinant.xhtml" }, { "name": "dFdx", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "dFdxCoarse", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "dFdxFine", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "dFdy", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "dFdyCoarse", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "dFdyFine", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dFdx.xhtml" }, { "name": "distance", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/distance.xhtml" }, { "name": "dot", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/dot.xhtml" }, { "name": "EmitStreamVertex", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/EmitStreamVertex.xhtml" }, { "name": "EmitVertex", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/EmitVertex.xhtml" }, { "name": "EndPrimitive", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/EndPrimitive.xhtml" }, { "name": "EndStreamPrimitive", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/EndStreamPrimitive.xhtml" }, { "name": "equal", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/equal.xhtml" }, { "name": "exp", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/exp.xhtml" }, { "name": "exp2", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/exp2.xhtml" }, { "name": "faceforward", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/faceforward.xhtml" }, { "name": "findLSB", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/findLSB.xhtml" }, { "name": "findMSB", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/findMSB.xhtml" }, { "name": "floatBitsToInt", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/floatBitsToInt.xhtml" }, { "name": "floatBitsToUint", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/floatBitsToInt.xhtml" }, { "name": "floor", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/floor.xhtml" }, { "name": "fma", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/fma.xhtml" }, { "name": "fract", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/fract.xhtml" }, { "name": "frexp", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/frexp.xhtml" }, { "name": "fwidth", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/fwidth.xhtml" }, { "name": "fwidthCoarse", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/fwidth.xhtml" }, { "name": "fwidthFine", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/fwidth.xhtml" }, { "name": "gl_ClipDistance", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_ClipDistance.xhtml" }, { "name": "gl_CullDistance", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_CullDistance.xhtml" }, { "name": "gl_FragCoord", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_FragCoord.xhtml" }, { "name": "gl_FragDepth", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_FragDepth.xhtml" }, { "name": "gl_FrontFacing", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_FrontFacing.xhtml" }, { "name": "gl_GlobalInvocationID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_GlobalInvocationID.xhtml" }, { "name": "gl_HelperInvocation", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_HelperInvocation.xhtml" }, { "name": "gl_InstanceID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_InstanceID.xhtml" }, { "name": "gl_InvocationID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_InvocationID.xhtml" }, { "name": "gl_Layer", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_Layer.xhtml" }, { "name": "gl_LocalInvocationID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_LocalInvocationID.xhtml" }, { "name": "gl_LocalInvocationIndex", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_LocalInvocationIndex.xhtml" }, { "name": "gl_NumSamples", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_NumSamples.xhtml" }, { "name": "gl_NumWorkGroups", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_NumWorkGroups.xhtml" }, { "name": "gl_PatchVerticesIn", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_PatchVerticesIn.xhtml" }, { "name": "gl_PointCoord", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_PointCoord.xhtml" }, { "name": "gl_PointSize", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_PointSize.xhtml" }, { "name": "gl_Position", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_Position.xhtml" }, { "name": "gl_PrimitiveID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_PrimitiveID.xhtml" }, { "name": "gl_PrimitiveIDIn", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_PrimitiveIDIn.xhtml" }, { "name": "gl_SampleID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_SampleID.xhtml" }, { "name": "gl_SampleMask", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_SampleMask.xhtml" }, { "name": "gl_SampleMaskIn", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_SampleMaskIn.xhtml" }, { "name": "gl_SamplePosition", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_SamplePosition.xhtml" }, { "name": "gl_TessCoord", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_TessCoord.xhtml" }, { "name": "gl_TessLevelInner", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_TessLevelInner.xhtml" }, { "name": "gl_TessLevelOuter", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_TessLevelOuter.xhtml" }, { "name": "gl_VertexID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_VertexID.xhtml" }, { "name": "gl_ViewportIndex", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_ViewportIndex.xhtml" }, { "name": "gl_WorkGroupID", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_WorkGroupID.xhtml" }, { "name": "gl_WorkGroupSize", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/gl_WorkGroupSize.xhtml" }, { "name": "greaterThan", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/greaterThan.xhtml" }, { "name": "greaterThanEqual", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/greaterThanEqual.xhtml" }, { "name": "groupMemoryBarrier", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/groupMemoryBarrier.xhtml" }, { "name": "imageAtomicAdd", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicAdd.xhtml" }, { "name": "imageAtomicAnd", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicAnd.xhtml" }, { "name": "imageAtomicCompSwap", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicCompSwap.xhtml" }, { "name": "imageAtomicExchange", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicExchange.xhtml" }, { "name": "imageAtomicMax", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicMax.xhtml" }, { "name": "imageAtomicMin", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicMin.xhtml" }, { "name": "imageAtomicOr", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicOr.xhtml" }, { "name": "imageAtomicXor", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageAtomicXor.xhtml" }, { "name": "imageLoad", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageLoad.xhtml" }, { "name": "imageSamples", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageSamples.xhtml" }, { "name": "imageSize", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageSize.xhtml" }, { "name": "imageStore", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/imageStore.xhtml" }, { "name": "imulExtended", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/umulExtended.xhtml" }, { "name": "intBitsToFloat", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/intBitsToFloat.xhtml" }, { "name": "interpolateAtCentroid", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/interpolateAtCentroid.xhtml" }, { "name": "interpolateAtOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/interpolateAtOffset.xhtml" }, { "name": "interpolateAtSample", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/interpolateAtSample.xhtml" }, { "name": "inverse", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/inverse.xhtml" }, { "name": "inversesqrt", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/inversesqrt.xhtml" }, { "name": "isinf", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/isinf.xhtml" }, { "name": "isnan", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/isnan.xhtml" }, { "name": "ldexp", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/ldexp.xhtml" }, { "name": "length", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/length.xhtml" }, { "name": "lessThan", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/lessThan.xhtml" }, { "name": "lessThanEqual", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/lessThanEqual.xhtml" }, { "name": "log", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/log.xhtml" }, { "name": "log2", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/log2.xhtml" }, { "name": "matrixCompMult", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/matrixCompMult.xhtml" }, { "name": "max", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/max.xhtml" }, { "name": "memoryBarrier", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/memoryBarrier.xhtml" }, { "name": "memoryBarrierAtomicCounter", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/memoryBarrierAtomicCounter.xhtml" }, { "name": "memoryBarrierBuffer", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/memoryBarrierBuffer.xhtml" }, { "name": "memoryBarrierImage", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/memoryBarrierImage.xhtml" }, { "name": "memoryBarrierShared", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/memoryBarrierShared.xhtml" }, { "name": "min", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/min.xhtml" }, { "name": "mix", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml" }, { "name": "mod", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/mod.xhtml" }, { "name": "modf", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/modf.xhtml" }, { "name": "noise", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/noise.xhtml" }, { "name": "noise1", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/noise.xhtml" }, { "name": "noise2", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/noise.xhtml" }, { "name": "noise3", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/noise.xhtml" }, { "name": "noise4", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/noise.xhtml" }, { "name": "normalize", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/normalize.xhtml" }, { "name": "not", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/not.xhtml" }, { "name": "notEqual", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/notEqual.xhtml" }, { "name": "outerProduct", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/outerProduct.xhtml" }, { "name": "packDouble2x32", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packDouble2x32.xhtml" }, { "name": "packHalf2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packHalf2x16.xhtml" }, { "name": "packSnorm2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packUnorm.xhtml" }, { "name": "packSnorm4x8", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packUnorm.xhtml" }, { "name": "packUnorm", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packUnorm.xhtml" }, { "name": "packUnorm2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packUnorm.xhtml" }, { "name": "packUnorm4x8", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/packUnorm.xhtml" }, { "name": "pow", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/pow.xhtml" }, { "name": "radians", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/radians.xhtml" }, { "name": "reflect", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/reflect.xhtml" }, { "name": "refract", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/refract.xhtml" }, { "name": "round", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/round.xhtml" }, { "name": "roundEven", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/roundEven.xhtml" }, { "name": "sign", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/sign.xhtml" }, { "name": "sin", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/sin.xhtml" }, { "name": "sinh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/sinh.xhtml" }, { "name": "smoothstep", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/smoothstep.xhtml" }, { "name": "sqrt", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/sqrt.xhtml" }, { "name": "step", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/step.xhtml" }, { "name": "tan", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/tan.xhtml" }, { "name": "tanh", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/tanh.xhtml" }, { "name": "texelFetch", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/texelFetch.xhtml" }, { "name": "texelFetchOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/texelFetchOffset.xhtml" }, { "name": "texture", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/texture.xhtml" }, { "name": "textureGather", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureGather.xhtml" }, { "name": "textureGatherOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureGatherOffset.xhtml" }, { "name": "textureGatherOffsets", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureGatherOffsets.xhtml" }, { "name": "textureGrad", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureGrad.xhtml" }, { "name": "textureGradOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureGradOffset.xhtml" }, { "name": "textureLod", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureLod.xhtml" }, { "name": "textureLodOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureLodOffset.xhtml" }, { "name": "textureOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureOffset.xhtml" }, { "name": "textureProj", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProj.xhtml" }, { "name": "textureProjGrad", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProjGrad.xhtml" }, { "name": "textureProjGradOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProjGradOffset.xhtml" }, { "name": "textureProjLod", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProjLod.xhtml" }, { "name": "textureProjLodOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProjLodOffset.xhtml" }, { "name": "textureProjOffset", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureProjOffset.xhtml" }, { "name": "textureQueryLevels", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureQueryLevels.xhtml" }, { "name": "textureQueryLod", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureQueryLod.xhtml" }, { "name": "textureSamples", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureSamples.xhtml" }, { "name": "textureSize", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/textureSize.xhtml" }, { "name": "transpose", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/transpose.xhtml" }, { "name": "trunc", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/trunc.xhtml" }, { "name": "uaddCarry", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/uaddCarry.xhtml" }, { "name": "uintBitsToFloat", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/intBitsToFloat.xhtml" }, { "name": "umulExtended", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/umulExtended.xhtml" }, { "name": "unpackDouble2x32", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackDouble2x32.xhtml" }, { "name": "unpackHalf2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackHalf2x16.xhtml" }, { "name": "unpackSnorm2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackUnorm.xhtml" }, { "name": "unpackSnorm4x8", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackUnorm.xhtml" }, { "name": "unpackUnorm", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackUnorm.xhtml" }, { "name": "unpackUnorm2x16", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackUnorm.xhtml" }, { "name": "unpackUnorm4x8", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/unpackUnorm.xhtml" }, { "name": "usubBorrow", "href": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/usubBorrow.xhtml" }];
+
+        itemsWrapper.innerHTML = items.map(x => {
+            return `<div data-src="${x.href}">${x.name}</div>`;
+        }).join('');
+        itemsWrapper.querySelectorAll('div')
+            .forEach(x => {
+                x.addEventListener('click', e => {
+                    window.open(e.currentTarget.dataset.src, '_blank');
+                })
+            })
+
+
+
+
+    </script>
+</body>
+
+</html>

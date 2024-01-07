@@ -182,14 +182,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 //
 //               }
 //    );
-
-    static const char contentTableSql[]
-            = R"(CREATE TABLE IF NOT EXISTS "snippet" (
+/*
+ CREATE TABLE IF NOT EXISTS "snippet" (
 	"id"	INTEGER,
 	"content"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
-))";
-    db::QueryResult fetch_row = db::query<contentTableSql>();
+ */
+//    static const char contentTableSql[]
+//            = R"(ALTER TABLE snippet ADD COLUMN views INTEGER)";
+ //   db::QueryResult fetch_row = db::query<contentTableSql>();
 
 
     jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
@@ -306,7 +307,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get("/snippets", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]
-                = R"(SELECT content FROM snippet)";
+                = R"(SELECT content FROM snippet ORDER BY views)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
         nlohmann::json doc = nlohmann::json::array();
@@ -342,6 +343,22 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         });
         static const char query[]
                 = R"(DELETE FROM snippet WHERE content = ?1)";
+        db::QueryResult fetch_row = db::query<query>(body);
+
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+    });
+    server.Post("/snippet/hit", [](const httplib::Request &req, httplib::Response &res,
+                                      const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        static const char query[]
+                = R"(UPDATE snippet SET views = views + 1 WHERE content = ?1)";
         db::QueryResult fetch_row = db::query<query>(body);
 
         res.set_content(std::to_string(fetch_row.resultCode()),

@@ -122,15 +122,6 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
-
-
-
-            <div id="code_snippet" class="item">
-                <span class="material-symbols-outlined">
-                    text_snippet
-                </span>
-                <div class="pivot-bar-item-title">代码</div>
-            </div>
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -174,6 +165,12 @@
                     navigate_next
                 </span>
                 <div class="pivot-bar-item-title">前进</div>
+            </div>
+            <div id="code_snippet" class="item">
+                <span class="material-symbols-outlined">
+                    text_snippet
+                </span>
+                <div class="pivot-bar-item-title">代码</div>
             </div>
         </div>
     </div>
@@ -296,7 +293,7 @@ else{
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', evt => {
-                showSnippetDialog(baseUri, textarea);
+                window.open('notes.html', '_blank');
             })
             document.getElementById('close-line').addEventListener('click', evt => {
                 deleteLine(textarea)

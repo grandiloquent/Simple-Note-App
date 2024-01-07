@@ -440,14 +440,14 @@ function escapeHtml(unsafe) {
 function comment(textarea) {
     const points = findExtendPosition(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-        if (s.startsWith("/*") && s.endsWith("*/")) {
-            s = s.substring(2);
-            s = s.substring(0, s.length - 2);
-        } else {
-            s = `/*
+    if (s.startsWith("/*") && s.endsWith("*/")) {
+        s = s.substring(2);
+        s = s.substring(0, s.length - 2);
+    } else {
+        s = `/*
     ${s}
     */`;
-        }
+    }
 
     textarea.setRangeText(s, points[0], points[1]);
 }
@@ -984,6 +984,7 @@ function decreaseCode(textarea) {
     s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
     s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
     s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
+    s = removeSubstring(s,`<body>`, `</html>`);
     //s = removeSubstring(s,``, ``);
     s = s.replace(/void mainImage\([^)]+\)[\r\n ]+\{/, m => {
         return `
@@ -993,6 +994,10 @@ void main(){
 vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
+    +`<body>
+    <script src="/file?path=/storage/emulated/0/.editor/gl.js"></script>
+  </body>
+  </html>`
 
 
     textarea.value = s;
@@ -1057,7 +1062,7 @@ float ${name} = ${s};
 }
 function copyLine(textarea) {
     const points = getLine(textarea);
-    s = textarea.value.substring(points[0], points[1]).trim();
+    let s = textarea.value.substring(points[0], points[1]).trim();
     let name = /[a-zA-Z0-9_]+(?= =)/.exec(s);
 
 
@@ -1116,5 +1121,18 @@ function copyBlock(textarea) {
 
 ${s}
 `, selectionEnd, selectionEnd);
+
+}
+function goToLine(textarea) {
+    const points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let i = parseInt(s);
+    const p1 = `type="x-shader/x-fragment">`;
+    const start = textarea.value.indexOf(p1);
+    if (start === -1) return;
+    const end = textarea.value.indexOf("</script>", start + p1.length);
+    let array = textarea.value.substring(start + p1.length, end).split('\n');
+    textarea.setRangeText(array[i], textarea.selectionStart, textarea.selectionEnd)
+
 
 }

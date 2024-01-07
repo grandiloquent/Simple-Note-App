@@ -132,7 +132,7 @@
             <div class="item" id="content_cut">
                 <span class="material-symbols-outlined">
                     content_cut
-                    </span>
+                </span>
                 <div class="pivot-bar-item-title">剪行</div>
             </div>
             <div class="item" id="content_copy_block">
@@ -190,6 +190,12 @@
                     text_snippet
                 </span>
                 <div class="pivot-bar-item-title">代码</div>
+            </div>
+            <div id="go_to_line" class="item">
+                <span class="material-symbols-outlined">
+                    go_to_line
+                </span>
+                <div class="pivot-bar-item-title">调试</div>
             </div>
         </div>
     </div>
@@ -342,6 +348,9 @@ else{
                 }
                 else
                     window.location.reload();
+            });
+            document.getElementById('go_to_line').addEventListener('click', evt => {
+                goToLine(textarea);
             });
 
             document.addEventListener('keydown', async evt => {

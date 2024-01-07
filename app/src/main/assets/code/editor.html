@@ -306,6 +306,7 @@ ${content}`;
             //     localStorage.setItem('code.editor', textarea.value.trim());
             // });
             document.getElementById('format').addEventListener('click', evt => {
+                evt.preventDefault();
                 formatCode();
             })
             document.getElementById('save').addEventListener('click', async evt => {
@@ -313,29 +314,37 @@ ${content}`;
                 // localStorage.setItem('code.editor', textarea.value.trim());
             })
             document.getElementById('variables').addEventListener('click', evt => {
+                evt.preventDefault();
                 variables(textarea)
             })
 
             document.getElementById('content_copy').addEventListener('click', evt => {
+                evt.preventDefault();
                 copyLine(textarea)
             })
             document.getElementById('content_copy_string').addEventListener('click', evt => {
+                evt.preventDefault();
                 copyWord(textarea)
             })
             document.getElementById('text_decrease').addEventListener('click', evt => {
-                numberFormat(textarea,false)
+                evt.preventDefault();
+                numberFormat(textarea, false)
             })
             document.getElementById('text_increase').addEventListener('click', evt => {
-                numberFormat(textarea,true)
+                evt.preventDefault();
+                numberFormat(textarea, true)
             })
 
             document.getElementById('content_cut').addEventListener('click', evt => {
+                evt.preventDefault();
                 cutLine(textarea)
             })
             document.getElementById('content_copy_block').addEventListener('click', evt => {
+                evt.preventDefault();
                 copyBlock(textarea)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
+                evt.preventDefault();
 
 
                 let selectionStart = textarea.selectionStart;
@@ -352,39 +361,50 @@ else{
                 await preview();
             })
             document.getElementById('comment').addEventListener('click', evt => {
+                evt.preventDefault();
                 comment(textarea);
             })
             document.getElementById('function').addEventListener('click', evt => {
+                evt.preventDefault();
                 functions(textarea);
             })
             document.getElementById('translate').addEventListener('click', evt => {
+                evt.preventDefault();
                 translate(baseUri, textarea);
             })
             document.getElementById('find_replace').addEventListener('click', evt => {
+                evt.preventDefault();
                 findReplace(textarea);
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
+                evt.preventDefault();
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', evt => {
+                evt.preventDefault();
                 window.open('notes.html', '_blank');
             })
             document.getElementById('close-line').addEventListener('click', evt => {
+                evt.preventDefault();
                 deleteLine(textarea)
             });
             document.getElementById('close-block').addEventListener('click', evt => {
+                evt.preventDefault();
                 deleteBlock(textarea)
             });
             document.getElementById('decimal_decrease').addEventListener('click', evt => {
+                evt.preventDefault();
                 decreaseCode(textarea)
             });
             document.getElementById('navigate_next').addEventListener('click', evt => {
+                evt.preventDefault();
                 if (id)
                     window.location.href = `?id=${parseInt(id) + 1}`
                 else
                     window.location.reload();
             });
             document.getElementById('shuffle').addEventListener('click', evt => {
+                evt.preventDefault();
                 if (id) {
                     window.location.href = `?id=${parseInt(id) + getRandomInt(-25, 25)}`
                 }
@@ -392,10 +412,12 @@ else{
                     window.location.reload();
             });
             document.getElementById('go_to_line').addEventListener('click', evt => {
+                evt.preventDefault();
                 goToLine(textarea);
             });
 
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
+                evt.preventDefault();
                 const e = document.querySelector('.items-wrapper');
                 if (e.hasAttribute('style')) {
                     e.removeAttribute('style');

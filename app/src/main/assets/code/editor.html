@@ -60,7 +60,6 @@
 
         .items-wrapper {
             display: flex;
-            row-gap: 8px;
             width: 48px;
             flex-direction: column;
             align-items: center;
@@ -307,6 +306,7 @@ ${content}`;
             // });
             document.getElementById('format').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 formatCode();
             })
             document.getElementById('save').addEventListener('click', async evt => {
@@ -315,36 +315,44 @@ ${content}`;
             })
             document.getElementById('variables').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 variables(textarea)
             })
 
             document.getElementById('content_copy').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 copyLine(textarea)
             })
             document.getElementById('content_copy_string').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 copyWord(textarea)
             })
             document.getElementById('text_decrease').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 numberFormat(textarea,false)
             })
             document.getElementById('text_increase').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 numberFormat(textarea,true)
             })
 
             document.getElementById('content_cut').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 cutLine(textarea)
             })
             document.getElementById('content_copy_block').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 copyBlock(textarea)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
 
 
                 let selectionStart = textarea.selectionStart;
@@ -358,46 +366,58 @@ else{
                 textarea.setRangeText(s, selectionStart, selectionEnd)
             })
             document.getElementById('preview').addEventListener('click', async evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 await preview();
             })
             document.getElementById('comment').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 comment(textarea);
             })
             document.getElementById('function').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 functions(textarea);
             })
             document.getElementById('translate').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 translate(baseUri, textarea);
             })
             document.getElementById('find_replace').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 findReplace(textarea);
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 window.open('notes.html', '_blank');
             })
             document.getElementById('close-line').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 deleteLine(textarea)
             });
             document.getElementById('close-block').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 deleteBlock(textarea)
             });
             document.getElementById('decimal_decrease').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 decreaseCode(textarea)
             });
             document.getElementById('navigate_next').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 if (id)
                     window.location.href = `?id=${parseInt(id) + 1}`
                 else
@@ -405,6 +425,7 @@ else{
             });
             document.getElementById('shuffle').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 if (id) {
                     window.location.href = `?id=${parseInt(id) + getRandomInt(-25, 25)}`
                 }
@@ -413,11 +434,13 @@ else{
             });
             document.getElementById('go_to_line').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 goToLine(textarea);
             });
 
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
                 evt.stopPropagation();
+                evt.stopImmediatePropagation();
                 const e = document.querySelector('.items-wrapper');
                 if (e.hasAttribute('style')) {
                     e.removeAttribute('style');

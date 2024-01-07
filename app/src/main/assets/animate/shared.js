@@ -420,10 +420,21 @@ function getLine(textarea) {
 function getWord(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
-    while (start - 1 > -1 && !/\s/.test(textarea.value[start - 1])) {
+    while (start - 1 > -1 && /[a-zA-Z0-9\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
         start--;
     }
-    while (end + 1 < textarea.value.length && !/\s/.test(textarea.value[end])) {
+    while (end + 1 < textarea.value.length && /[a-zA-Z0-9\u3400-\u9FBF]/.test(textarea.value[end])) {
+        end++;
+    }
+    return [start, end + 1];
+}
+function getWordString(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1 && /[a-zA-Z0-9.]/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && /[a-zA-Z0-9.]/.test(textarea.value[end])) {
         end++;
     }
     return [start, end + 1];
@@ -984,7 +995,7 @@ function decreaseCode(textarea) {
     s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
     s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
     s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
-    s = removeSubstring(s,`<body>`, `</html>`);
+    s = removeSubstring(s, `<body>`, `</html>`);
     //s = removeSubstring(s,``, ``);
     s = s.replace(/void mainImage\([^)]+\)[\r\n ]+\{/, m => {
         return `
@@ -994,7 +1005,7 @@ void main(){
 vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
-    +`<body>
+        + `<body>
     <script src="/file?path=/storage/emulated/0/.editor/gl.js"></script>
   </body>
   </html>`
@@ -1133,6 +1144,30 @@ function goToLine(textarea) {
     const end = textarea.value.indexOf("</script>", start + p1.length);
     let array = textarea.value.substring(start + p1.length, end).split('\n');
     textarea.setRangeText(array[i], textarea.selectionStart, textarea.selectionEnd)
+
+
+}
+function copyWord(textarea) {
+    const points = getWordString(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    writeText(s);
+
+}
+function numberFormat(textarea, isIncrease) {
+    const points = getWordString(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let f = parseFloat(s);
+    if (!f) {
+        f = 1.0;
+    } else {
+        if (isIncrease) {
+            f += 0.1;
+        } else {
+            f -= 0.1;
+
+        }
+    }
+    textarea.setRangeText(f.toFixed(1), points[0], points[1]);
 
 
 }

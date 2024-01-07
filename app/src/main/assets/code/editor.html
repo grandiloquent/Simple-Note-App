@@ -49,7 +49,6 @@
             bottom: 0;
             z-index: 100001;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-y: scroll;
@@ -60,9 +59,13 @@
         }
 
         .items-wrapper {
-            display: grid;
+            display: flex;
             row-gap: 8px;
-            grid-template-columns: 48px 48px;
+            width: 48px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
         .item {
@@ -72,6 +75,7 @@
             display: flex;
             align-items: center;
             flex-direction: column;
+            user-select: none;
         }
 
         .title {
@@ -86,14 +90,7 @@
         }
     </style>
     <div class="items">
-        <div class="items-wrapper">
-           
-            <div id="close-line" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">剪行</div>
-            </div>
+        <div class="items-wrapper" style="display: none;">
             <div class="item" id="comment">
                 <span class="material-symbols-outlined">
                     comment
@@ -106,23 +103,12 @@
                 </span>
                 <div class="pivot-bar-item-title">变量</div>
             </div>
-            <div class="item" id="find_replace">
-                <span class="material-symbols-outlined">
-                    find_replace
-                </span>
-                <div class="pivot-bar-item-title">替换</div>
-            </div>
-            <div class="item" id="content_copy">
-                <span class="material-symbols-outlined">
-                    content_copy
-                </span>
-                <div class="pivot-bar-item-title">复行</div>
-            </div>
+
             <div class="item" id="content_cut">
                 <span class="material-symbols-outlined">
                     content_cut
                 </span>
-                <div class="pivot-bar-item-title">剪行</div>
+                <div class="pivot-bar-item-title">剪式</div>
             </div>
             <div class="item" id="content_copy_block">
                 <span class="material-symbols-outlined">
@@ -136,20 +122,6 @@
                 </span>
                 <div class="pivot-bar-item-title">剪块</div>
             </div>
-            <div id="preview" class="item">
-                <span class="material-symbols-outlined">
-                    preview
-                </span>
-                <div class="pivot-bar-item-title">预览</div>
-            </div>
-            <div class="item" id="format">
-                <span class="material-symbols-outlined">
-                    code
-                </span>
-                <div class="pivot-bar-item-title">格式化</div>
-            </div>
-           
-
             <div id="save" class="item">
                 <span class="material-symbols-outlined">
                     save
@@ -187,11 +159,11 @@
                 </span>
                 <div class="pivot-bar-item-title">前进</div>
             </div>
-            <div id="code_snippet" class="item">
+            <div class="item" id="find_replace">
                 <span class="material-symbols-outlined">
-                    text_snippet
+                    find_replace
                 </span>
-                <div class="pivot-bar-item-title">代码</div>
+                <div class="pivot-bar-item-title">替换</div>
             </div>
             <div id="go_to_line" class="item">
                 <span class="material-symbols-outlined">
@@ -199,6 +171,64 @@
                 </span>
                 <div class="pivot-bar-item-title">调试</div>
             </div>
+        </div>
+        <div class="items-wrapper selected">
+
+            <div id="close-line" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪行</div>
+            </div>
+            <div class="item" id="content_copy">
+                <span class="material-symbols-outlined">
+                    content_copy
+                </span>
+                <div class="pivot-bar-item-title">复行</div>
+            </div>
+            <div class="item" id="content_copy_string">
+                <span class="material-symbols-outlined">
+                    content_copy
+                </span>
+                <div class="pivot-bar-item-title">复字</div>
+            </div>
+            <div id="preview" class="item">
+                <span class="material-symbols-outlined">
+                    preview
+                </span>
+                <div class="pivot-bar-item-title">预览</div>
+            </div>
+            <div class="item" id="format">
+                <span class="material-symbols-outlined">
+                    code
+                </span>
+                <div class="pivot-bar-item-title">格式</div>
+            </div>
+
+
+
+
+            <div id="code_snippet" class="item">
+                <span class="material-symbols-outlined">
+                    text_snippet
+                </span>
+                <div class="pivot-bar-item-title">代码</div>
+            </div>
+
+            <div id="text_increase" class="item">
+                <span class="material-symbols-outlined">
+                    text_increase
+                </span>
+                <div class="pivot-bar-item-title">递增</div>
+            </div>
+            <div id="text_decrease" class="item">
+                <span class="material-symbols-outlined">
+                    text_decrease
+                </span>
+                <div class="pivot-bar-item-title">递减</div>
+            </div>
+
+
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -289,6 +319,16 @@ ${content}`;
             document.getElementById('content_copy').addEventListener('click', evt => {
                 copyLine(textarea)
             })
+            document.getElementById('content_copy_string').addEventListener('click', evt => {
+                copyWord(textarea)
+            })
+            document.getElementById('text_decrease').addEventListener('click', evt => {
+                numberFormat(textarea,false)
+            })
+            document.getElementById('text_increase').addEventListener('click', evt => {
+                numberFormat(textarea,true)
+            })
+
             document.getElementById('content_cut').addEventListener('click', evt => {
                 cutLine(textarea)
             })
@@ -353,6 +393,15 @@ else{
             });
             document.getElementById('go_to_line').addEventListener('click', evt => {
                 goToLine(textarea);
+            });
+
+            document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
+                const e = document.querySelector('.items-wrapper');
+                if (e.hasAttribute('style')) {
+                    e.removeAttribute('style');
+                } else {
+                    e.style.display = 'none';
+                }
             });
 
             document.addEventListener('keydown', async evt => {

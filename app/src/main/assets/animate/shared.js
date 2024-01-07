@@ -1025,7 +1025,7 @@ function variables(textarea) {
     let s = textarea.value.substring(selectionStart, selectionEnd + 1);
     let str = `float ${s[0]}0 = ${s};
 `
-    textarea.setRangeText(`${s[0]}0`, selectionStart, selectionEnd);
+    textarea.setRangeText(`${s[0]}0`, selectionStart, selectionEnd+1);
 
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
         selectionStart--;

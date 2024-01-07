@@ -1023,9 +1023,16 @@ function variables(textarea) {
         selectionEnd++;
     }
     let s = textarea.value.substring(selectionStart, selectionEnd + 1);
-    let str = `float ${s[0]}0 = ${s};
-`
-    textarea.setRangeText(`${s[0]}0`, selectionStart, selectionEnd+1);
+    let name = `${s[0]}0`;
+
+    let str = `float ${name}0 = ${s};
+`;
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${s[0]}${i}`;
+    }
+    textarea.setRangeText(`${name}0`, selectionStart, selectionEnd + 1);
 
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
         selectionStart--;

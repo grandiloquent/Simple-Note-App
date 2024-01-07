@@ -1062,3 +1062,19 @@ ${s.replace(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/, name)}`;
     textarea.setRangeText(str, selectionEnd, selectionEnd);
 
 }
+function cutLine(textarea) {
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === ')') {
+            selectionEnd++;
+            break;
+        }
+    }
+    let s = textarea.value.substring(selectionStart, selectionEnd).trim();
+    writeText(s)
+    textarea.setRangeText("", selectionStart, selectionEnd);
+
+}

@@ -1032,9 +1032,12 @@ function variables(textarea) {
         name = `${s[0]}${i}`;
     }
     textarea.setRangeText(`${name}`, selectionStart, selectionEnd + 1);
-    let str = `float ${name} = ${s};
+    let str = `
+float ${name} = ${s};
     `;
-    
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+        selectionStart--;
+    }
     textarea.setRangeText(str, selectionStart, selectionStart);
 
 }
@@ -1049,13 +1052,13 @@ function copyLine(textarea) {
         i++
         name = `${/[a-zA-Z]+/.exec(name)}${i}`;
     }
-     let str = `
-${s.replace(/[a-zA-Z0-9_]+(?= =)/,name)}`;
-     let selectionEnd = textarea.selectionEnd;
-  
-     while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
-         selectionEnd++;
-     }
-    textarea.setRangeText(str, selectionEnd,selectionEnd);
+    let str = `
+${s.replace(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/, name)}`;
+    let selectionEnd = textarea.selectionEnd;
+
+    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+        selectionEnd++;
+    }
+    textarea.setRangeText(str, selectionEnd, selectionEnd);
 
 }

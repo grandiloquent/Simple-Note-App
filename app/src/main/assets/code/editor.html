@@ -63,6 +63,7 @@
             display: grid;
             row-gap: 8px;
             grid-template-columns: 48px 48px;
+            pointer-events: none;
         }
 
         .item {
@@ -87,18 +88,7 @@
     </style>
     <div class="items">
         <div class="items-wrapper">
-            <div id="preview" class="item">
-                <span class="material-symbols-outlined">
-                    preview
-                </span>
-                <div class="pivot-bar-item-title">预览</div>
-            </div>
-            <div class="item" id="format">
-                <span class="material-symbols-outlined">
-                    code
-                </span>
-                <div class="pivot-bar-item-title">格式化</div>
-            </div>
+           
             <div id="close-line" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -140,6 +130,18 @@
                     content_copy
                 </span>
                 <div class="pivot-bar-item-title">复块</div>
+            </div>
+            <div id="preview" class="item">
+                <span class="material-symbols-outlined">
+                    preview
+                </span>
+                <div class="pivot-bar-item-title">预览</div>
+            </div>
+            <div class="item" id="format">
+                <span class="material-symbols-outlined">
+                    code
+                </span>
+                <div class="pivot-bar-item-title">格式化</div>
             </div>
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">

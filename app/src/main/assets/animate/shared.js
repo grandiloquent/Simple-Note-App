@@ -1072,7 +1072,7 @@ function copyLine(textarea) {
         name = `${/[a-zA-Z]+/.exec(name)}${i}`;
     }
     let str = `
-${s.replace(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/, name)}`;
+${s.replace(/(?<=[a-zA-Z0-9] )[a-zA-Z0-9_]+(?= =)/, name)}`;
     let selectionEnd = textarea.selectionEnd;
 
     while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {

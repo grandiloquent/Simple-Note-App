@@ -306,7 +306,7 @@ ${content}`;
             //     localStorage.setItem('code.editor', textarea.value.trim());
             // });
             document.getElementById('format').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 formatCode();
             })
             document.getElementById('save').addEventListener('click', async evt => {
@@ -314,37 +314,37 @@ ${content}`;
                 // localStorage.setItem('code.editor', textarea.value.trim());
             })
             document.getElementById('variables').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 variables(textarea)
             })
 
             document.getElementById('content_copy').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 copyLine(textarea)
             })
             document.getElementById('content_copy_string').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 copyWord(textarea)
             })
             document.getElementById('text_decrease').addEventListener('click', evt => {
-                evt.preventDefault();
-                numberFormat(textarea, false)
+                evt.stopPropagation();
+                numberFormat(textarea,false)
             })
             document.getElementById('text_increase').addEventListener('click', evt => {
-                evt.preventDefault();
-                numberFormat(textarea, true)
+                evt.stopPropagation();
+                numberFormat(textarea,true)
             })
 
             document.getElementById('content_cut').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 cutLine(textarea)
             })
             document.getElementById('content_copy_block').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 copyBlock(textarea)
             })
             document.getElementById('javascript').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
 
 
                 let selectionStart = textarea.selectionStart;
@@ -361,50 +361,50 @@ else{
                 await preview();
             })
             document.getElementById('comment').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 comment(textarea);
             })
             document.getElementById('function').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 functions(textarea);
             })
             document.getElementById('translate').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 translate(baseUri, textarea);
             })
             document.getElementById('find_replace').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 findReplace(textarea);
             })
             document.getElementById('text_snippet').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 window.open('notes.html', '_blank');
             })
             document.getElementById('close-line').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 deleteLine(textarea)
             });
             document.getElementById('close-block').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 deleteBlock(textarea)
             });
             document.getElementById('decimal_decrease').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 decreaseCode(textarea)
             });
             document.getElementById('navigate_next').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 if (id)
                     window.location.href = `?id=${parseInt(id) + 1}`
                 else
                     window.location.reload();
             });
             document.getElementById('shuffle').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 if (id) {
                     window.location.href = `?id=${parseInt(id) + getRandomInt(-25, 25)}`
                 }
@@ -412,12 +412,12 @@ else{
                     window.location.reload();
             });
             document.getElementById('go_to_line').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 goToLine(textarea);
             });
 
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
-                evt.preventDefault();
+                evt.stopPropagation();
                 const e = document.querySelector('.items-wrapper');
                 if (e.hasAttribute('style')) {
                     e.removeAttribute('style');

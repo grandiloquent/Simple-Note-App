@@ -23,7 +23,7 @@
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
 
-    
+
     <style>
         .items {
             position: fixed;
@@ -81,8 +81,8 @@
                 </span>
                 <div class="pivot-bar-item-title">代码段</div>
             </div>
-    
-    
+
+
             <div class="item" id="javascript">
                 <span class="material-symbols-outlined">
                     javascript
@@ -96,7 +96,7 @@
                 <div class="pivot-bar-item-title">注释</div>
             </div>
 
-           
+
             <div class="item" id="content_cut">
                 <span class="material-symbols-outlined">
                     content_cut
@@ -129,7 +129,7 @@
             </div>
 
 
-            
+
             <div class="item" id="navigate_next">
                 <span class="material-symbols-outlined">
                     navigate_next
@@ -142,22 +142,17 @@
                 </span>
                 <div class="pivot-bar-item-title">替换</div>
             </div>
-           
-        </div>
-        <div class="items-wrapper selected">
-            
-            <div class="item" id="variables">
+            <div class="item" id="variables_find_replace">
                 <span class="material-symbols-outlined">
                     variables
                 </span>
                 <div class="pivot-bar-item-title">变量</div>
             </div>
-            <div id="go_to_line" class="item">
-                <span class="material-symbols-outlined">
-                    go_to_line
-                </span>
-                <div class="pivot-bar-item-title">调试</div>
-            </div>
+        </div>
+        <div class="items-wrapper selected">
+
+
+
 
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
@@ -171,12 +166,7 @@
                 </span>
                 <div class="pivot-bar-item-title">复块</div>
             </div>
-            <div id="preview" class="item">
-                <span class="material-symbols-outlined">
-                    preview
-                </span>
-                <div class="pivot-bar-item-title">预览</div>
-            </div>
+
             <div class="item" id="format">
                 <span class="material-symbols-outlined">
                     code
@@ -195,8 +185,24 @@
                 </span>
                 <div class="pivot-bar-item-title">括号</div>
             </div>
-
-
+            <div class="item" id="variables">
+                <span class="material-symbols-outlined">
+                    variables
+                </span>
+                <div class="pivot-bar-item-title">变量</div>
+            </div>
+            <div id="go_to_line" class="item">
+                <span class="material-symbols-outlined">
+                    go_to_line
+                </span>
+                <div class="pivot-bar-item-title">调试</div>
+            </div>
+            <div id="preview" class="item">
+                <span class="material-symbols-outlined">
+                    preview
+                </span>
+                <div class="pivot-bar-item-title">预览</div>
+            </div>
             <div id="code_snippet" class="item">
                 <span class="material-symbols-outlined">
                     text_snippet
@@ -217,7 +223,7 @@
                 </span>
                 <div class="pivot-bar-item-title">随机</div>
             </div>
-           
+
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -227,8 +233,8 @@
 
         const textarea = document.getElementById("textarea");
         async function loadData() {
-            const res = await fetch(`${baseUri}/code?id=${id}`,{
-                cache: "no-store" 
+            const res = await fetch(`${baseUri}/code?id=${id}`, {
+                cache: "no-store"
             });
             if (res.status !== 200)
                 throw new Error(res.status);
@@ -253,7 +259,7 @@
                 res = await fetch(`${baseUri}/code`, {
                     method: 'POST',
                     body: JSON.stringify(body),
-                    cache: "no-store" 
+                    cache: "no-store"
                 });
                 if (res.status !== 200) {
                     throw new Error();
@@ -310,6 +316,11 @@ ${content}`;
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 variables(textarea)
+            })
+            document.getElementById('variables_find_replace').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                variablesReplace(textarea)
             })
 
             document.getElementById('content_copy').addEventListener('click', evt => {
@@ -369,15 +380,16 @@ else{
                 evt.stopImmediatePropagation();
                 findReplace(textarea);
             })
-            document.getElementById('text_snippet').addEventListener('click',async evt => {
+            document.getElementById('text_snippet').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+               
+                showSnippetsDialog();
+            })
+            document.getElementById('code_snippet').addEventListener('click', async evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 await saveData();
-                showSnippetsDialog();
-            })
-            document.getElementById('code_snippet').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
                 window.open('notes.html', '_blank');
             })
             document.getElementById('close-line').addEventListener('click', evt => {
@@ -420,9 +432,9 @@ else{
             document.getElementById('data_object').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
-                parentheses (textarea);
+                parentheses(textarea);
             });
-            
+
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();

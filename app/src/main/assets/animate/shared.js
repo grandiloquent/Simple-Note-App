@@ -1045,6 +1045,43 @@ function variables(textarea) {
                     let s = `let v = 0;`;
                     textarea.setRangeText(s, selectionStart, selectionEnd)
     */
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionStart - 1 > -1 && /[a-zA-Z0-9]/.test(textarea.value[selectionStart - 1])) {
+        selectionStart--;
+    }
+    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== ')') {
+        selectionEnd++;
+    }
+    let s = textarea.value.substring(selectionStart, selectionEnd + 1);
+    let name = `${s[0]}0`;
+
+
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${s[0]}${i}`;
+    }
+    textarea.setRangeText(`${name}`, selectionStart, selectionEnd + 1);
+    let str = `
+float ${name} = ${s};
+    `;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+        selectionStart--;
+    }
+    textarea.setRangeText(str, selectionStart, selectionStart);
+
+
+
+}
+
+function variablesReplace(textarea) {
+    /*
+    let selectionStart = textarea.selectionStart;
+                    let selectionEnd = textarea.selectionEnd;
+                    let s = `let v = 0;`;
+                    textarea.setRangeText(s, selectionStart, selectionEnd)
+    */
     /*let selectionStart = textarea.selectionStart;
     let selectionEnd = textarea.selectionEnd;
     while (selectionStart - 1 > -1 && /[a-zA-Z0-9]/.test(textarea.value[selectionStart - 1])) {
@@ -1216,7 +1253,7 @@ function parentheses(textarea) {
                     i--;
                 if (i === 0) {
                     break;
-                } 
+                }
             }
         } else if (s[end] !== '\n') {
             end++;
@@ -1225,5 +1262,5 @@ function parentheses(textarea) {
         }
     }
     textarea.setRangeText("(", start, start);
-    textarea.setRangeText(")", end+1, end+1);
+    textarea.setRangeText(")", end + 1, end + 1);
 }

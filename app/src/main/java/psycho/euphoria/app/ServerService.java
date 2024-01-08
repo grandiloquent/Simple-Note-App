@@ -174,11 +174,13 @@ public class ServerService extends Service {
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_BRO)) {
                 PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-                launchIntent.setData(Uri.parse("http://" +
-                        Shared.getDeviceIP(this) + ":8500/app.html"));
+                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.k");
+//                launchIntent.setData(Uri.parse("http://" +
+//                        Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
+            // com.android.chrome
             }
+
 
         }
         return super.onStartCommand(intent, flags, startId);

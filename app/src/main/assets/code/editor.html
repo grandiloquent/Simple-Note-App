@@ -96,7 +96,7 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
-          
+
             <div id="close-line" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -133,7 +133,7 @@
                 </span>
                 <div class="pivot-bar-item-title">函数</div>
             </div>
-            
+
 
             <div class="item" id="shuffle">
                 <span class="material-symbols-outlined">
@@ -153,11 +153,16 @@
                 </span>
                 <div class="pivot-bar-item-title">替换</div>
             </div>
-           
+            <div id="go_to_line" class="item">
+                <span class="material-symbols-outlined">
+                    go_to_line
+                </span>
+                <div class="pivot-bar-item-title">调试</div>
+            </div>
         </div>
         <div class="items-wrapper selected">
 
-            
+
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
                     content_copy
@@ -183,7 +188,12 @@
                 <div class="pivot-bar-item-title">格式</div>
             </div>
 
-
+            <div class="item" id="data_object">
+                <span class="material-symbols-outlined">
+                    data_object
+                </span>
+                <div class="pivot-bar-item-title">括号</div>
+            </div>
 
 
             <div id="code_snippet" class="item">
@@ -199,12 +209,7 @@
                 </span>
                 <div class="pivot-bar-item-title">简化</div>
             </div>
-            <div id="go_to_line" class="item">
-                <span class="material-symbols-outlined">
-                    go_to_line
-                </span>
-                <div class="pivot-bar-item-title">调试</div>
-            </div>
+
             <div class="item" id="variables">
                 <span class="material-symbols-outlined">
                     variables
@@ -220,7 +225,9 @@
 
         const textarea = document.getElementById("textarea");
         async function loadData() {
-            const res = await fetch(`${baseUri}/code?id=${id}`);
+            const res = await fetch(`${baseUri}/code?id=${id}`,{
+                cache: "no-store" 
+            });
             if (res.status !== 200)
                 throw new Error(res.status);
             return await res.json();
@@ -243,7 +250,8 @@
             try {
                 res = await fetch(`${baseUri}/code`, {
                     method: 'POST',
-                    body: JSON.stringify(body)
+                    body: JSON.stringify(body),
+                    cache: "no-store" 
                 });
                 if (res.status !== 200) {
                     throw new Error();
@@ -307,7 +315,7 @@ ${content}`;
                 evt.stopImmediatePropagation();
                 copyLine(textarea)
             })
-            
+
 
             document.getElementById('content_cut').addEventListener('click', evt => {
                 evt.stopPropagation();
@@ -359,9 +367,10 @@ else{
                 evt.stopImmediatePropagation();
                 findReplace(textarea);
             })
-            document.getElementById('text_snippet').addEventListener('click', evt => {
+            document.getElementById('text_snippet').addEventListener('click',async evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
+                await saveData();
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', evt => {
@@ -406,7 +415,12 @@ else{
                 evt.stopImmediatePropagation();
                 goToLine(textarea);
             });
-
+            document.getElementById('data_object').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                parentheses (textarea);
+            });
+            
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();

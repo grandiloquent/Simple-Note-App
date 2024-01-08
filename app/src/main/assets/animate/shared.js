@@ -1075,8 +1075,8 @@ float ${name} = ${s};
     const points = findExtendPosition(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
     const first = substringBefore(s, "\n").trim();
-    const second = substringAfter(s, "\n") ;
-    
+    const second = substringAfter(s, "\n");
+
     let name = `v0`;
 
 
@@ -1086,11 +1086,11 @@ float ${name} = ${s};
         name = `v${i}`;
     }
     s = second.replaceAll(first, name)
-     
+
     textarea.setRangeText(`
 float ${name} = ${first};
 ${s}
-`, points[0],points[1]);
+`, points[0], points[1]);
 
 }
 function copyLine(textarea) {
@@ -1200,4 +1200,30 @@ function numberFormat(textarea, isIncrease) {
     textarea.setRangeText(f.toFixed(1), points[0], points[1]);
 
 
+}
+function parentheses(textarea) {
+    let s = textarea.value;
+    let start = textarea.selectionStart
+    let end = textarea.selectionEnd;
+    let i = 0;
+    while (end < s.length) {
+        if (s[end] === '(') {
+            i++;
+            end++;
+            while (end < s.length) {
+                end++;
+                if (s[end] === ')')
+                    i--;
+                if (i === 0) {
+                    break;
+                } 
+            }
+        } else if (s[end] !== '\n') {
+            end++;
+        } else {
+            break;
+        }
+    }
+    textarea.setRangeText("(", start, start);
+    textarea.setRangeText(")", end+1, end+1);
 }

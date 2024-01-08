@@ -13,7 +13,7 @@
 #include "imageReader.h"
 #include "utils.h"
 
-static const char *kDirName = "/storage/emulated/0/Download/v";
+static const char *kDirName = "/storage/emulated/0/Download/v/";
 static const char *kFileName = "capture";
 
 void OnImageCallback(void *ctx, AImageReader *reader) {

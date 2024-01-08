@@ -96,12 +96,7 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
-            <div class="item" id="variables">
-                <span class="material-symbols-outlined">
-                    variables
-                </span>
-                <div class="pivot-bar-item-title">变量</div>
-            </div>
+          
             <div id="close-line" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -113,12 +108,6 @@
                     content_cut
                 </span>
                 <div class="pivot-bar-item-title">剪式</div>
-            </div>
-            <div class="item" id="content_copy_block">
-                <span class="material-symbols-outlined">
-                    content_copy
-                </span>
-                <div class="pivot-bar-item-title">复块</div>
             </div>
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
@@ -216,6 +205,12 @@
                 </span>
                 <div class="pivot-bar-item-title">调试</div>
             </div>
+            <div class="item" id="variables">
+                <span class="material-symbols-outlined">
+                    variables
+                </span>
+                <div class="pivot-bar-item-title">变量</div>
+            </div>
         </div>
     </div>
     <custom-toast id="toast"></custom-toast>
@@ -312,11 +307,7 @@ ${content}`;
                 evt.stopImmediatePropagation();
                 copyLine(textarea)
             })
-            document.getElementById('content_copy_string').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                copyWord(textarea)
-            })
+            
 
             document.getElementById('content_cut').addEventListener('click', evt => {
                 evt.stopPropagation();

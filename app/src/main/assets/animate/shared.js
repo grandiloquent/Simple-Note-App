@@ -1003,6 +1003,9 @@ async function showSnippetDialog(baseUri, textarea) {
 
 function decreaseCode(textarea) {
     let s = textarea.value;
+    if (s.indexOf("THREE.") !== -1) {
+        return
+    }
     s = removeSubstring(s, `<!DOCTYPE html>`, `<html lang='en'>`);
     s = removeSubstring(s, `<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
     s = removeSubstring(s, `uniform vec4 iMouse;`, `uniform float iTime;`);
@@ -1019,7 +1022,7 @@ function decreaseCode(textarea) {
         
 out vec4 ${m.match(/(?<=out vec4 )[^,]+/)};                                          
 void main(){
-vec2 ${m.match(/(?<=in +vec2 )[^)]+/)||m.match(/(?<=vec2 )[^)]+/)} = gl_FragCoord.xy;
+vec2 ${m.match(/(?<=in +vec2 )[^)]+/) || m.match(/(?<=vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
         .replace(`</html>`, '')
@@ -1214,7 +1217,7 @@ ${s}
 function removeEmptyLinesBlock(textarea) {
     const points = getStatement(textarea);
     s = textarea.value.substring(points[0], points[1]).trim();
-    if (s.indexOf('\n')!==-1) {
+    if (s.indexOf('\n') !== -1) {
         s = s.replaceAll(/[\r\n]/g, "");
     } else {
         s = s.replaceAll(/\+/g, "+\n")

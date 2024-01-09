@@ -128,7 +128,7 @@
                 </span>
                 <div class="pivot-bar-item-title">语句</div>
             </div>
-            
+
 
             <div class="item" id="content_cut">
                 <span class="material-symbols-outlined">
@@ -136,7 +136,7 @@
                 </span>
                 <div class="pivot-bar-item-title">剪式</div>
             </div>
-            
+
             <div id="save" class="item">
                 <span class="material-symbols-outlined">
                     save
@@ -200,10 +200,10 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
-            
+
         </div>
         <div class="items-wrapper selected">
-            
+
             <div id="close-line-v" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -216,7 +216,7 @@
                 </span>
                 <div class="pivot-bar-item-title">复行</div>
             </div>
-            
+
             <div class="item" id="data_object">
                 <span class="material-symbols-outlined">
                     data_object
@@ -229,7 +229,7 @@
                 </span>
                 <div class="pivot-bar-item-title">变量</div>
             </div>
-          
+
 
 
 
@@ -415,8 +415,8 @@ else{
                 evt.stopImmediatePropagation();
                 deleteLine(textarea)
             });
-            
-            
+
+
             document.getElementById('close-block').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -507,7 +507,11 @@ else{
             } catch (error) {
 
             }
-            window.open(`/viewer?id=${id}`, '_blank');
+            if (typeof NativeAndroid !== 'undefined') {
+                NativeAndroid.launchApp("psycho.euphoria.l",`/viewer?id=${id}`);
+            } else {
+                window.open(`/viewer?id=${id}`, '_blank');
+            }
         }
         cacheCode();
         initialize();

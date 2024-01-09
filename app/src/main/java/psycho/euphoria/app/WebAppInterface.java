@@ -98,13 +98,7 @@ public class WebAppInterface {
         return mSharedPreferences.getString(key, "");
     }
 
-    @JavascriptInterface
-    public void launchApp(String text) {
-        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
-        if (launchIntent != null) {
-            mContext.startActivity(launchIntent);//null pointer check in case package name was not found
-        }
-    }
+
 
     @JavascriptInterface
     public String listAllPackages() {

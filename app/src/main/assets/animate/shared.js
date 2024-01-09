@@ -417,6 +417,23 @@ function getLine(textarea) {
     }
     return [start, end + 1];
 }
+function getStatement(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    if (textarea.value[start] === '\n' && start - 1 > 0) {
+        start--;
+    }
+    if (textarea.value[end] === '\n' && end - 1 > 0) {
+        end--;
+    }
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== ';') {
+        end++;
+    }
+    return [start, end + 1];
+}
 function getWord(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
@@ -1193,6 +1210,19 @@ ${s}
 `, selectionEnd, selectionEnd);
 
 }
+
+function removeEmptyLinesBlock(textarea) {
+    const points = getStatement(textarea);
+    s = textarea.value.substring(points[0], points[1]).trim();
+    if (s.indexOf('\n')!==-1) {
+        s = s.replaceAll(/[\r\n]/g, "");
+    } else {
+        s = s.replaceAll(/\+/g, "+\n")
+            .replaceAll(/,/g, ",\n");
+    }
+    textarea.setRangeText(s, points[0], points[1]);
+}
+
 function goToLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();

@@ -190,6 +190,12 @@
                 </span>
                 <div class="pivot-bar-item-title">剪块</div>
             </div>
+            <div id="close-line" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">空行</div>
+            </div>
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
                     content_copy
@@ -201,14 +207,6 @@
                     content_copy
                 </span>
                 <div class="pivot-bar-item-title">复块</div>
-            </div>
-
-
-            <div id="close-line" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">剪行</div>
             </div>
             <div class="item" id="data_object">
                 <span class="material-symbols-outlined">
@@ -400,7 +398,8 @@ else{
             document.getElementById('close-line').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
-                deleteLine(textarea)
+                //deleteLine(textarea)
+                removeEmptyLinesBlock(textarea)
             });
             document.getElementById('close-block').addEventListener('click', evt => {
                 evt.stopPropagation();

@@ -392,7 +392,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                 = R"(select id,title from code)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view id, title;
-        std::regex c("[\\u4e00-\\u9fa5]+");
+        std::regex c("[\u4e00-\u9fa5]+");
         while (fetch_row(id, title)) {
                 if (!std::regex_search(title.data(), c)) {
                     res.set_content(id.data(), id.size(), "text/plain");

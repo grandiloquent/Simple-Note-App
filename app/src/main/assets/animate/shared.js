@@ -1014,12 +1014,12 @@ function decreaseCode(textarea) {
     s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
     s = removeSubstring(s, `<body>`, `</html>`);
     //s = removeSubstring(s,``, ``);
-    s = s.replace(/void mainImage\([^)]+\)[\r\n ]+\{/, m => {
+    s = s.replace(/void mainImage\([^)]+\)[\r\n ]*\{/, m => {
         return `
         
 out vec4 ${m.match(/(?<=out vec4 )[^,]+/)};                                          
 void main(){
-vec2 ${m.match(/(?<=in vec2 )[^)]+/)} = gl_FragCoord.xy;
+vec2 ${m.match(/(?<=(in +)*vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
         .replace(`</html>`, '')

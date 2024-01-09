@@ -402,7 +402,11 @@ else{
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 await saveData();
-                window.open('notes.html', '_blank');
+                if (typeof NativeAndroid !== 'undefined') {
+                    NativeAndroid.launchApp("psycho.euphoria.l", `/notes.html`);
+                } else {
+                    window.open('notes.html', '_blank');
+                }
             })
             document.getElementById('close-line').addEventListener('click', evt => {
                 evt.stopPropagation();
@@ -508,7 +512,7 @@ else{
 
             }
             if (typeof NativeAndroid !== 'undefined') {
-                NativeAndroid.launchApp("psycho.euphoria.l",`/viewer?id=${id}`);
+                NativeAndroid.launchApp("psycho.euphoria.l", `/viewer?id=${id}`);
             } else {
                 window.open(`/viewer?id=${id}`, '_blank');
             }

@@ -230,7 +230,12 @@
                 <div class="pivot-bar-item-title">变量</div>
             </div>
 
-
+            <div class="item" id="search">
+                <span class="material-symbols-outlined">
+                    search
+                </span>
+                <div class="pivot-bar-item-title">搜索</div>
+            </div>
 
 
 
@@ -408,6 +413,19 @@ else{
                     window.open('notes.html', '_blank');
                 }
             })
+
+            document.getElementById('search').addEventListener('click', async evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                const points = getWordString(textarea);
+                let v = textarea.value.substring(points[0], points[1]).trim();
+                const s = `https://www.google.com/search?q=` + encodeURIComponent(v);
+                if (typeof NativeAndroid !== 'undefined') {
+                    NativeAndroid.launchApp("psycho.euphoria.l", `/notes.html`);
+                } else {
+                    window.open('notes.html', '_blank');
+                }
+            });
             document.getElementById('close-line').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();

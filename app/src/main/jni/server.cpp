@@ -190,7 +190,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
  */
 //    static const char contentTableSql[]
 //            = R"(ALTER TABLE snippet ADD COLUMN views INTEGER)";
- //   db::QueryResult fetch_row = db::query<contentTableSql>();
+    //   db::QueryResult fetch_row = db::query<contentTableSql>();
 
 
     jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
@@ -333,7 +333,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                         "text/plain; charset=UTF-8");
     });
     server.Post("/snippet/delete", [](const httplib::Request &req, httplib::Response &res,
-                               const httplib::ContentReader &content_reader) {
+                                      const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
         std::string body;
@@ -349,7 +349,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                         "text/plain; charset=UTF-8");
     });
     server.Post("/snippet/hit", [](const httplib::Request &req, httplib::Response &res,
-                                      const httplib::ContentReader &content_reader) {
+                                   const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
         std::string body;
@@ -364,7 +364,6 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
     });
-
 
 
     server.Get("/code", [](const httplib::Request &req, httplib::Response &res) {
@@ -386,6 +385,48 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(j.dump(), "application/json");
         }
     });
+    server.Get("/code/random", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        static const char query[]
+                = R"(select id,title from code)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view id, title;
+        std::regex c("[\\u4e00-\\u9fa5]+");
+        while (fetch_row(id, title)) {
+                if (!std::regex_search(title.data(), c)) {
+                    res.set_content(id.data(), id.size(), "text/plain");
+                    return;
+                }
+        }
+        static const char query_r[]
+                = R"(select id,title from code ORDER BY random() LIMIT 1)";
+        db::QueryResult fetch_row_r = db::query<query_r>();
+        if (fetch_row_r(id, title)) {
+            res.set_content(id.data(), id.size(), "text/plain");
+        }
+        /*
+         static const char query[]
+                = R"(select id,title from code ORDER BY random() LIMIT 1)";
+        db::QueryResult fetch_row = db::query<query>();
+        std::string_view id, title;
+        std::regex c("[\\u4e00-\\u9fa5]+");
+        int count = 10;
+        while (count > 0) {
+            if (fetch_row(id, title)) {
+                if (!std::regex_search(title.data(), c)) {
+                    res.set_content(id.data(), id.size(), "application/json");
+                    return;
+                }
+            }
+            count--;
+        }
+        if (fetch_row(id, title)) {
+            res.set_content(id.data(), id.size(), "application/json");
+        }
+         */
+    });
+
     server.Get("/viewer", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto id = req.get_param_value("id");

@@ -408,7 +408,7 @@ else{
                 evt.stopImmediatePropagation();
                 await saveData();
                 if (typeof NativeAndroid !== 'undefined') {
-                    NativeAndroid.launchApp("psycho.euphoria.l", `/notes.html`);
+                    NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
                 } else {
                     window.open('notes.html', '_blank');
                 }
@@ -457,11 +457,21 @@ else{
                 else
                     window.location.reload();
             });
-            document.getElementById('shuffle').addEventListener('click', evt => {
+            document.getElementById('shuffle').addEventListener('click', async evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
+
                 if (id) {
-                    window.location.href = `?id=${parseInt(id) + getRandomInt(-25, 25)}`
+                    try {
+                        const response = await fetch(`${baseUri}/code/random`);
+                        if (response.status > 399 || response.status < 200) {
+                            throw new Error(`${response.status}: ${response.statusText}`)
+                        }
+                        const results = await response.text();
+                        window.location.href = `?id=${results}`
+                    } catch (error) {
+                        console.log(error);
+                    }
                 }
                 else
                     window.location.reload();

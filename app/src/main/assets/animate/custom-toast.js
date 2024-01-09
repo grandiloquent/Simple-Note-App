@@ -94,7 +94,7 @@ ${CustomToast.getStyle()}
     z-index: 999;
     left: 0;
     right: 0;
-    bottom: 0;
+    top: 0;
     box-sizing: border-box;
     padding: 14px 24px;
     font-size: 1.4rem;

@@ -22,7 +22,46 @@
     <div class="wrapper" style="padding: 0px 0 49px 0;">
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
+    <div class="bar-renderer">
+        <div id="preview" class="bar-item-tab">
+            <span class="material-symbols-outlined">
+                preview
+            </span>
+            <div class="pivot-bar-item-title">预览</div>
+        </div>
+        <div class="bar-item-tab" id="format">
+            <span class="material-symbols-outlined">
+                code
+            </span>
+            <div class="pivot-bar-item-title">格式</div>
+        </div>
+        <div class="bar-item-tab" id="decimal_decrease">
+            <span class="material-symbols-outlined">
+                decimal_decrease
+            </span>
+            <div class="pivot-bar-item-title">简化</div>
+        </div>
+        <div id="go_to_line" class="bar-item-tab">
+            <span class="material-symbols-outlined">
+                go_to_line
+            </span>
+            <div class="pivot-bar-item-title">调试</div>
+        </div>
 
+        <div id="code_snippet" class="bar-item-tab">
+            <span class="material-symbols-outlined">
+                text_snippet
+            </span>
+            <div class="pivot-bar-item-title">代码</div>
+        </div>
+
+        <div class="bar-item-tab" id="shuffle">
+            <span class="material-symbols-outlined">
+                shuffle
+            </span>
+            <div class="pivot-bar-item-title">随机</div>
+        </div>
+    </div>
 
     <style>
         .items {
@@ -89,13 +128,7 @@
                 </span>
                 <div class="pivot-bar-item-title">语句</div>
             </div>
-            <div class="item" id="comment">
-                <span class="material-symbols-outlined">
-                    comment
-                </span>
-                <div class="pivot-bar-item-title">注释</div>
-            </div>
-
+            
 
             <div class="item" id="content_cut">
                 <span class="material-symbols-outlined">
@@ -103,12 +136,7 @@
                 </span>
                 <div class="pivot-bar-item-title">剪式</div>
             </div>
-            <div id="close-block" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">剪块</div>
-            </div>
+            
             <div id="save" class="item">
                 <span class="material-symbols-outlined">
                     save
@@ -150,10 +178,18 @@
             </div>
         </div>
         <div class="items-wrapper selected">
-
-
-
-
+            <div class="item" id="comment">
+                <span class="material-symbols-outlined">
+                    comment
+                </span>
+                <div class="pivot-bar-item-title">注释</div>
+            </div>
+            <div id="close-block" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪块</div>
+            </div>
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
                     content_copy
@@ -167,12 +203,7 @@
                 <div class="pivot-bar-item-title">复块</div>
             </div>
 
-            <div class="item" id="format">
-                <span class="material-symbols-outlined">
-                    code
-                </span>
-                <div class="pivot-bar-item-title">格式</div>
-            </div>
+
             <div id="close-line" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -191,38 +222,12 @@
                 </span>
                 <div class="pivot-bar-item-title">变量</div>
             </div>
-            <div id="go_to_line" class="item">
-                <span class="material-symbols-outlined">
-                    go_to_line
-                </span>
-                <div class="pivot-bar-item-title">调试</div>
-            </div>
-            <div id="preview" class="item">
-                <span class="material-symbols-outlined">
-                    preview
-                </span>
-                <div class="pivot-bar-item-title">预览</div>
-            </div>
-            <div id="code_snippet" class="item">
-                <span class="material-symbols-outlined">
-                    text_snippet
-                </span>
-                <div class="pivot-bar-item-title">代码</div>
-            </div>
+          
 
-            <div class="item" id="decimal_decrease">
-                <span class="material-symbols-outlined">
-                    decimal_decrease
-                </span>
-                <div class="pivot-bar-item-title">简化</div>
-            </div>
 
-            <div class="item" id="shuffle">
-                <span class="material-symbols-outlined">
-                    shuffle
-                </span>
-                <div class="pivot-bar-item-title">随机</div>
-            </div>
+
+
+
 
         </div>
     </div>
@@ -383,7 +388,7 @@ else{
             document.getElementById('text_snippet').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
-               
+
                 showSnippetsDialog();
             })
             document.getElementById('code_snippet').addEventListener('click', async evt => {

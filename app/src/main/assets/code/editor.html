@@ -69,7 +69,7 @@
             right: 0;
             top: 0;
             bottom: 0;
-            z-index: 100001;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -176,6 +176,24 @@
                 </span>
                 <div class="pivot-bar-item-title">变量</div>
             </div>
+            <div id="close-line" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">空行</div>
+            </div>
+            <div class="item" id="content_copy_block">
+                <span class="material-symbols-outlined">
+                    content_copy
+                </span>
+                <div class="pivot-bar-item-title">复块</div>
+            </div>
+            <div id="close-block" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪块</div>
+            </div>
         </div>
         <div class="items-wrapper selected">
             <div class="item" id="comment">
@@ -184,17 +202,12 @@
                 </span>
                 <div class="pivot-bar-item-title">注释</div>
             </div>
-            <div id="close-block" class="item">
+            
+            <div id="close-line_v" class="item">
                 <span class="material-symbols-outlined">
                     close
                 </span>
-                <div class="pivot-bar-item-title">剪块</div>
-            </div>
-            <div id="close-line" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">空行</div>
+                <div class="pivot-bar-item-title">剪行</div>
             </div>
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
@@ -202,12 +215,7 @@
                 </span>
                 <div class="pivot-bar-item-title">复行</div>
             </div>
-            <div class="item" id="content_copy_block">
-                <span class="material-symbols-outlined">
-                    content_copy
-                </span>
-                <div class="pivot-bar-item-title">复块</div>
-            </div>
+            
             <div class="item" id="data_object">
                 <span class="material-symbols-outlined">
                     data_object
@@ -401,6 +409,13 @@ else{
                 //deleteLine(textarea)
                 removeEmptyLinesBlock(textarea)
             });
+            document.getElementById('close-line_v').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                deleteLine(textarea)
+            });
+            
+            
             document.getElementById('close-block').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();

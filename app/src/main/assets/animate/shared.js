@@ -1019,7 +1019,7 @@ function decreaseCode(textarea) {
         
 out vec4 ${m.match(/(?<=out vec4 )[^,]+/)};                                          
 void main(){
-vec2 ${m.match(/(?<=(in +)*vec2 )[^)]+/)} = gl_FragCoord.xy;
+vec2 ${m.match(/(?<=in +vec2 )[^)]+/)||m.match(/(?<=vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
         .replace(`</html>`, '')

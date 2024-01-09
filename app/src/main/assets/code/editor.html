@@ -41,13 +41,26 @@
             </span>
             <div class="pivot-bar-item-title">简化</div>
         </div>
+
+        <div class="bar-item-tab" id="normal-line" style="display: none;">
+            <span class="material-symbols-outlined">
+                density_large
+            </span>
+            <div class="pivot-bar-item-title">正常</div>
+        </div>
+
         <div id="go_to_line" class="bar-item-tab">
             <span class="material-symbols-outlined">
                 go_to_line
             </span>
             <div class="pivot-bar-item-title">调试</div>
         </div>
-
+        <div class="bar-item-tab" id="switch_right" style="display: none;">
+            <span class="material-symbols-outlined">
+                switch_right
+            </span>
+            <div class="pivot-bar-item-title">交换</div>
+        </div>
         <div id="code_snippet" class="bar-item-tab">
             <span class="material-symbols-outlined">
                 text_snippet
@@ -60,6 +73,12 @@
                 shuffle
             </span>
             <div class="pivot-bar-item-title">随机</div>
+        </div>
+        <div id="comment_word" class="bar-item-tab" style="display: none;">
+            <span class="material-symbols-outlined">
+                comment
+            </span>
+            <div class="pivot-bar-item-title">注字</div>
         </div>
     </div>
 
@@ -203,7 +222,12 @@
 
         </div>
         <div class="items-wrapper selected">
-
+            <div class="item" id="light_mode">
+                <span class="material-symbols-outlined">
+                    light_mode
+                </span>
+                <div class="pivot-bar-item-title">模式</div>
+            </div>
             <div id="close-line-v" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -497,6 +521,37 @@ else{
                     e.style.display = 'none';
                 }
             });
+            document.getElementById('light_mode').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                if (document.getElementById('normal-line').hasAttribute('style')) {
+                    document.getElementById('decimal_decrease').style.display = 'none';
+                    document.getElementById('go_to_line').style.display = 'none';
+                    document.getElementById('shuffle').style.display = 'none';
+                    document.getElementById('normal-line').removeAttribute('style');
+                    document.getElementById('switch_right').removeAttribute('style');
+                    document.getElementById('comment_word').removeAttribute('style');
+
+
+                } else {
+                    document.getElementById('decimal_decrease').removeAttribute('style');
+                    document.getElementById('go_to_line').removeAttribute('style');
+                    document.getElementById('shuffle').removeAttribute('style');
+                    document.getElementById('normal-line').style.display = 'none';
+                    document.getElementById('switch_right').style.display = 'none';
+                    document.getElementById('comment_word').style.display = 'none';
+
+                }
+            })
+            document.getElementById('switch_right').addEventListener('click', evt => {
+                switchStatement(textarea);
+            })
+            document.getElementById('normal-line').addEventListener('click', evt => {
+                duplicateLine(textarea)
+            })
+            document.getElementById('comment_word').addEventListener('click', evt => {
+                commentWord(textarea)
+            })
 
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {

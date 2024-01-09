@@ -1295,5 +1295,82 @@ function parentheses(textarea) {
         }
     }
     textarea.setRangeText("(", start, start);
-    textarea.setRangeText(")", end + 1, end + 1);
+    if (end + 1 < textarea.length && textarea[end + 1] === ';') {
+        textarea.setRangeText(")", end + 2, end + 2);
+    } else {
+        textarea.setRangeText(")", end + 1, end + 1);
+    }
+}
+
+function switchStatement(textarea) {
+    let s = textarea.value;
+    let start = textarea.selectionStart
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1) {
+        if (textarea.value[start - 1] !== '(' && textarea.value[start - 1] !== '\n')
+            start--;
+        else
+            break;
+    }
+    let i = 0;
+    while (end < s.length) {
+        if (s[end] === '(') {
+            i++;
+            end++;
+
+        } else if (s[end] === ')') {
+            end++;
+            i--;
+            if (i === -1) {
+                break;
+            }
+        } else if (s[end] !== '\n') {
+            end++;
+        } else {
+            break;
+        }
+    }
+    let str = textarea.value.substring(start, end - 1);
+    if (str.indexOf(',') === -1) {
+        return;
+    }
+    textarea.setRangeText(`${substringAfter(str, ",")},${substringBefore(str, ",")}`, start, end - 1);
+}
+function duplicateLine(textarea) {
+    const points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let name = "0.0";
+    if (s.startsWith("vec2")) {
+        name = "vec2(0.0,0.0)"
+    } else if (s.startsWith("vec3")) {
+        name = "vec3(0.0,0.0,0.0)"
+    } else if (s.startsWith("vec4")) {
+        name = "vec3(0.0,0.0,0.0,1.0)"
+    }
+    let str = `${substringBefore(s, "=")}= ${name};`
+    let selectionEnd = textarea.selectionEnd;
+
+    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+        selectionEnd++;
+    }
+    textarea.setRangeText("\n" + str, selectionEnd, selectionEnd);
+    textarea.setRangeText("// ", points[0], points[0]);
+
+}
+function commentWord(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1 && !/\s/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && !/\s/.test(textarea.value[end])) {
+        end++;
+    }
+    let s = textarea.value.substring(start, end).trim();
+    if (s.startsWith("/*") && s.endsWith("*/")) {
+        textarea.setRangeText(s.substring(2, s.length - 2), start, end);
+    } else {
+        textarea.setRangeText(`/*${s}*/`, start, end);
+    }
+
 }

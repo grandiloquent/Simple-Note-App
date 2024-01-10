@@ -1191,16 +1191,25 @@ function copyBlock(textarea) {
     const points = findExtendPosition(textarea);
     s = textarea.value.substring(points[0], points[1]).trim();
     const buf = [];
+    const array=[];
     s = s.replaceAll(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/g, m => {
+        let v=[m];
         let name = m;
         let i = 0;
         while (buf.indexOf(name) !== -1 || new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
             i++
             name = `${/[a-zA-Z]+/.exec(name)}${i}`;
         }
+        v.push(name);
+        array.push(v);
         buf.push(name);
         return name;
     });
+
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        s=s.replaceAll(new RegExp("\\b" + element[0] + "\\b", 'g'),element[1]);
+    }
 
     let selectionEnd = points[1];
 
@@ -1274,7 +1283,7 @@ function numberFormat(textarea, isIncrease) {
 function parentheses(textarea) {
     //let s = textarea.value;
     let start = textarea.selectionStart
-    let end = textarea.selectionEnd;
+    //let end = textarea.selectionEnd;
     // let i = 0;
     // while (end < s.length) {
     //     if (s[end] === '(') {
@@ -1300,17 +1309,32 @@ function parentheses(textarea) {
     // } else {
     //     textarea.setRangeText(")", end + 1, end + 1);
     // }
-    textarea.setRangeText('(', start, end);
+    //textarea.setRangeText('(', start, end);
     writeText(")");
     while (start - 1 > -1 && textarea.value[start - 1] !== '\n')
         start--;
         textarea.setRangeText(`/* , + - ; * { } || & ? : 
-step(1.0,uv)
-smoothstep fwidth sin cos atan radians
+sin
+atan
+cos
+fwidth
+distance
+length
+max
+min
+min
+radians
+smoothstep 
+step
+v *= v;
+v += v;
+v -= v;
+if(){}
+float v = (,);
 float f = 1.0;
 vec2 v = vec2(0.0, 0.0);
-vec3 v = vec2(0.0, 0.0, 0.0);
-vec4 v = vec2(0.0, 0.0, 0.0, 1.0);
+vec3 v = vec3(0.0, 0.0, 0.0);
+vec4 v = vec4(0.0, 0.0, 0.0, 1.0);
 */
 `, start, start);
 }

@@ -207,12 +207,7 @@
                 </span>
                 <div class="pivot-bar-item-title">复块</div>
             </div>
-            <div id="close-block" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">剪块</div>
-            </div>
+            
             <div class="item" id="comment">
                 <span class="material-symbols-outlined">
                     comment
@@ -227,6 +222,12 @@
                     light_mode
                 </span>
                 <div class="pivot-bar-item-title">模式</div>
+            </div>
+            <div id="close-block" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪块</div>
             </div>
             <div id="close-line-v" class="item">
                 <span class="material-symbols-outlined">
@@ -445,9 +446,9 @@ else{
                 let v = textarea.value.substring(points[0], points[1]).trim();
                 const s = `https://www.google.com/search?q=` + encodeURIComponent(v);
                 if (typeof NativeAndroid !== 'undefined') {
-                    NativeAndroid.launchApp("psycho.euphoria.l", `/notes.html`);
+                    NativeAndroid.launchApp("psycho.euphoria.l", s);
                 } else {
-                    window.open('notes.html', '_blank');
+                    window.open(s, '_blank');
                 }
             });
             document.getElementById('close-line').addEventListener('click', evt => {

@@ -1272,34 +1272,47 @@ function numberFormat(textarea, isIncrease) {
 
 }
 function parentheses(textarea) {
-    let s = textarea.value;
+    //let s = textarea.value;
     let start = textarea.selectionStart
     let end = textarea.selectionEnd;
-    let i = 0;
-    while (end < s.length) {
-        if (s[end] === '(') {
-            i++;
-            end++;
-            while (end < s.length) {
-                end++;
-                if (s[end] === ')')
-                    i--;
-                if (i === 0) {
-                    break;
-                }
-            }
-        } else if (s[end] !== '\n') {
-            end++;
-        } else {
-            break;
-        }
-    }
-    textarea.setRangeText("(", start, start);
-    if (end + 1 < textarea.length && textarea[end + 1] === ';') {
-        textarea.setRangeText(")", end + 2, end + 2);
-    } else {
-        textarea.setRangeText(")", end + 1, end + 1);
-    }
+    // let i = 0;
+    // while (end < s.length) {
+    //     if (s[end] === '(') {
+    //         i++;
+    //         end++;
+    //         while (end < s.length) {
+    //             end++;
+    //             if (s[end] === ')')
+    //                 i--;
+    //             if (i === 0) {
+    //                 break;
+    //             }
+    //         }
+    //     } else if (s[end] !== '\n') {
+    //         end++;
+    //     } else {
+    //         break;
+    //     }
+    // }
+    // textarea.setRangeText("step(", start, start);
+    // if (end + 1 < textarea.length && textarea.value[end + 1] === ';') {
+    //     textarea.setRangeText(")", end + 2, end + 2);
+    // } else {
+    //     textarea.setRangeText(")", end + 1, end + 1);
+    // }
+    textarea.setRangeText('(', start, end);
+    writeText(")");
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n')
+        start--;
+        textarea.setRangeText(`/* , + - ; * { } || & ? : 
+step(1.0,uv)
+smoothstep fwidth sin cos atan radians
+float f = 1.0;
+vec2 v = vec2(0.0, 0.0);
+vec3 v = vec2(0.0, 0.0, 0.0);
+vec4 v = vec2(0.0, 0.0, 0.0, 1.0);
+*/
+`, start, start);
 }
 
 function switchStatement(textarea) {

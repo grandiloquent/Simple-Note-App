@@ -229,6 +229,8 @@ public class Utils {
                         "com.eg.android.AlipayGphone",
                         "euphoria.psycho.browser",
                         "psycho.euphoria.v",
+                        "psycho.euphoria.l",
+                        "psycho.euphoria.n",
                         "com.android.settings",
                         "com.zhiliaoapp.musically",
                         "psycho.euphoria.app"

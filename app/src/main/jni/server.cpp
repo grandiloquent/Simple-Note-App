@@ -389,7 +389,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_header("Access-Control-Allow-Origin", "*");
 
         static const char query[]
-                = R"(select id,title from code)";
+                = R"(select id,title from code ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view id, title;
         std::regex c("[\u4e00-\u9fa5]+");

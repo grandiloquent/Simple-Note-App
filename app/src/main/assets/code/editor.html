@@ -579,7 +579,14 @@ else{
                     } else if (evt.key === 'F5') {
                         evt.preventDefault();
                         await glslTemplate(1);
+                    }else if (evt.key === 'F6') {
+                        evt.preventDefault();
+                        textarea.value =textarea.value.replace(/(?<=iTime;)[\n\r\s]+uniform vec4\s+iMouse;()/,`
+ uniform vec4      iMouse;                
+${await readText()}`)
+
                     }
+                    // uniform vec4      iMouse
                 }
 
             })

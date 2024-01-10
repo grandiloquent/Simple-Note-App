@@ -581,8 +581,8 @@ else{
                         await glslTemplate(1);
                     }else if (evt.key === 'F6') {
                         evt.preventDefault();
-                        textarea.value =textarea.value.replace(/(?<=iTime;)[\n\r\s]+uniform vec4\s+iMouse;()/,`
- uniform vec4      iMouse;                
+                        textarea.value =textarea.value.replace(/(?<=iFrame;)[\n\r\s]+uniform vec3 iChannelResolution\[4\];()/,`
+uniform vec3 iChannelResolution[4];            
 ${await readText()}`)
 
                     }

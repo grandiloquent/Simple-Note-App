@@ -1,0 +1,17 @@
+<script id="{{2}}" type="x-shader/x-fragment">
+    #version 300 es
+    uniform vec3 sampler3D;
+uniform sampler2D iChannel0;
+uniform vec3      iResolution;  
+uniform vec4 iDate;
+uniform int iFrame;
+uniform float     iTime;      
+uniform vec4      iMouse;  
+uniform sampler2D iChannel1;
+uniform int iFrame;
+uniform vec3 iChannelResolution[4];
+{{1}}
+void main() {
+  mainImage(gl_FragColor, gl_FragCoord.xy);
+}
+</script>

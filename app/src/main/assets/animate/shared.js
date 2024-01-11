@@ -1416,22 +1416,29 @@ function switchStatement(textarea) {
 function duplicateLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    let name = "0.0";
-    if (s.startsWith("vec2")) {
-        name = "vec2(0.0,0.0)"
-    } else if (s.startsWith("vec3")) {
-        name = "vec3(0.0,0.0,0.0)"
-    } else if (s.startsWith("vec4")) {
-        name = "vec3(0.0,0.0,0.0,1.0)"
-    }
-    let str = `${substringBefore(s, "=")}= ${name};`
-    let selectionEnd = textarea.selectionEnd;
+    if (s.startsWith("//")) {
+        textarea.selectionStart = points[1] + 1;
+        let p = getLine(textarea);
+        textarea.setRangeText("", p[0], p[1]);
+        textarea.setRangeText(substringAfter(s, "//"), points[0], points[1]);
+    } else {
+        let name = "0.0";
+        if (s.startsWith("vec2")) {
+            name = "vec2(0.0,0.0)"
+        } else if (s.startsWith("vec3")) {
+            name = "vec3(0.0,0.0,0.0)"
+        } else if (s.startsWith("vec4")) {
+            name = "vec3(0.0,0.0,0.0,1.0)"
+        }
+        let str = `${substringBefore(s, "=")}= ${name};`
+        let selectionEnd = textarea.selectionEnd;
 
-    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
-        selectionEnd++;
+        while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+            selectionEnd++;
+        }
+        textarea.setRangeText("\n" + str, selectionEnd, selectionEnd);
+        textarea.setRangeText("// ", points[0], points[0]);
     }
-    textarea.setRangeText("\n" + str, selectionEnd, selectionEnd);
-    textarea.setRangeText("// ", points[0], points[0]);
 
 }
 function commentWord(textarea) {

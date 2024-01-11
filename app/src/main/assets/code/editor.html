@@ -201,7 +201,7 @@
                 </span>
                 <div class="pivot-bar-item-title">空行</div>
             </div>
-            
+
             <div id="close-block" class="item">
                 <span class="material-symbols-outlined">
                     close
@@ -574,15 +574,15 @@ else{
                             window.location.href = `?id=${parseInt(id) + 1}`
                         else
                             window.location.reload();
-                    } else if (evt.key === 'F2') {
+                    } else if (evt.key === 'F7') {
                         evt.preventDefault();
-                        await glslTemplate(0);
+                        textarea.value = await readText();//glslTemplate(0);
                     } else if (evt.key === 'F5') {
                         evt.preventDefault();
                         await glslTemplate(1);
-                    }else if (evt.key === 'F6') {
+                    } else if (evt.key === 'F6') {
                         evt.preventDefault();
-                        textarea.value =textarea.value.replace(/(?<=iFrame;)[\n\r\s]+uniform vec3 iChannelResolution\[4\];()/,`
+                        textarea.value = textarea.value.replace(/(?<=iFrame;)[\n\r\s]+uniform vec3 iChannelResolution\[4\];()/, `
 uniform vec3 iChannelResolution[4];            
 ${await readText()}`)
 

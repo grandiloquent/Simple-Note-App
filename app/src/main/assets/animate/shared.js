@@ -618,7 +618,7 @@ async function glslTemplate(t) {
     }
     if (t === 1) {
         if (textarea.value.trim()) {
-textarea.value =textarea.value.replace("void main() {",`${await readText()}
+            textarea.value = textarea.value.replace("void main() {", `${await readText()}
 void main() {
 `);
         }
@@ -959,7 +959,7 @@ const WEBGL1 = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charse
 
 const WEBGL2 = ["<html lang='en'>\r\n<head>\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">#version 300 es\r\nprecision highp float;\r\nprecision highp sampler2D;\r\nuniform vec3 iResolution;\r\nuniform vec4 iMouse;\r\nuniform float iTime;\r\nuniform sampler2D iChannel0;\r\nuniform int iFrame;\r\n", "\r\nout vec4 outColor;\r\nvoid main() {\r\n  mainImage(outColor, gl_FragCoord.xy);\r\n}\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.textContent = log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n    window.onerror = function(errMsg, url, line, column, error) {\r\n      var result = !column ? '' : 'column: ' + column;\r\n      result += !error;\r\n      document.write(\"\\nError= \" + errMsg + \"\\nurl= \" + url + \"\\nline= \" + line + result);\r\n      var suppressErrorAlert = true;\r\n      return suppressErrorAlert;\r\n    };\r\n    document.addEventListener('visibilitychange', async evt => {\r\n      if (document.visibilityState === \"visible\") {\r\n        location.reload();\r\n      }\r\n    })\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const mouseLocation = gl.getUniformLocation(program, \"iMouse\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const frameLocation = gl.getUniformLocation(program, \"iFrame\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([\r\n      -1, -1,\r\n      1, -1,\r\n      -1, 1,\r\n      -1, 1,\r\n      1, -1,\r\n      1, 1,\r\n    ]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(\r\n      positionAttributeLocation,\r\n      2,\r\n      gl.FLOAT,\r\n      false,\r\n      0,\r\n      0,\r\n    );\r\n    let mouseX = 0;\r\n    let mouseY = 0;\r\n    function setMousePosition(e) {\r\n      const rect = canvas.getBoundingClientRect();\r\n      mouseX = e.clientX - rect.left;\r\n      mouseY = rect.height - (e.clientY - rect.top) - 1;\r\n    }\r\n    canvas.addEventListener('mousemove', setMousePosition);\r\n    canvas.addEventListener('touchstart', (e) => {\r\n      e.preventDefault();\r\n    }, {\r\n      passive: false\r\n    });\r\n    canvas.addEventListener('touchmove', (e) => {\r\n      e.preventDefault();\r\n      setMousePosition(e.touches[0]);\r\n    }, {\r\n      passive: false\r\n    });\r\n    let frame = 0;\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001;\r\n      frame++;\r\n      gl.clearColor(0., 0., 0., 1.0);\r\n      gl.clear(gl.COLOR_BUFFER_BIT);\r\n      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.uniform1i(frameLocation, frame);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
 
-const THREE1 = ["<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n  <title>Document</title>\r\n  <style>\r\n    body {\r\n      margin: 0;\r\n    }\r\n  </style>\r\n  <script>\r\n    console.error = function(e) {\r\n      document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g,\"<br>\")}</span>`).join('\\n');\r\n    }\r\n  </script>\r\n  <script id=\"ba\" type=\"x-shader/x-fragment\">uniform vec3 iResolution;\r\nuniform float iTime;\r\nuniform float iTimeDelta;\r\nuniform float iFrameRate;\r\nuniform int iFrame;\r\nuniform vec4 iMouse;\r\nuniform sampler2D iChannel0;\r\n","\r\nvoid main() {\r\n  mainImage(gl_FragColor, gl_FragCoord.xy);\r\n}\r\n</script>\r\n\r\n\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n    uniform sampler2D iChannel0;\r\n    uniform vec3      iResolution;  \r\n    uniform float     iTime;      \r\n    uniform vec4      iMouse;  \r\n    uniform sampler2D iChannel1;\r\n    uniform int iFrame;\r\n    uniform vec3 iChannelResolution[4];\r\n    void main() {\r\n      mainImage(gl_FragColor, gl_FragCoord.xy);\r\n    }\r\n    </script>\r\n\r\n  <script>\r\n    window.getShaderSource = function(id) {\r\n      return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n    };\r\n  </script>\r\n\r\n\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    varying vec2 vUv;\r\n        void main() {\r\n            vUv = uv;\r\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\r\n        }\r\n    </script>\r\n\r\n</head>\r\n<body>\r\n  <script>\r\n    class App {\r\n      constructor() {\r\n        this.width = 300;\r\n        this.height = 300;\r\n        this.renderer = new THREE.WebGLRenderer();\r\n        this.loader = new THREE.TextureLoader();\r\n        this.mousePosition = new THREE.Vector4();\r\n        this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);\r\n        this.counter = 0;\r\n        this.renderer.setSize(this.width, this.height);\r\n        document.body.appendChild(this.renderer.domElement);\r\n        this.renderer.domElement.addEventListener('mousedown', () => {\r\n          this.mousePosition.setZ(1);\r\n          this.counter = 0;\r\n        });\r\n        this.renderer.domElement.addEventListener('mouseup', () => {\r\n          this.mousePosition.setZ(0);\r\n        });\r\n        this.renderer.domElement.addEventListener('mousemove', event => {\r\n          this.mousePosition.setX(event.clientX);\r\n          this.mousePosition.setY(this.height - event.clientY);\r\n        });\r\n        this.targetA = new BufferManager(this.renderer, {\r\n          width: this.width,\r\n          height: this.height\r\n        });\r\n        this.targetC = new BufferManager(this.renderer, {\r\n          width: this.width,\r\n          height: this.height\r\n        });\r\n      }\r\n      start() {\r\n        const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);\r\n        this.bufferA = new BufferShader(getShaderSource('ba'), {\r\n          iTime: {\r\n            value: 0\r\n          },\r\n          iFrame: {\r\n            value: 0\r\n          },\r\n          iResolution: {\r\n            value: resolution\r\n          },\r\n          iMouse: {\r\n            value: this.mousePosition\r\n          },\r\n          iChannel0: {\r\n            value: null\r\n          },\r\n          iChannel1: {\r\n            value: null\r\n          }\r\n        });\r\n        this.bufferImage = new BufferShader(getShaderSource('fs'), {\r\n          iTime: {\r\n            value: 0\r\n          },\r\n          iResolution: {\r\n            value: resolution\r\n          },\r\n          iMouse: {\r\n            value: this.mousePosition\r\n          },\r\n          iChannel0: {\r\n            value: null\r\n          },\r\n          iChannel1: {\r\n            value: null\r\n          }\r\n        });\r\n        this.animate();\r\n      }\r\n      animate() {\r\n        requestAnimationFrame(() => {\r\n          const time = performance.now() / 1000;\r\n          this.bufferA.uniforms['iFrame'].value = this.counter++;\r\n          this.bufferA.uniforms['iTime'].value = time;\r\n          this.bufferA.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n          this.targetA.render(this.bufferA.scene, this.orthoCamera);\r\n          this.bufferImage.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n          this.bufferImage.uniforms['iTime'].value = time;\r\n          this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);\r\n          this.animate();\r\n        });\r\n      }\r\n    }\r\n    class BufferShader {\r\n      constructor(fragmentShader, uniforms = {}) {\r\n        this.uniforms = uniforms;\r\n        this.material = new THREE.ShaderMaterial({\r\n          fragmentShader: fragmentShader,\r\n          vertexShader: getShaderSource('vs'),\r\n          uniforms: uniforms\r\n        });\r\n        this.scene = new THREE.Scene();\r\n        this.scene.add(\r\n          new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)\r\n        );\r\n      }\r\n    }\r\n    class BufferManager {\r\n      constructor(renderer, size) {\r\n        this.renderer = renderer;\r\n        this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {\r\n          minFilter: THREE.LinearFilter,\r\n          magFilter: THREE.LinearFilter,\r\n          format: THREE.RGBAFormat,\r\n          type: THREE.FloatType,\r\n          stencilBuffer: false\r\n        });\r\n        this.writeBuffer = this.readBuffer.clone();\r\n      }\r\n      swap() {\r\n        const temp = this.readBuffer;\r\n        this.readBuffer = this.writeBuffer;\r\n        this.writeBuffer = temp;\r\n      }\r\n      render(scene, camera, toScreen = false) {\r\n        if (toScreen) {\r\n          this.renderer.render(scene, camera);\r\n        } else {\r\n          this.renderer.setRenderTarget(this.writeBuffer);\r\n          this.renderer.clear();\r\n          this.renderer.render(scene, camera)\r\n          this.renderer.setRenderTarget(null);\r\n        }\r\n        this.swap();\r\n      }\r\n    }\r\n    document.addEventListener('DOMContentLoaded', () => {\r\n      (new App()).start();\r\n    });\r\n  </script>\r\n  <script src=\"https://fastly.jsdelivr.net/npm/three@0.121.1/build/three.js\">\r\n  </script>\r\n</body>\r\n</html>"]
+const THREE1 = ["<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n  <title>Document</title>\r\n  <style>\r\n    body {\r\n      margin: 0;\r\n    }\r\n  </style>\r\n  <script>\r\n    console.error = function(e) {\r\n      document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g,\"<br>\")}</span>`).join('\\n');\r\n    }\r\n  </script>\r\n  <script id=\"ba\" type=\"x-shader/x-fragment\">uniform vec3 iResolution;\r\nuniform float iTime;\r\nuniform float iTimeDelta;\r\nuniform float iFrameRate;\r\nuniform int iFrame;\r\nuniform vec4 iMouse;\r\nuniform sampler2D iChannel0;\r\n", "\r\nvoid main() {\r\n  mainImage(gl_FragColor, gl_FragCoord.xy);\r\n}\r\n</script>\r\n\r\n\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n    uniform sampler2D iChannel0;\r\n    uniform vec3      iResolution;  \r\n    uniform float     iTime;      \r\n    uniform vec4      iMouse;  \r\n    uniform sampler2D iChannel1;\r\n    uniform int iFrame;\r\n    uniform vec3 iChannelResolution[4];\r\n    void main() {\r\n      mainImage(gl_FragColor, gl_FragCoord.xy);\r\n    }\r\n    </script>\r\n\r\n  <script>\r\n    window.getShaderSource = function(id) {\r\n      return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n    };\r\n  </script>\r\n\r\n\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    varying vec2 vUv;\r\n        void main() {\r\n            vUv = uv;\r\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\r\n        }\r\n    </script>\r\n\r\n</head>\r\n<body>\r\n  <script>\r\n    class App {\r\n      constructor() {\r\n        this.width = 300;\r\n        this.height = 300;\r\n        this.renderer = new THREE.WebGLRenderer();\r\n        this.loader = new THREE.TextureLoader();\r\n        this.mousePosition = new THREE.Vector4();\r\n        this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);\r\n        this.counter = 0;\r\n        this.renderer.setSize(this.width, this.height);\r\n        document.body.appendChild(this.renderer.domElement);\r\n        this.renderer.domElement.addEventListener('mousedown', () => {\r\n          this.mousePosition.setZ(1);\r\n          this.counter = 0;\r\n        });\r\n        this.renderer.domElement.addEventListener('mouseup', () => {\r\n          this.mousePosition.setZ(0);\r\n        });\r\n        this.renderer.domElement.addEventListener('mousemove', event => {\r\n          this.mousePosition.setX(event.clientX);\r\n          this.mousePosition.setY(this.height - event.clientY);\r\n        });\r\n        this.targetA = new BufferManager(this.renderer, {\r\n          width: this.width,\r\n          height: this.height\r\n        });\r\n        this.targetC = new BufferManager(this.renderer, {\r\n          width: this.width,\r\n          height: this.height\r\n        });\r\n      }\r\n      start() {\r\n        const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);\r\n        this.bufferA = new BufferShader(getShaderSource('ba'), {\r\n          iTime: {\r\n            value: 0\r\n          },\r\n          iFrame: {\r\n            value: 0\r\n          },\r\n          iResolution: {\r\n            value: resolution\r\n          },\r\n          iMouse: {\r\n            value: this.mousePosition\r\n          },\r\n          iChannel0: {\r\n            value: null\r\n          },\r\n          iChannel1: {\r\n            value: null\r\n          }\r\n        });\r\n        this.bufferImage = new BufferShader(getShaderSource('fs'), {\r\n          iTime: {\r\n            value: 0\r\n          },\r\n          iResolution: {\r\n            value: resolution\r\n          },\r\n          iMouse: {\r\n            value: this.mousePosition\r\n          },\r\n          iChannel0: {\r\n            value: null\r\n          },\r\n          iChannel1: {\r\n            value: null\r\n          }\r\n        });\r\n        this.animate();\r\n      }\r\n      animate() {\r\n        requestAnimationFrame(() => {\r\n          const time = performance.now() / 1000;\r\n          this.bufferA.uniforms['iFrame'].value = this.counter++;\r\n          this.bufferA.uniforms['iTime'].value = time;\r\n          this.bufferA.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n          this.targetA.render(this.bufferA.scene, this.orthoCamera);\r\n          this.bufferImage.uniforms['iChannel0'].value = this.targetA.readBuffer.texture;\r\n          this.bufferImage.uniforms['iTime'].value = time;\r\n          this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);\r\n          this.animate();\r\n        });\r\n      }\r\n    }\r\n    class BufferShader {\r\n      constructor(fragmentShader, uniforms = {}) {\r\n        this.uniforms = uniforms;\r\n        this.material = new THREE.ShaderMaterial({\r\n          fragmentShader: fragmentShader,\r\n          vertexShader: getShaderSource('vs'),\r\n          uniforms: uniforms\r\n        });\r\n        this.scene = new THREE.Scene();\r\n        this.scene.add(\r\n          new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)\r\n        );\r\n      }\r\n    }\r\n    class BufferManager {\r\n      constructor(renderer, size) {\r\n        this.renderer = renderer;\r\n        this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {\r\n          minFilter: THREE.LinearFilter,\r\n          magFilter: THREE.LinearFilter,\r\n          format: THREE.RGBAFormat,\r\n          type: THREE.FloatType,\r\n          stencilBuffer: false\r\n        });\r\n        this.writeBuffer = this.readBuffer.clone();\r\n      }\r\n      swap() {\r\n        const temp = this.readBuffer;\r\n        this.readBuffer = this.writeBuffer;\r\n        this.writeBuffer = temp;\r\n      }\r\n      render(scene, camera, toScreen = false) {\r\n        if (toScreen) {\r\n          this.renderer.render(scene, camera);\r\n        } else {\r\n          this.renderer.setRenderTarget(this.writeBuffer);\r\n          this.renderer.clear();\r\n          this.renderer.render(scene, camera)\r\n          this.renderer.setRenderTarget(null);\r\n        }\r\n        this.swap();\r\n      }\r\n    }\r\n    document.addEventListener('DOMContentLoaded', () => {\r\n      (new App()).start();\r\n    });\r\n  </script>\r\n  <script src=\"https://fastly.jsdelivr.net/npm/three@0.121.1/build/three.js\">\r\n  </script>\r\n</body>\r\n</html>"]
 
 async function showSnippetDialog(baseUri, textarea) {
     const snippet = document.createElement('custom-select');
@@ -1079,8 +1079,24 @@ function variables(textarea) {
     while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {
         selectionStart--;
     }
-    while (selectionEnd < textarea.value.length && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')) {
+    let count = 0;
+    while (selectionEnd < textarea.value.length) {
         selectionEnd++;
+        //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
+        if (textarea.value[selectionEnd] === '(') {
+            count++;
+        } else if (textarea.value[selectionEnd] === ')') {
+            if (count === 0) {
+                break;
+            }
+            count--;
+            if (count === 0) {
+                selectionEnd++;
+                break;
+            }
+        } else if (textarea.value[selectionEnd] === ';' || textarea.value[selectionEnd] === '\n') {
+            break;
+        }
     }
     let s = textarea.value.substring(selectionStart, selectionEnd);
     let name = `${s[0]}0`;
@@ -1243,30 +1259,40 @@ function removeEmptyLinesBlock(textarea) {
     }
     textarea.setRangeText(s, points[0], points[1]);
 }
-let _index = 0;
+
 function goToLine(textarea) {
-    if (_index == 0) {
-        const points = getLine(textarea);
-        let s = textarea.value.substring(points[0], points[1]).trim();
-        _index = parseInt(s) - 1;
+    const points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let i = (/^\d$/.test(s) && parseInt(s) - 1) || 0;
+
+    if (i) {
+        const p1 = `type="x-shader/x-fragment">`;
+        const start = textarea.value.indexOf(p1);
+        if (start === -1) return;
+        const end = textarea.value.indexOf("</script>", start + p1.length);
+        let array = textarea.value.substring(start + p1.length, end).split('\n');
+        let index = textarea.value.indexOf(array[i]);
+        textarea.focus();
+        const fullText = textarea.value;
+        textarea.value = fullText.substring(0, index + array[i].length);
+        textarea.scrollTop = textarea.scrollHeight;
+        textarea.value = fullText;
+
+        textarea.selectionStart = index;
+        textarea.selectionEnd = index + array[i].length;
+    } else {
+        let selectedString = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
+        s = selectedString || s;
+        let index = textarea.value.indexOf(s, textarea.selectionEnd);
+        textarea.focus();
+        const fullText = textarea.value;
+        textarea.value = fullText.substring(0, index + s.length);
+        textarea.scrollTop = textarea.scrollHeight;
+        textarea.value = fullText;
+
+        textarea.selectionStart = index;
+        textarea.selectionEnd = index + s.length;
     }
-
-    const p1 = `type="x-shader/x-fragment">`;
-    const start = textarea.value.indexOf(p1, textarea.selectionStart);
-    if (start === -1) return;
-    const end = textarea.value.indexOf("</script>", start + p1.length);
-    let array = textarea.value.substring(start + p1.length, end).split('\n');
-    console.log(array);
-    let index = textarea.value.indexOf(array[_index]);
-    textarea.focus();
-
-    const fullText = textarea.value;
-    textarea.value = fullText.substring(0, index + array[_index].length);
-    textarea.scrollTop = textarea.scrollHeight;
-    textarea.value = fullText;
-
-    textarea.selectionStart = index;
-    textarea.selectionEnd = index + array[_index].length;
 
 }
 function copyWord(textarea) {
@@ -1294,62 +1320,56 @@ function numberFormat(textarea, isIncrease) {
 
 }
 function parentheses(textarea) {
-    //let s = textarea.value;
-    let start = textarea.selectionStart
-    //let end = textarea.selectionEnd;
-    // let i = 0;
-    // while (end < s.length) {
-    //     if (s[end] === '(') {
-    //         i++;
-    //         end++;
-    //         while (end < s.length) {
-    //             end++;
-    //             if (s[end] === ')')
-    //                 i--;
-    //             if (i === 0) {
-    //                 break;
-    //             }
-    //         }
-    //     } else if (s[end] !== '\n') {
-    //         end++;
-    //     } else {
-    //         break;
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {
+        selectionStart--;
+    }
+    let count = 0;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
+        if (textarea.value[selectionEnd] === '{') {
+            count++;
+        } else if (textarea.value[selectionEnd] === '}') {
+            if (count === 0) {
+                break;
+            }
+            count--;
+            if (count === 0) {
+                selectionEnd++;
+                break;
+            }
+        }
+    }
+    let p = getWord(textarea);
+    let nameString = textarea.value.substring(p[0], p[1]).trim();
+    p = getLine(textarea);
+    let s = textarea.value.substring(p[1], selectionEnd);
+    let line = substringAfter(textarea.value.substring(p[0], p[1]), '=').trim();
+    line = substringBeforeLast(line, ';');
+    s=s.replaceAll(new RegExp("\\b" +nameString + "\\b", 'g'),
+    `(${line})`);
+   
+    //     let name = `${s[0]}0`;
+
+
+    //     let i = 0;
+    //     while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+    //         i++
+    //         name = `${s[0]}${i}`;
     //     }
-    // }
-    // textarea.setRangeText("step(", start, start);
-    // if (end + 1 < textarea.length && textarea.value[end + 1] === ';') {
-    //     textarea.setRangeText(")", end + 2, end + 2);
-    // } else {
-    //     textarea.setRangeText(")", end + 1, end + 1);
-    // }
-    //textarea.setRangeText('(', start, end);
-    writeText(")");
-    while (start - 1 > -1 && textarea.value[start - 1] !== '\n')
-        start--;
-    textarea.setRangeText(`/* , + - ; * { } || & ? : 
-sin
-atan
-cos
-fwidth
-distance
-length
-max
-min
-min
-radians
-smoothstep 
-step
-v *= v;
-v += v;
-v -= v;
-if(){}
-float v = (,);
-float f = 1.0;
-vec2 v = vec2(0.0, 0.0);
-vec3 v = vec3(0.0, 0.0, 0.0);
-vec4 v = vec4(0.0, 0.0, 0.0, 1.0);
-*/
-`, start, start);
+    textarea.setRangeText(s, p[1], selectionEnd);
+    //     let str = `
+    // float ${name} = ${s};
+    //     `;
+    //     while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+    //         selectionStart--;
+    //     }
+     textarea.setRangeText("// ", p[0],  p[0]);
+
+
+
 }
 
 function switchStatement(textarea) {

@@ -1193,7 +1193,9 @@ ${s.replace(/(?<=[a-zA-Z0-9] )[a-zA-Z0-9_]+(?= =)/, name)}`;
     while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
         selectionEnd++;
     }
-    textarea.setRangeText(str, selectionEnd, selectionEnd);
+    textarea.setRangeText(str.replace(/(?<=iChannel)\d+/, m => {
+        return parseInt(m) + 1;
+    }), selectionEnd, selectionEnd);
 
 }
 function cutLine(textarea) {
@@ -1263,8 +1265,7 @@ function removeEmptyLinesBlock(textarea) {
 function goToLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    let i = (/^\d$/.test(s) && parseInt(s) - 1) || 0;
-
+    let i = (/^\d+$/.test(s) && parseInt(s)) || 0;
     if (i) {
         const p1 = `type="x-shader/x-fragment">`;
         const start = textarea.value.indexOf(p1);
@@ -1273,6 +1274,7 @@ function goToLine(textarea) {
         let array = textarea.value.substring(start + p1.length, end).split('\n');
         let index = textarea.value.indexOf(array[i]);
         textarea.focus();
+        textarea.scrollTop = 0;
         const fullText = textarea.value;
         textarea.value = fullText.substring(0, index + array[i].length);
         textarea.scrollTop = textarea.scrollHeight;
@@ -1282,9 +1284,14 @@ function goToLine(textarea) {
         textarea.selectionEnd = index + array[i].length;
     } else {
         let selectedString = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
-        s = selectedString || s;
+        s = selectedString || s || `<script id="fs" type="x-shader/x-fragment">`;
+        console.log(s)
         let index = textarea.value.indexOf(s, textarea.selectionEnd);
+        if (index === -1)
+            index = textarea.value.indexOf(s);
+
         textarea.focus();
+        textarea.scrollTop = 0;
         const fullText = textarea.value;
         textarea.value = fullText.substring(0, index + s.length);
         textarea.scrollTop = textarea.scrollHeight;
@@ -1348,9 +1355,9 @@ function parentheses(textarea) {
     let s = textarea.value.substring(p[1], selectionEnd);
     let line = substringAfter(textarea.value.substring(p[0], p[1]), '=').trim();
     line = substringBeforeLast(line, ';');
-    s=s.replaceAll(new RegExp("\\b" +nameString + "\\b", 'g'),
-    `(${line})`);
-   
+    s = s.replaceAll(new RegExp("\\b" + nameString + "\\b", 'g'),
+        `(${line})`);
+
     //     let name = `${s[0]}0`;
 
 
@@ -1366,7 +1373,7 @@ function parentheses(textarea) {
     //     while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
     //         selectionStart--;
     //     }
-     textarea.setRangeText("// ", p[0],  p[0]);
+    textarea.setRangeText("// ", p[0], p[0]);
 
 
 

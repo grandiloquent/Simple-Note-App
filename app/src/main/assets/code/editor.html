@@ -20,19 +20,7 @@
 
 <body>
     <div class="wrapper" style="padding: 0px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px">vec4 circleBox(in vec4 background,
-            in vec4 circleColor,
-            in vec2 position,
-            in float radius,
-            in float thickness,
-            in vec2 sideLength
-          ) {
-            vec2 relative = vUV - position;
-            float distance = length(max(vec2(0.), abs(relative) - sideLength));
-            distance = smoothstep(distance - thickness / 2., distance + thickness / 2., radius);
-            vec4 outColor = mix(circleColor, background, distance);
-            return outColor;
-          }</textarea>
+        <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer">
         <div id="preview" class="bar-item-tab">

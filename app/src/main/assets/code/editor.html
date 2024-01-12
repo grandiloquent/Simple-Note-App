@@ -328,7 +328,6 @@ ${content}`;
                     "function",
                     "展数",
                     () => {
-                        decreaseCode(textarea)
                         functionsExpand(textarea);
                     }
                 ], [
@@ -469,11 +468,13 @@ ${content}`;
                 ],
                 [
                     "function",
-                    "radians",
+                    ".",
                     () => {
                         let selectionStart = textarea.selectionStart;
                         let selectionEnd = textarea.selectionEnd;
-                        let s = `radians(90.)`;
+                        let s = `fragColor.w = 1.0;
+uv.y=1.0 - uv.y;
+`;
                         textarea.setRangeText(s, selectionStart, selectionEnd)
                     }
                 ],
@@ -491,7 +492,8 @@ vec2 uv = (gl_FragCoord.xy) / iResolution.xy;
 uv.y=1.0 - uv.y;
 vec2 pointCenter = vec2(cos(iTime), sin(iTime));
 vec3 color = backGroundColor * gridColor * circleLine * point * segement;
-fragColor = vec4(color, 1.0);  
+fragColor = vec4(color, 1.0); 
+let s=sin(radians(90.)); 
 
 
 mat2 rotate2d(float theta) {

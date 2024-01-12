@@ -18,82 +18,16 @@
     <script src="../animate/custom-dialog.js"></script>
 </head>
 
-<body>
+<body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
         <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer" style="top: 0;">
-        <div class="bar-item-tab" id="light_mode">
-            <span class="material-symbols-outlined">
-                light_mode
-            </span>
-            <div class="pivot-bar-item-title">模式</div>
-        </div>
-        <div class="bar-item-tab" id="search">
-            <span class="material-symbols-outlined">
-                search
-            </span>
-            <div class="pivot-bar-item-title">搜索</div>
-        </div>
-        <div class="bar-item-tab" id="content_copy_block">
-            <span class="material-symbols-outlined">
-                content_copy
-            </span>
-            <div class="pivot-bar-item-title">复块</div>
-        </div>
-        <div class="bar-item-tab" id="data_object">
-            <span class="material-symbols-outlined">
-                data_object
-            </span>
-            <div class="pivot-bar-item-title">展变</div>
-        </div>
-        <div class="bar-item-tab" id="variables">
-            <span class="material-symbols-outlined">
-                variables
-            </span>
-            <div class="pivot-bar-item-title">收变</div>
-        </div>
-
-        
-    </div>
-    <div class="bar-renderer">
         <div id="preview" class="bar-item-tab">
             <span class="material-symbols-outlined">
                 preview
             </span>
             <div class="pivot-bar-item-title">预览</div>
-        </div>
-        <div class="bar-item-tab" id="format">
-            <span class="material-symbols-outlined">
-                code
-            </span>
-            <div class="pivot-bar-item-title">格式</div>
-        </div>
-        <div class="bar-item-tab" id="decimal_decrease">
-            <span class="material-symbols-outlined">
-                decimal_decrease
-            </span>
-            <div class="pivot-bar-item-title">简化</div>
-        </div>
-
-        <div class="bar-item-tab" id="normal-line" style="display: none;">
-            <span class="material-symbols-outlined">
-                density_large
-            </span>
-            <div class="pivot-bar-item-title">正常</div>
-        </div>
-
-        <div id="go_to_line" class="bar-item-tab">
-            <span class="material-symbols-outlined">
-                go_to_line
-            </span>
-            <div class="pivot-bar-item-title">调试</div>
-        </div>
-        <div class="bar-item-tab" id="switch_right" style="display: none;">
-            <span class="material-symbols-outlined">
-                switch_right
-            </span>
-            <div class="pivot-bar-item-title">交换</div>
         </div>
         <div id="code_snippet" class="bar-item-tab">
             <span class="material-symbols-outlined">
@@ -101,13 +35,37 @@
             </span>
             <div class="pivot-bar-item-title">代码</div>
         </div>
-
-        <div class="bar-item-tab" id="shuffle">
+        <div id="save" class="bar-item-tab">
             <span class="material-symbols-outlined">
-                shuffle
+                save
             </span>
-            <div class="pivot-bar-item-title">随机</div>
+            <div class="pivot-bar-item-title">保存</div>
         </div>
+        
+        <div class="bar-item-tab" id="translate">
+            <span class="material-symbols-outlined">
+                translate
+            </span>
+            <div class="pivot-bar-item-title">翻译</div>
+        </div>
+        <div class="bar-item-tab" id="light_mode">
+            <span class="material-symbols-outlined">
+                light_mode
+            </span>
+            <div class="pivot-bar-item-title">模式</div>
+        </div>
+
+
+
+
+
+    </div>
+    <div class="bar-renderer bottom">
+
+
+
+
+
         <div id="comment_word" class="bar-item-tab" style="display: none;">
             <span class="material-symbols-outlined">
                 comment
@@ -190,18 +148,7 @@
                 <div class="pivot-bar-item-title">剪式</div>
             </div>
 
-            <div id="save" class="item">
-                <span class="material-symbols-outlined">
-                    save
-                </span>
-                <div class="pivot-bar-item-title">保存</div>
-            </div>
-            <div class="item" id="translate">
-                <span class="material-symbols-outlined">
-                    translate
-                </span>
-                <div class="pivot-bar-item-title">翻译</div>
-            </div>
+
             <div class="item" id="function">
                 <span class="material-symbols-outlined">
                     function
@@ -217,7 +164,7 @@
                 </span>
                 <div class="pivot-bar-item-title">前进</div>
             </div>
-           
+
             <div class="item" id="variables_find_replace">
                 <span class="material-symbols-outlined">
                     variables
@@ -231,28 +178,24 @@
                 <div class="pivot-bar-item-title">空行</div>
             </div>
 
-            <div id="close-block" class="item">
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-                <div class="pivot-bar-item-title">剪块</div>
-            </div>
-            <div class="item" id="comment">
-                <span class="material-symbols-outlined">
-                    comment
-                </span>
-                <div class="pivot-bar-item-title">注释</div>
-            </div>
+           
 
         </div>
         <div class="items-wrapper selected">
-            
-           
+
             <div id="close-line-v" class="item">
                 <span class="material-symbols-outlined">
                     close
                 </span>
                 <div class="pivot-bar-item-title">剪行</div>
+            </div>
+            
+
+            <div id="close-block" class="item">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+                <div class="pivot-bar-item-title">剪块</div>
             </div>
             <div class="item" id="content_copy">
                 <span class="material-symbols-outlined">
@@ -260,31 +203,18 @@
                 </span>
                 <div class="pivot-bar-item-title">复行</div>
             </div>
+           
             <div class="item" id="find_replace">
                 <span class="material-symbols-outlined">
                     find_replace
                 </span>
                 <div class="pivot-bar-item-title">替换</div>
             </div>
-            <div class="item" id="function_expand">
+            <div class="item" id="comment">
                 <span class="material-symbols-outlined">
-                    function
+                    comment
                 </span>
-                <div class="pivot-bar-item-title">展数</div>
-            </div>
-          
-            <div class="item" id="text_snippet_1">
-                <span class="material-symbols-outlined">
-                    text_snippet
-                </span>
-                <div class="pivot-bar-item-title">图片</div>
-            </div>
-
-            <div class="item" id="text_snippet_2">
-                <span class="material-symbols-outlined">
-                    text_snippet
-                </span>
-                <div class="pivot-bar-item-title">颜色</div>
+                <div class="pivot-bar-item-title">注释</div>
             </div>
 
         </div>
@@ -355,30 +285,209 @@ ${content}`;
         function formatCode() {
             textarea.value = formatGlslCode(textarea.value);
         }
-        function initialize() {
-            // document.addEventListener('visibilitychange', async evt => {
-            //     if (document.visibilityState !== "visible") {
-            //         await saveData();
-            //         localStorage.setItem('code.editor', textarea.value.trim());
-            //     }
-            // });
-            // window.addEventListener("beforeunload", async evt => {
-            //     await saveData();
-            //     localStorage.setItem('code.editor', textarea.value.trim());
-            // });
-            document.getElementById('format').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                formatCode();
+        function mode1() {
+            const bottomBar = document.querySelector('.bar-renderer.bottom');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "comment",
+                    "注释",
+                    () => {
+                        commentLine(textarea)
+                    }
+                ],
+                [
+                    "code",
+                    "格式",
+                    () => {
+                        formatCode();
+                    }
+                ],
+                [
+                    "density_large",
+                    "正常",
+                    () => {
+                        formatCode();
+                    }
+                ],
+                [
+                    "content_copy",
+                    "复块",
+                    () => {
+                        copyBlock(textarea)
+                    }
+                ],
+
+                [
+                    "function",
+                    "展数",
+                    () => {
+                        decreaseCode(textarea)
+                        functionsExpand(textarea);
+                    }
+                ], [
+                    "variables",
+                    "收变",
+                    () => {
+                        decreaseCode(textarea)
+                        variables(textarea);
+                    }
+                ], [
+                    "data_object",
+                    "展变",
+                    () => {
+                        decreaseCode(textarea)
+                        parentheses(textarea);
+                    }
+                ],
+
+
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
             })
+        }
+        function mode2() {
+            const bottomBar = document.querySelector('.bar-renderer.bottom');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "decimal_decrease",
+                    "简化",
+                    () => {
+                        decreaseCode(textarea)
+                        formatCode();
+                    }
+                ],
+                [
+                    "go_to_line",
+                    "调试",
+                    () => {
+                        goToLine(textarea);
+                    }
+                ],
+                [
+                    "switch_right",
+                    "交换",
+                    () => {
+                        switchStatement(textarea);
+                    }
+                ],
+                [
+                    "shuffle",
+                    "随机",
+                    async () => {
+                        if (id) {
+                            try {
+                                const response = await fetch(`${baseUri}/code/random`);
+                                if (response.status > 399 || response.status < 200) {
+                                    throw new Error(`${response.status}: ${response.statusText}`)
+                                }
+                                const results = await response.text();
+                                window.location.href = `?id=${results}`
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        }
+                        else
+                            window.location.reload();
+                    }
+                ], [
+                    "text_snippet",
+                    "图片",
+                    () => {
+                        decreaseCode(textarea)
+                        insertSnippet1();
+                    }
+                ],
+                [
+                    "text_snippet",
+                    "颜色",
+                    () => {
+                        decreaseCode(textarea)
+                        insertSnippet2();
+                    }
+                ],
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+        function mode3() {
+            const bottomBar = document.querySelector('.bar-renderer.bottom');
+            [
+                [
+                    "decimal_decrease",
+                    "简化",
+                    () => {
+                        decreaseCode(textarea)
+                        formatCode();
+                    }
+                ],
+                [
+                    "go_to_line",
+                    "调试",
+                    () => {
+                        goToLine(textarea);
+                    }
+                ],
+                [
+                    "switch_right",
+                    "交换",
+                    () => {
+                        switchStatement(textarea);
+                    }
+                ],
+                [
+                    "shuffle",
+                    "随机",
+                    async () => {
+                        if (id) {
+                            try {
+                                const response = await fetch(`${baseUri}/code/random`);
+                                if (response.status > 399 || response.status < 200) {
+                                    throw new Error(`${response.status}: ${response.statusText}`)
+                                }
+                                const results = await response.text();
+                                window.location.href = `?id=${results}`
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        }
+                        else
+                            window.location.reload();
+                    }
+                ],
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+
+        function initialize() {
+            mode1();
+
             document.getElementById('save').addEventListener('click', async evt => {
                 await saveData();
                 // localStorage.setItem('code.editor', textarea.value.trim());
-            })
-            document.getElementById('variables').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                variables(textarea)
             })
             document.getElementById('variables_find_replace').addEventListener('click', evt => {
                 evt.stopPropagation();
@@ -398,11 +507,7 @@ ${content}`;
                 evt.stopImmediatePropagation();
                 cutLine(textarea)
             })
-            document.getElementById('content_copy_block').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                copyBlock(textarea)
-            })
+
             document.getElementById('javascript').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -428,17 +533,15 @@ else{
                 evt.stopImmediatePropagation();
                 comment(textarea);
             })
+
+
             document.getElementById('function').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 functions(textarea);
             })
-            document.getElementById('function_expand').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                functionsExpand(textarea);
-            })
-           
+
+
             document.getElementById('translate').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -455,17 +558,8 @@ else{
 
                 showSnippetsDialog();
             })
-            document.getElementById('text_snippet_1').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                insertSnippet1();
-            })
-            document.getElementById('text_snippet_2').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                insertSnippet2()
-            })
-            
+
+
             document.getElementById('code_snippet').addEventListener('click', async evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -477,18 +571,18 @@ else{
                 }
             })
 
-            document.getElementById('search').addEventListener('click', async evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                const points = getWordString(textarea);
-                let v = textarea.value.substring(points[0], points[1]).trim();
-                const s = `https://www.google.com/search?q=` + encodeURIComponent(v);
-                if (typeof NativeAndroid !== 'undefined') {
-                    NativeAndroid.launchApp("psycho.euphoria.l", s);
-                } else {
-                    window.open(s, '_blank');
-                }
-            });
+            // document.getElementById('search').addEventListener('click', async evt => {
+            //     evt.stopPropagation();
+            //     evt.stopImmediatePropagation();
+            //     const points = getWordString(textarea);
+            //     let v = textarea.value.substring(points[0], points[1]).trim();
+            //     const s = `https://www.google.com/search?q=` + encodeURIComponent(v);
+            //     if (typeof NativeAndroid !== 'undefined') {
+            //         NativeAndroid.launchApp("psycho.euphoria.l", s);
+            //     } else {
+            //         window.open(s, '_blank');
+            //     }
+            // });
             document.getElementById('close-line').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -507,12 +601,7 @@ else{
                 evt.stopImmediatePropagation();
                 deleteBlock(textarea)
             });
-            document.getElementById('decimal_decrease').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                decreaseCode(textarea)
-                formatCode();
-            });
+
             document.getElementById('navigate_next').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
@@ -521,35 +610,8 @@ else{
                 else
                     window.location.reload();
             });
-            document.getElementById('shuffle').addEventListener('click', async evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
 
-                if (id) {
-                    try {
-                        const response = await fetch(`${baseUri}/code/random`);
-                        if (response.status > 399 || response.status < 200) {
-                            throw new Error(`${response.status}: ${response.statusText}`)
-                        }
-                        const results = await response.text();
-                        window.location.href = `?id=${results}`
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
-                else
-                    window.location.reload();
-            });
-            document.getElementById('go_to_line').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                goToLine(textarea);
-            });
-            document.getElementById('data_object').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                parentheses(textarea);
-            });
+
 
             document.querySelector('.items-wrapper.selected').addEventListener('click', evt => {
                 evt.stopPropagation();
@@ -564,34 +626,24 @@ else{
             document.getElementById('light_mode').addEventListener('click', evt => {
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
-                if (document.getElementById('normal-line').hasAttribute('style')) {
-                    document.getElementById('decimal_decrease').style.display = 'none';
-                    document.getElementById('go_to_line').style.display = 'none';
-                    document.getElementById('shuffle').style.display = 'none';
-                    document.getElementById('normal-line').removeAttribute('style');
-                    document.getElementById('switch_right').removeAttribute('style');
-                    document.getElementById('comment_word').removeAttribute('style');
-
-
-                } else {
-                    document.getElementById('decimal_decrease').removeAttribute('style');
-                    document.getElementById('go_to_line').removeAttribute('style');
-                    document.getElementById('shuffle').removeAttribute('style');
-                    document.getElementById('normal-line').style.display = 'none';
-                    document.getElementById('switch_right').style.display = 'none';
-                    document.getElementById('comment_word').style.display = 'none';
-
+                let mode = parseInt(document.body.dataset.mode);
+                console.log(mode);
+                mode++;
+                if (mode > 2) {
+                    mode = 1;
+                }
+                document.body.dataset.mode = mode;
+                if (mode === 1) {
+                    mode1();
+                }
+                else if (mode === 2) {
+                    mode2();
                 }
             })
-            document.getElementById('switch_right').addEventListener('click', evt => {
-                switchStatement(textarea);
-            })
-            document.getElementById('normal-line').addEventListener('click', evt => {
-                duplicateLine(textarea)
-            })
-            document.getElementById('comment_word').addEventListener('click', evt => {
-                commentWord(textarea)
-            })
+
+            // document.getElementById('comment_word').addEventListener('click', evt => {
+            //     commentWord(textarea)
+            // })
 
             document.addEventListener('keydown', async evt => {
                 if (evt.ctrlKey) {

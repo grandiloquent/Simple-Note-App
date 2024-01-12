@@ -1510,11 +1510,10 @@ function functionsExpand(textarea) {
             inputsFunction[argumentsFunction.length] + " = "
         );
     }
+    writeText(substringBeforeLast(substringAfter(s,"{"),"}"))
     s = `/*
-${s}
-*/
 ${textarea.value.substring(p[1], selectionEnd)}
-    `
+*/`
     textarea.setRangeText(s, p[0], selectionEnd);
 }
 

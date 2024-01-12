@@ -394,10 +394,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::string_view id, title;
         std::regex c("[\u4e00-\u9fa5]+");
         while (fetch_row(id, title)) {
-                if (!std::regex_search(title.data(), c)) {
-                    res.set_content(id.data(), id.size(), "text/plain");
-                    return;
-                }
+            if (!std::regex_search(title.data(), c)) {
+                res.set_content(id.data(), id.size(), "text/plain");
+                return;
+            }
         }
         static const char query_r[]
                 = R"(select id,title from code ORDER BY random() LIMIT 1)";
@@ -470,7 +470,6 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             }
 
         }
-
         if (isUpdate) {
 
             static const char query[]
@@ -486,6 +485,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             if (id == 0) {
                 static const char query[]
                         = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+
                 db::QueryResult fetch_row = db::query<query>(title,
                                                              content,
                                                              GetTimeStamp(),

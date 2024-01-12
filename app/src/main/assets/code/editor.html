@@ -48,6 +48,12 @@
             </span>
             <div class="pivot-bar-item-title">翻译</div>
         </div>
+        <div class="bar-item-tab" id="comment_string">
+            <span class="material-symbols-outlined">
+                comment
+            </span>
+            <div class="pivot-bar-item-title">注释</div>
+        </div>
         <div class="bar-item-tab" id="light_mode">
             <span class="material-symbols-outlined">
                 light_mode
@@ -329,14 +335,14 @@ ${content}`;
                     "variables",
                     "收变",
                     () => {
-                        decreaseCode(textarea)
+                        
                         variables(textarea);
                     }
                 ], [
                     "data_object",
                     "展变",
                     () => {
-                        decreaseCode(textarea)
+                        
                         parentheses(textarea);
                     }
                 ],
@@ -521,6 +527,20 @@ else if(x !== undefined){
 }
 else{
 }`;
+                textarea.setRangeText(s, selectionStart, selectionEnd)
+            })
+            document.getElementById('comment_string').addEventListener('click', evt => {
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+
+
+                let selectionStart = textarea.selectionStart;
+                let selectionEnd = textarea.selectionEnd;
+                let s = `
+// ============================
+// 
+// ============================
+`;
                 textarea.setRangeText(s, selectionStart, selectionEnd)
             })
             document.getElementById('preview').addEventListener('click', async evt => {

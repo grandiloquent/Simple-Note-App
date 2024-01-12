@@ -443,7 +443,7 @@ function getWord(textarea) {
     while (end + 1 < textarea.value.length && /[a-zA-Z0-9\u3400-\u9FBF]/.test(textarea.value[end])) {
         end++;
     }
-    return [start, end + 1];
+    return [start, end];
 }
 function getWordString(textarea) {
     let start = textarea.selectionStart;
@@ -955,6 +955,8 @@ ${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
     textarea.setRangeText(s, points[0], points[1]);
 
 }
+
+
 const WEBGL1 = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charset='UTF-8' />\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">\r\n  \r\n#version 300 es\r\nprecision highp float;\r\nuniform vec3 iResolution;\r\nuniform float iTime;\r\n\r\n", "\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.innerHTML=log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001; // convert to seconds\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
 
 const WEBGL2 = ["<html lang='en'>\r\n<head>\r\n  <meta name='viewport' content='width=device-width, initial-scale=1.0' />\r\n  <script id=\"vs\" type=\"x-shader/x-vertex\">\r\n    #version 300 es\r\n     in vec4 a_position;\r\n     void main() {\r\n       gl_Position = a_position;\r\n     }\r\n     </script>\r\n  <script id=\"fs\" type=\"x-shader/x-fragment\">#version 300 es\r\nprecision highp float;\r\nprecision highp sampler2D;\r\nuniform vec3 iResolution;\r\nuniform vec4 iMouse;\r\nuniform float iTime;\r\nuniform sampler2D iChannel0;\r\nuniform int iFrame;\r\n", "\r\nout vec4 outColor;\r\nvoid main() {\r\n  mainImage(outColor, gl_FragCoord.xy);\r\n}\r\n</script>\r\n</head>\r\n<body>\r\n  <script>\r\n    (function() {\r\n      'use strict';\r\n      window.getShaderSource = function(id) {\r\n        return document.getElementById(id).textContent.replace(/^\\s+|\\s+$/g, '');\r\n      };\r\n      function createShader(gl, source, type) {\r\n        var shader = gl.createShader(type);\r\n        gl.shaderSource(shader, source);\r\n        gl.compileShader(shader);\r\n        return shader;\r\n      }\r\n      window.createProgram = function(gl, vertexShaderSource, fragmentShaderSource) {\r\n        var program = gl.createProgram();\r\n        var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);\r\n        var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);\r\n        gl.attachShader(program, vshader);\r\n        gl.deleteShader(vshader);\r\n        gl.attachShader(program, fshader);\r\n        gl.deleteShader(fshader);\r\n        gl.linkProgram(program);\r\n        var log = gl.getProgramInfoLog(program);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(vshader);\r\n        if (log) {\r\n          console.log(log);\r\n        }\r\n        log = gl.getShaderInfoLog(fshader);\r\n        if (log) {\r\n          document.body.textContent = log;\r\n        }\r\n        return program;\r\n      };\r\n    })();\r\n    window.onerror = function(errMsg, url, line, column, error) {\r\n      var result = !column ? '' : 'column: ' + column;\r\n      result += !error;\r\n      document.write(\"\\nError= \" + errMsg + \"\\nurl= \" + url + \"\\nline= \" + line + result);\r\n      var suppressErrorAlert = true;\r\n      return suppressErrorAlert;\r\n    };\r\n    document.addEventListener('visibilitychange', async evt => {\r\n      if (document.visibilityState === \"visible\") {\r\n        location.reload();\r\n      }\r\n    })\r\n  </script>\r\n  <script>\r\n    var canvas = document.createElement('canvas');\r\n    canvas.height = 300;\r\n    canvas.width = 300;\r\n    canvas.style.width = '300px';\r\n    canvas.style.height = '300px';\r\n    document.body.appendChild(canvas);\r\n    var gl = canvas.getContext('webgl2', {\r\n      antialias: false\r\n    });\r\n    var program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));\r\n    const positionAttributeLocation = gl.getAttribLocation(program, \"a_position\");\r\n    const resolutionLocation = gl.getUniformLocation(program, \"iResolution\");\r\n    const mouseLocation = gl.getUniformLocation(program, \"iMouse\");\r\n    const timeLocation = gl.getUniformLocation(program, \"iTime\");\r\n    const frameLocation = gl.getUniformLocation(program, \"iFrame\");\r\n    const vao = gl.createVertexArray();\r\n    gl.bindVertexArray(vao);\r\n    const positionBuffer = gl.createBuffer();\r\n    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\r\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([\r\n      -1, -1,\r\n      1, -1,\r\n      -1, 1,\r\n      -1, 1,\r\n      1, -1,\r\n      1, 1,\r\n    ]), gl.STATIC_DRAW);\r\n    gl.enableVertexAttribArray(positionAttributeLocation);\r\n    gl.vertexAttribPointer(\r\n      positionAttributeLocation,\r\n      2,\r\n      gl.FLOAT,\r\n      false,\r\n      0,\r\n      0,\r\n    );\r\n    let mouseX = 0;\r\n    let mouseY = 0;\r\n    function setMousePosition(e) {\r\n      const rect = canvas.getBoundingClientRect();\r\n      mouseX = e.clientX - rect.left;\r\n      mouseY = rect.height - (e.clientY - rect.top) - 1;\r\n    }\r\n    canvas.addEventListener('mousemove', setMousePosition);\r\n    canvas.addEventListener('touchstart', (e) => {\r\n      e.preventDefault();\r\n    }, {\r\n      passive: false\r\n    });\r\n    canvas.addEventListener('touchmove', (e) => {\r\n      e.preventDefault();\r\n      setMousePosition(e.touches[0]);\r\n    }, {\r\n      passive: false\r\n    });\r\n    let frame = 0;\r\n    gl.useProgram(program);\r\n    gl.bindVertexArray(vao);\r\n    function render(time) {\r\n      time *= 0.001;\r\n      frame++;\r\n      gl.clearColor(0., 0., 0., 1.0);\r\n      gl.clear(gl.COLOR_BUFFER_BIT);\r\n      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);\r\n      gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);\r\n      gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);\r\n      gl.uniform1f(timeLocation, time);\r\n      gl.uniform1i(frameLocation, frame);\r\n      gl.drawArrays(gl.TRIANGLES, 0, 6);\r\n      requestAnimationFrame(render);\r\n    }\r\n    requestAnimationFrame(render);\r\n  </script>\r\n</body>\r\n</html>"]
@@ -1467,5 +1469,170 @@ function commentWord(textarea) {
     } else {
         textarea.setRangeText(`/*${s}*/`, start, end);
     }
+
+}
+function functionsExpand(textarea) {
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== "\n") {
+        selectionStart--;
+    }
+    let count = 0;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
+        if (textarea.value[selectionEnd] === '{') {
+            count++;
+        } else if (textarea.value[selectionEnd] === '}') {
+            if (count === 0) {
+                break;
+            }
+            count--;
+            if (count === 0) {
+                selectionEnd++;
+                break;
+            }
+        }
+    }
+    let p = getLine(textarea);
+    let s = textarea.value.substring(p[1], selectionEnd);
+    let inputsFunction = textarea.value.substring(p[0], p[1]).split(',');
+    let argumentsFunction = substringBefore(substringAfter(s, "("), ")")
+        .split(",").map(x => x.split(" ")[x.split(" ").length - 1]);
+    console.log(argumentsFunction, inputsFunction, s);
+
+    for (let i = 0; i < argumentsFunction.length; i++) {
+        s = s.replaceAll(new RegExp("\\b" + argumentsFunction[i] + "\\b", 'g'),
+            inputsFunction[i]);
+    }
+    if (inputsFunction.length > argumentsFunction.length) {
+        s = s.replaceAll(new RegExp("\\b" + "return" + "\\b", 'g'),
+            inputsFunction[argumentsFunction.length] + " = "
+        );
+    }
+    s = `/*
+${s}
+*/
+${textarea.value.substring(p[1], selectionEnd)}
+    `
+    textarea.setRangeText(s, p[0], selectionEnd);
+}
+
+function insertSnippet1() {
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    let s = `<script>
+    //
+    // Initialize a texture and load an image.
+    // When the image finished loading copy it into the texture.
+    //
+    function loadTexture(gl, url, offset) {
+      const texture = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0 + offset);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      // Because images have to be downloaded over the internet
+      // they might take a moment until they are ready.
+      // Until then put a single pixel in the texture so we can
+      // use it immediately. When the image has finished downloading
+      // we'll update the texture with the contents of the image.
+      const level = 0;
+      const internalFormat = gl.RGBA;
+      const width = 1;
+      const height = 1;
+      const border = 0;
+      const srcFormat = gl.RGBA;
+      const srcType = gl.UNSIGNED_BYTE;
+      const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        level,
+        internalFormat,
+        width,
+        height,
+        border,
+        srcFormat,
+        srcType,
+        pixel,
+      );
+      const image = new Image();
+      image.onload = () => {
+        gl.activeTexture(gl.TEXTURE0 + offset);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          level,
+          internalFormat,
+          srcFormat,
+          srcType,
+          image,
+        );
+        // WebGL1 has different requirements for power of 2 images
+        // vs. non power of 2 images so check if the image is a
+        // power of 2 in both dimensions.
+        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+          // Yes, it's a power of 2. Generate mips.
+          gl.generateMipmap(gl.TEXTURE_2D);
+        } else {
+          // No, it's not a power of 2. Turn off mips and set
+          // wrapping to clamp to edge
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+      };
+      image.src = url;
+      return texture;
+    }
+    function isPowerOf2(value) {
+      return (value & (value - 1)) === 0;
+    }
+    loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/mmexport1704519455697.jpg", 0);
+    const startRecording = () => {
+      const canvas = document.querySelector("canvas");
+      const data = []; // here we will store our recorded media chunks (Blobs)
+      const stream = canvas.captureStream(30); // records the canvas in real time at our preferred framerate 30 in this case.
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "video/webm; codecs=vp9"
+      }); // init the recorder
+      // whenever the recorder has new data, we will store it in our array
+      mediaRecorder.ondataavailable = (e) => data.push(e.data);
+      // only when the recorder stops, we construct a complete Blob from all the chunks
+      mediaRecorder.onstop = (e) =>
+        downloadVideo(new Blob(data, {
+          type: "video/webm;codecsvp9"
+        }));
+      mediaRecorder.start();
+      setTimeout(() => {
+        mediaRecorder.stop();
+      }, 8000); // stop recording in 6s
+    };
+    const downloadVideo = async (blob) => {
+      const div = document.querySelector("body");
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "test.webm";
+      a.className = "button";
+      a.innerText = "click here to download";
+      div.appendChild(a);
+    };
+    setTimeout(() => {
+      startRecording();
+    }, 3000);
+  </script>`;
+    textarea.setRangeText(s, selectionStart, selectionEnd)
+
+}
+function insertSnippet2() {
+    const points = getWord(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n')
+            break;
+    }
+    textarea.setRangeText(`
+${s}.w = 1.0;`, selectionEnd, selectionEnd)
 
 }

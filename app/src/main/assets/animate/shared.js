@@ -437,10 +437,10 @@ function getStatement(textarea) {
 function getWord(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
-    while (start - 1 > -1 && /[a-zA-Z0-9\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
+    while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
         start--;
     }
-    while (end + 1 < textarea.value.length && /[a-zA-Z0-9\u3400-\u9FBF]/.test(textarea.value[end])) {
+    while (end + 1 < textarea.value.length && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[end])) {
         end++;
     }
     return [start, end];
@@ -1098,8 +1098,11 @@ function variables(textarea) {
             }
         } else if (textarea.value[selectionEnd] === ';' || textarea.value[selectionEnd] === '\n') {
             break;
+        } else if (textarea.value[selectionEnd] === ',' && count === 0) {
+            break;
         }
     }
+
     let s = textarea.value.substring(selectionStart, selectionEnd);
     let name = `${s[0]}0`;
 
@@ -1122,6 +1125,18 @@ float ${name} = ${s};
 
 }
 
+function variablesUnique(textarea) {
+    let p = getWord(textare);
+    let name = textarea.value.substring(p[0], p[1]);
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${s[0]}${i}`;
+    }
+
+    textarea.value = textarea.value.replaceAll(new RegExp("\\b" + name + "\\b", 'g'), name);
+
+}
 function variablesReplace(textarea) {
     /*
     let selectionStart = textarea.selectionStart;
@@ -1274,7 +1289,7 @@ function goToLine(textarea) {
         if (start === -1) return;
         const end = textarea.value.indexOf("</script>", start + p1.length);
         let array = textarea.value.substring(start + p1.length, end).split('\n');
-        let index = textarea.value.indexOf(array[i]);
+        let index = textarea.value.indexOf(array[i-1]+"\n"+array[i]);
         textarea.focus();
         textarea.scrollTop = 0;
         const fullText = textarea.value;
@@ -1443,6 +1458,28 @@ function duplicateLine(textarea) {
     }
 
 }
+function duplicateStart(textarea) {
+    const points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    if (s.startsWith("//")) {
+        textarea.selectionStart = points[1] + 1;
+        let p = getLine(textarea);
+        textarea.setRangeText("", p[0], p[1]);
+        textarea.setRangeText(substringAfter(s, "//"), points[0], points[1]);
+    } else {
+        let name = "";
+
+        let str = `${substringBefore(s, "=")}= ${name};`
+        let selectionEnd = textarea.selectionEnd;
+
+        while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+            selectionEnd++;
+        }
+        textarea.setRangeText("\n" + str, selectionEnd, selectionEnd);
+        textarea.setRangeText("// ", points[0], points[0]);
+    }
+
+}
 function commentWord(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
@@ -1510,7 +1547,7 @@ function functionsExpand(textarea) {
             inputsFunction[argumentsFunction.length] + " = "
         );
     }
-    writeText(substringBeforeLast(substringAfter(s,"{"),"}"))
+    writeText(substringBeforeLast(substringAfter(s, "{"), "}"))
     s = `/*
 ${textarea.value.substring(p[1], selectionEnd)}
 */`

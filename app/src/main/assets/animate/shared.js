@@ -1688,9 +1688,10 @@ ${textarea.value.substring(p[1], selectionEnd)}
 }
 
 function insertSnippet1() {
-    let selectionStart = textarea.selectionStart;
-    let selectionEnd = textarea.selectionEnd;
-    let s = `<script>
+
+    let s = `
+    
+<script>
     //
     // Initialize a texture and load an image.
     // When the image finished loading copy it into the texture.
@@ -1735,6 +1736,9 @@ function insertSnippet1() {
           srcType,
           image,
         );
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         // WebGL1 has different requirements for power of 2 images
         // vs. non power of 2 images so check if the image is a
         // power of 2 in both dimensions.
@@ -1757,7 +1761,6 @@ function insertSnippet1() {
     }
     loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/mmexport1704519455697.jpg", 0);
     // loadTexture(gl, "", 1);
-    
     const startRecording = () => {
       const canvas = document.querySelector("canvas");
       const data = []; // here we will store our recorded media chunks (Blobs)
@@ -1833,8 +1836,10 @@ function insertSnippet1() {
   }
   loadCubeMap();
 </script>
+
+</body>
   `;
-    textarea.setRangeText(s, selectionStart, selectionEnd)
+    textarea.value=textarea.value.replace("</body>", s);
 
 }
 function insertSnippet2() {
@@ -1999,18 +2004,18 @@ if(${selectedString}==0.0){
             while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
                 selectionStart--;
             }
-            textarea.setRangeText("// " + s + "\n", selectionStart, selectionStart);
+            textarea.setRangeText("\n// " + s , selectionStart, selectionStart);
             return;
         } else {
             let start = textarea.selectionStart;
             let end = textarea.selectionEnd;
-            while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
+            while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start])) {
                 start--;
             }
-            while (end + 1 < textarea.value.length && textarea.value[end] !== ",") {
+            while (end + 1 < textarea.value.length && textarea.value[end+1] !== ",") {
                 end++;
             }
-            let str = s.substring(0, start) + "0.0" + s.substring(end);
+            let str = s.substring(0, start-1) + "0.0" + s.substring(end-1);
             textarea.setRangeText("\n" + str, points[1], points[1]);
         }
         let selectionEnd = textarea.selectionEnd;

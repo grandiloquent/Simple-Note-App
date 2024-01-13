@@ -14,13 +14,14 @@
     <link rel="stylesheet" href="index.css">
     <script src="../animate/custom-toast.js"></script>
     <script src="../animate/shared.js"></script>
+    <script src="../animate/editor.js"></script>
     <script src="../animate/glslx.js"></script>
     <script src="../animate/custom-dialog.js"></script>
 </head>
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px"></textarea>
+        <textarea id="textarea" style="font-size: 14px">12345</textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>
@@ -154,6 +155,8 @@
         const id = new URL(window.location).searchParams.get('id');
 
         const textarea = document.getElementById("textarea");
+        findNextLineStart();
+       
         async function loadData() {
             const res = await fetch(`${baseUri}/code?id=${id}`, {
                 cache: "no-store"
@@ -697,7 +700,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                     }
                 ],
 
-               
+
                 [
                     "find_replace",
                     "替换",
@@ -717,15 +720,15 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                     "exposure_plus_2",
                     "放大",
                     () => {
-                        decrease2(textarea,true);  
+                        decrease2(textarea, true);
 
                     }
                 ],
                 [
                     "exposure_neg_2",
                     "缩小",
-                     () => {
-                    decrease2(textarea);  
+                    () => {
+                        decrease2(textarea);
 
                     }
                 ],

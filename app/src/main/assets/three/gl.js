@@ -45,10 +45,22 @@ document.addEventListener('visibilitychange', async evt => {
     }
 })
 var canvas = document.createElement('canvas');
-canvas.height = 300;
-canvas.width = 300;
-canvas.style.width = '300px';
-canvas.style.height = '300px';
+let canvasWidth = 300;
+let canvasHeight = 300;
+let isDate = false;
+const dataset = document.body.dataset;
+if (dataset.size) {
+    const array = dataset.size.split(' ');
+    canvasWidth = parseInt(array[0], 10);
+    canvasHeight = parseInt(array[1], 10);
+}
+if (dataset.isdate) {
+    isDate = true;
+}
+canvas.height = canvasWidth;
+canvas.width = canvasHeight;
+canvas.style.width = canvasWidth + 'px';
+canvas.style.height = canvasHeight + 'px';
 document.body.appendChild(canvas);
 var gl = canvas.getContext('webgl2', {
     antialias: false
@@ -59,6 +71,10 @@ const resolutionLocation = gl.getUniformLocation(program, "iResolution");
 const mouseLocation = gl.getUniformLocation(program, "iMouse");
 const timeLocation = gl.getUniformLocation(program, "iTime");
 const frameLocation = gl.getUniformLocation(program, "iFrame");
+const dateLocation = gl.getUniformLocation(program, "iDate");
+const timeDeltaLocation = gl.getUniformLocation(program, "iTimeDelta");
+const frameRateLocation = gl.getUniformLocation(program, "iFrameRate");
+
 const vao = gl.createVertexArray();
 gl.bindVertexArray(vao);
 const positionBuffer = gl.createBuffer();
@@ -100,6 +116,7 @@ canvas.addEventListener('touchmove', (e) => {
     passive: false
 });
 let frame = 0;
+let then = 0;
 gl.useProgram(program);
 gl.bindVertexArray(vao);
 function render(time) {
@@ -111,7 +128,19 @@ function render(time) {
     gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);
     gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);
     gl.uniform1f(timeLocation, time);
+    gl.uniform1f(timeDeltaLocation, then - time);
+    gl.uniform1f(frameRateLocation, then - time / (1 / 60));
+    then = time;
+
     gl.uniform1i(frameLocation, frame);
+    if (isDate) {
+        const d = new Date();
+        let dates = [d.getFullYear(), // the year (four digits)
+        d.getMonth(),	   // the month (from 0-11)
+        d.getDate(),     // the day of the month (from 1-31)
+        d.getHours() * 60.0 * 60 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000.0];
+        gl.uniform4fv(dateLocation, new Float32Array(dates));
+    }
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     requestAnimationFrame(render);
 }

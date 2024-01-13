@@ -221,6 +221,131 @@ function humanFileSize(size) {
     var i = Math.floor(Math.log(size) / Math.log(1024));
     return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
 }
+function getLine(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    if (textarea.value[start] === '\n' && start - 1 > 0) {
+        start--;
+    }
+    if (textarea.value[end] === '\n' && end - 1 > 0) {
+        end--;
+    }
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
+        end++;
+    }
+    return [start, end + 1];
+}
+function getStatement(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    if (textarea.value[start] === '\n' && start - 1 > 0) {
+        start--;
+    }
+    if (textarea.value[end] === '\n' && end - 1 > 0) {
+        end--;
+    }
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== ';') {
+        end++;
+    }
+    return [start, end + 1];
+}
+function getWord(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[end])) {
+        end++;
+    }
+    return [start, end];
+}
+function getNumber(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1 && /[0-9.]/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && /[0-9.]/.test(textarea.value[end])) {
+        end++;
+    }
+    return [start, end];
+}
+function getWordString(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1 && /[a-zA-Z0-9.]/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && /[a-zA-Z0-9.]/.test(textarea.value[end])) {
+        end++;
+    }
+    return [start, end];
+}
+function findExtendPosition(editor) {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    let string = editor.value;
+    let offsetStart = start;
+    while (offsetStart > 0) {
+        if (!/\s/.test(string[offsetStart - 1]))
+            offsetStart--;
+        else {
+            let os = offsetStart;
+            while (os > 0 && /\s/.test(string[os - 1])) {
+                os--;
+            }
+            if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
+                break;
+            }
+            offsetStart = os;
+        }
+    }
+    let offsetEnd = end;
+    while (offsetEnd < string.length) {
+        if (!/\s/.test(string[offsetEnd + 1])) {
+
+            offsetEnd++;
+        } else {
+
+            let oe = offsetEnd;
+            while (oe < string.length && /\s/.test(string[oe + 1])) {
+                oe++;
+            }
+            if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
+                offsetEnd++;
+
+                break;
+            }
+            offsetEnd = oe + 1;
+
+        }
+    }
+    while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
+        offsetStart--;
+    }
+    // if (/\s/.test(string[offsetEnd])) {
+    //     offsetEnd--;
+    // }
+    return [offsetStart, offsetEnd];
+}
+
+function writeText(message) {
+    const textarea = document.createElement("textarea");
+    textarea.style.position = 'fixed';
+    textarea.style.right = '100%';
+    document.body.appendChild(textarea);
+    textarea.value = message;
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+}
 
 async function readText() {
     // const textarea = document.createElement("textarea");
@@ -240,6 +365,17 @@ async function readText() {
     return strings
 }
 
+function findNextLineStart() {
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n') {
+            selectionEnd++;
+            break;
+        }
+    }
+    return selectionEnd;
+}
 function snake(string) {
     return string.replaceAll(/(?<=[a-z])[A-Z]/g, m => `_${m}`).toLowerCase()
         .replaceAll(/[ -]([a-z])/g, m => `_${m[1]}`)
@@ -318,63 +454,6 @@ function upperCamel(string) {
     return string.slice(0, 1).toUpperCase() + string.slice(1);
 }
 
-function writeText(message) {
-    const textarea = document.createElement("textarea");
-    textarea.style.position = 'fixed';
-    textarea.style.right = '100%';
-    document.body.appendChild(textarea);
-    textarea.value = message;
-    textarea.select();
-    document.execCommand('copy');
-    textarea.remove();
-}
-function findExtendPosition(editor) {
-    const start = editor.selectionStart;
-    const end = editor.selectionEnd;
-    let string = editor.value;
-    let offsetStart = start;
-    while (offsetStart > 0) {
-        if (!/\s/.test(string[offsetStart - 1]))
-            offsetStart--;
-        else {
-            let os = offsetStart;
-            while (os > 0 && /\s/.test(string[os - 1])) {
-                os--;
-            }
-            if ([...string.substring(offsetStart, os).matchAll(/\n/g)].length > 1) {
-                break;
-            }
-            offsetStart = os;
-        }
-    }
-    let offsetEnd = end;
-    while (offsetEnd < string.length) {
-        if (!/\s/.test(string[offsetEnd + 1])) {
-
-            offsetEnd++;
-        } else {
-
-            let oe = offsetEnd;
-            while (oe < string.length && /\s/.test(string[oe + 1])) {
-                oe++;
-            }
-            if ([...string.substring(offsetEnd, oe + 1).matchAll(/\n/g)].length > 1) {
-                offsetEnd++;
-
-                break;
-            }
-            offsetEnd = oe + 1;
-
-        }
-    }
-    while (offsetStart > 0 && string[offsetStart - 1] !== '\n') {
-        offsetStart--;
-    }
-    // if (/\s/.test(string[offsetEnd])) {
-    //     offsetEnd--;
-    // }
-    return [offsetStart, offsetEnd];
-}
 function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
@@ -400,74 +479,7 @@ ${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
     textarea.value = `${textarea.value.substring(0, selectionStart)}${fn(selectedString.trim())}${textarea.value.substring(selectionEnd)}`;
 
 }
-function getLine(textarea) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    if (textarea.value[start] === '\n' && start - 1 > 0) {
-        start--;
-    }
-    if (textarea.value[end] === '\n' && end - 1 > 0) {
-        end--;
-    }
-    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
-        start--;
-    }
-    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
-        end++;
-    }
-    return [start, end + 1];
-}
-function getStatement(textarea) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    if (textarea.value[start] === '\n' && start - 1 > 0) {
-        start--;
-    }
-    if (textarea.value[end] === '\n' && end - 1 > 0) {
-        end--;
-    }
-    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
-        start--;
-    }
-    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== ';') {
-        end++;
-    }
-    return [start, end + 1];
-}
-function getWord(textarea) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
-        start--;
-    }
-    while (end + 1 < textarea.value.length && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[end])) {
-        end++;
-    }
-    return [start, end];
-}
-function getNumber(textarea) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    while (start - 1 > -1 && /[0-9.]/.test(textarea.value[start - 1])) {
-        start--;
-    }
-    while (end + 1 < textarea.value.length && /[0-9.]/.test(textarea.value[end])) {
-        end++;
-    }
-    return [start, end];
-}
 
-function getWordString(textarea) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    while (start - 1 > -1 && /[a-zA-Z0-9.]/.test(textarea.value[start - 1])) {
-        start--;
-    }
-    while (end + 1 < textarea.value.length && /[a-zA-Z0-9.]/.test(textarea.value[end])) {
-        end++;
-    }
-    return [start, end];
-}
 function escapeHtml(unsafe) {
     return unsafe
         .replace(/&/g, "&amp;")
@@ -1744,6 +1756,8 @@ function insertSnippet1() {
       return (value & (value - 1)) === 0;
     }
     loadTexture(gl, "/file?path=/storage/emulated/0/.editor/images/mmexport1704519455697.jpg", 0);
+    // loadTexture(gl, "", 1);
+    
     const startRecording = () => {
       const canvas = document.querySelector("canvas");
       const data = []; // here we will store our recorded media chunks (Blobs)
@@ -1776,21 +1790,59 @@ function insertSnippet1() {
     setTimeout(() => {
       startRecording();
     }, 3000);
-  </script>`;
+  </script>
+  
+  <script>
+  function loadCubeMap(urls) {
+    urls = [
+      "/file?path=/storage/emulated/0/.editor/images/v.jpg",
+      "/file?path=/storage/emulated/0/.editor/images/v_1.jpg",
+      "/file?path=/storage/emulated/0/.editor/images/v_2.jpg",
+      "/file?path=/storage/emulated/0/.editor/images/v_3.jpg",
+      "/file?path=/storage/emulated/0/.editor/images/v_4.jpg",
+      "/file?path=/storage/emulated/0/.editor/images/v_5.jpg",
+    ];
+    let images = [new Image(), new Image(), new Image(), new Image(), new Image(), new Image()];
+    let numLoaded = 0;
+    for (var i = 0; i < 6; i++) {
+      images[i].id = i;
+      images[i].crossOrigin = '';
+      images[i].onload = function() {
+        var id = this.id;
+        numLoaded++;
+        if (numLoaded === 6) {
+          var id = gl.createTexture();
+          let flipY = false;
+          gl.bindTexture(gl.TEXTURE_CUBE_MAP, id);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, 32856, 6408, 5121, images[0]);
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 32856, 6408, 5121, images[1]);
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, 32856, 6408, 5121, (flipY ? images[3] : images[2]));
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, 32856, 6408, 5121, (flipY ? images[2] : images[3]));
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, 32856, 6408, 5121, images[4]);
+          gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, 32856, 6408, 5121, images[5]);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+          //gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+        }
+      }
+      images[i].src = urls[i];
+    }
+  }
+  loadCubeMap();
+</script>
+  `;
     textarea.setRangeText(s, selectionStart, selectionEnd)
 
 }
 function insertSnippet2() {
     const points = getWord(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
-    let selectionEnd = textarea.selectionEnd;
-    while (selectionEnd < textarea.value.length) {
-        selectionEnd++;
-        if (textarea.value[selectionEnd] === '\n')
-            break;
-    }
-    textarea.setRangeText(`
-${s}.w = 1.0;`, selectionEnd, selectionEnd)
+    let nextStart = findNextLineStart();
+    textarea.setRangeText(`${s}.w = 1.0;
+`, nextStart, nextStart)
 
 }
 function decrease2(textarea, isAdd) {
@@ -1943,7 +1995,7 @@ if(${selectedString}==0.0){
             }
 
             textarea.setRangeText(name, pn[0], pn[1]);
-            let selectionStart= textarea.selectionStart;
+            let selectionStart = textarea.selectionStart;
             while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
                 selectionStart--;
             }

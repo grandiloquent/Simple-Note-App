@@ -258,7 +258,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         res.set_header("Access-Control-Allow-Origin", "*");
 
         auto q = req.get_param_value("q");
-
+        auto all = req.get_param_value("all");
         if (q.empty()) {
             static const char query[]
                     = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
@@ -277,7 +277,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             }
             res.set_content(doc.dump(), "application/json");
 
-        } else {
+        } else if (!all.empty()) {
 
             static const char queryv[]
                     = R"(SELECT id,title,content,update_at FROM code)";
@@ -289,6 +289,29 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             while (fetch_row_v(id, title, content, update_at)) {
                 if (std::regex_search(std::string{title}, q_regex) ||
                     std::regex_search(std::string{content}, q_regex)) {
+                    nlohmann::json j = {
+
+                            {"id",        id},
+                            {"title",     title},
+                            {"update_at", update_at},
+
+                    };
+                    doc.push_back(j);
+                }
+
+            }
+            res.set_content(doc.dump(), "application/json");
+        } else {
+
+            static const char queryv[]
+                    = R"(SELECT id,title,update_at FROM code)";
+            db::QueryResult fetch_row_v = db::query<queryv>();
+            std::string_view id, title, update_at;
+
+            nlohmann::json doc = nlohmann::json::array();
+            std::regex q_regex(q);
+            while (fetch_row_v(id, title, update_at)) {
+                if (std::regex_search(std::string{title}, q_regex)) {
                     nlohmann::json j = {
 
                             {"id",        id},
@@ -470,7 +493,6 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             }
 
         }
-
 
 
         if (isUpdate) {

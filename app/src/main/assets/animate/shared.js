@@ -2199,8 +2199,8 @@ function duplicateLine(textarea) {
         if (s.trim().startsWith("//")) {
             textarea.selectionStart = end + 1;
             let p = getLine(textarea);
-            textarea.setRangeText("", p[0], p[1]);
-            return substringAfter(s, "//") + "\n";
+            textarea.setRangeText("", p[0], p[1]+1);
+            return substringAfter(s, "//");
         }
         let p = getWord(textarea);
         let index = s.indexOf("=", p[1] - start);
@@ -2222,8 +2222,7 @@ function duplicateLine(textarea) {
                 value = "mat2(vec2(0.0,0.0),vec2(0.0,0.0))";
             }
             return `// ${s}
-${substringBefore(s, "=")} = ${value};
-            `
+${substringBefore(s, "=")} = ${value};`
         } else {
             let selectionStart = textarea.selectionStart;
             while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {

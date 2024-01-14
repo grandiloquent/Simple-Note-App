@@ -261,7 +261,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto all = req.get_param_value("all");
         if (q.empty()) {
             static const char query[]
-                    = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
+                    = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC limit 100)";
             db::QueryResult fetch_row = db::query<query>();
             std::string_view id, title, update_at;
             nlohmann::json doc = nlohmann::json::array();

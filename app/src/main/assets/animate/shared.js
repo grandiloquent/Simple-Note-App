@@ -2300,3 +2300,9 @@ function formatLine(textarea, fn) {
 function deleteComments(textarea) {
     textarea.value = textarea.value.replaceAll(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
 }
+
+function copyVariables(textarea) {
+    let points = getLine(textarea);
+    let s = textarea.value.substring(points[0], points[1]);
+    writeText(`${substringBeforeLast(substringAfter(s,"("),")")},${substringAfter(substringBefore(s,'=').trim()," ")}`);
+}

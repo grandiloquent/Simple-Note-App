@@ -570,6 +570,20 @@ function deleteLine(textarea) {
     writeText(s);
     textarea.setRangeText("", points[0], points[1]);
 }
+function deleteComment(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+
+
+    while (end + 1 < textarea.value.length) {
+        end++;
+        if (textarea.value[end] !== '*' && end + 1 < textarea.value.length && textarea.value[end + 1] !== "/") {
+            end += 2;
+        }
+    }
+    textarea.setRangeText("", start, end);
+
+}
 const HTML = `<!DOCTYPE html>
   <html lang="en">
   

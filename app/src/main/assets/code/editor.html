@@ -269,6 +269,28 @@ ${content}`;
                     }
                 ],
                 [
+                    "close",
+                    "剪行",
+                    () => {
+
+                        deleteLine(textarea)
+                    }
+                ],
+                [
+                    "close",
+                    "剪块",
+                    () => {
+                        deleteBlock(textarea)
+                    }
+                ],
+                [
+                    "close",
+                    "剪评",
+                    () => {
+                        deleteComment(textarea)
+                    }
+                ],
+                [
                     "content_copy",
                     "复字",
                     () => {
@@ -289,28 +311,7 @@ ${content}`;
                         copyLine(textarea)
                     }
                 ],
-                [
-                    "close",
-                    "剪行",
-                    () => {
 
-                        deleteLine(textarea)
-                    }
-                ],
-                [
-                    "close",
-                    "剪块",
-                    () => {
-                        deleteBlock(textarea)
-                    }
-                ],
-                [
-                    "content_copy",
-                    "复行",
-                    () => {
-                        copyLine(textarea)
-                    }
-                ],
                 [
                     "comment",
                     "注释",
@@ -654,7 +655,7 @@ ${content}`;
             })
         }
         function mode8() {
-           
+
         }
         function mode3() {
             const bottomBar = document.querySelector('.bar-renderer.bottom');

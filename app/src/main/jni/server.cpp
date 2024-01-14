@@ -301,7 +301,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
             }
             res.set_content(doc.dump(), "application/json");
-        } else {
+        } else
+        {
 
             static const char queryv[]
                     = R"(SELECT id,title,update_at FROM code)";

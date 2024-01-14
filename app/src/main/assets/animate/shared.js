@@ -578,8 +578,8 @@ function deleteComment(textarea) {
     while (end + 1 < textarea.value.length) {
         end++;
         if (textarea.value[end] === '*' &&
-         end + 1 < textarea.value.length &&
-          textarea.value[end + 1] === "/") {
+            end + 1 < textarea.value.length &&
+            textarea.value[end + 1] === "/") {
             end += 2;
             break;
         }
@@ -1913,7 +1913,7 @@ function breakLine1(textarea) {
         end++;
     }
     textarea.setRangeText(`
-    ${name}=vec4(${selectedString});
+    ${name}=vec4(${selectedString}, ${selectedString}, ${selectedString}, 1.0);
 return;
     ` , end, end);
 
@@ -2295,4 +2295,8 @@ function formatLine(textarea, fn) {
         }
     }
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
+}
+
+function deleteComments(textarea) {
+    textarea.value = textarea.value.replaceAll(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
 }

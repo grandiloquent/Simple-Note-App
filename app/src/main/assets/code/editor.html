@@ -311,20 +311,18 @@ ${content}`;
                         copyLine(textarea)
                     }
                 ],
-
                 [
-                    "comment",
-                    "注释",
+                    "light_mode",
+                    "模式",
                     () => {
-                        let selectionStart = textarea.selectionStart;
-                        let selectionEnd = textarea.selectionEnd;
-                        let s = `
-// ============================
-// 
-// ============================
-`;
-                        textarea.setRangeText(s, selectionStart, selectionEnd)
-
+                        let mode = parseInt(document.body.dataset.mode);
+                        mode++;
+                        if (mode > 2) {
+                            mode = 1;
+                        }
+                        document.body.dataset.mode = mode;
+                        localStorage.setItem('light_mode', mode);
+                        setMode(mode);
 
                     }
                 ],
@@ -429,24 +427,10 @@ ${content}`;
                 ],
                 [
                     "close",
-                    "剪行",
+                    "删注",
                     () => {
 
-                        deleteLine(textarea)
-                    }
-                ],
-                [
-                    "close",
-                    "剪块",
-                    () => {
-                        deleteBlock(textarea)
-                    }
-                ],
-                [
-                    "code",
-                    "格式",
-                    () => {
-                        formatCode();
+                        deleteComments(textarea)
                     }
                 ],
                 [
@@ -459,29 +443,36 @@ ${content}`;
                 ],
 
                 [
-                    "content_copy",
-                    "复行",
-                    () => {
-                        copyLine(textarea)
-                    }
-                ],
-                [
-                    "comment",
-                    "注释",
-                    () => {
-                        let selectionStart = textarea.selectionStart;
-                        let selectionEnd = textarea.selectionEnd;
-                        let s = `
+                "comment",
+                "注释",
+                () => {
+                    let selectionStart = textarea.selectionStart;
+                    let selectionEnd = textarea.selectionEnd;
+                    let s = `
 // ============================
 // 
 // ============================
 `;
-                        textarea.setRangeText(s, selectionStart, selectionEnd)
+                    textarea.setRangeText(s, selectionStart, selectionEnd)
 
+
+                }
+            ],
+                [
+                    "light_mode",
+                    "模式",
+                    () => {
+                        let mode = parseInt(document.body.dataset.mode);
+                        mode++;
+                        if (mode > 2) {
+                            mode = 1;
+                        }
+                        document.body.dataset.mode = mode;
+                        localStorage.setItem('light_mode', mode);
+                        setMode(mode);
 
                     }
                 ],
-
             ].forEach(x => {
                 const div = document.createElement('div');
                 div.className = "bar-item-tab";
@@ -912,66 +903,60 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             bottomBar.innerHTML = '';
             [
                 [
-                    "light_mode",
-                    "模式",
-                    () => {
-                        let mode = parseInt(document.body.dataset.mode);
-                        mode++;
-                        if (mode > 2) {
-                            mode = 1;
-                        }
-                        document.body.dataset.mode = mode;
-                        localStorage.setItem('light_mode', mode);
-                        setMode(mode);
+                "code",
+                "格式",
+                () => {
+                    formatCode();
+                }
+            ],
+            
 
+            [
+                "text_snippet",
+                "代码",
+                async () => {
+
+                    await saveData();
+                    if (typeof NativeAndroid !== 'undefined') {
+                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                    } else {
+                        window.open('notes.html', '_blank');
                     }
-                ],
-                [
-                    "text_snippet",
-                    "代码",
-                    async () => {
-
-                        await saveData();
-                        if (typeof NativeAndroid !== 'undefined') {
-                            NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
-                        } else {
-                            window.open('notes.html', '_blank');
-                        }
-                    }
-                ],
+                }
+            ],
 
 
-                [
-                    "find_replace",
-                    "替换",
-                    () => {
-                        findReplace(textarea);
-                    }
-                ],
-                [
-                    "comment",
-                    "注释",
-                    () => {
-                        comment(textarea);
-                    }
-                ],
+            [
+                "find_replace",
+                "替换",
+                () => {
+                    findReplace(textarea);
+                }
+            ],
+            [
+                "comment",
+                "注释",
+                () => {
+                    comment(textarea);
+                }
+            ],
 
-                [
-                    "exposure_plus_2",
-                    "放大",
-                    () => {
-                        decrease2(textarea, true);
+            [
+                "exposure_plus_2",
+                "放大",
+                () => {
+                    decrease2(textarea, true);
 
-                    }
-                ],
-                [
-                    "exposure_neg_2",
-                    "缩小",
-                    () => {
-                        decrease2(textarea);
+                }
+            ],
+            [
+                "exposure_neg_2",
+                "缩小",
+                () => {
+                    decrease2(textarea);
 
-                    }
-                ],
+                }
+            ],
             ].forEach(x => {
                 const div = document.createElement('div');
                 div.className = "item";

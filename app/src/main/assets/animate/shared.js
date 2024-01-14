@@ -1348,10 +1348,15 @@ function goToLine(textarea) {
 
 }
 function copyWord(textarea) {
-    const points = getWordString(textarea);
+    const points = getWord(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
     writeText(s);
 
+}
+async function pasteWord(textarea) {
+    const points = getWord(textarea);
+    let s = await readText();
+    textarea.setRangeText(s, points[0], points[1]);
 }
 function numberFormat(textarea, isIncrease) {
     const points = getWordString(textarea);
@@ -1940,63 +1945,63 @@ function breakLine2(textarea) {
     if(${selectedString}==0.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}==1.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}>0.0 && ${selectedString}<0.5){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}==0.5){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}>0.5 && ${selectedString}<1.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}>1.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}<1.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}<0.0){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
        if(${selectedString}-0.5<0.0001){
         ${name}=vec4(0.0,0.0,0.0,1.0);
        }else{
-        ${name}=vec4(1.0,1.0,1.0,1.0);
+        ${name}=vec4(1.0,0.0,0.0,1.0);
        }
        return;
 
@@ -2175,7 +2180,7 @@ function duplicateLine(textarea) {
 
     formatLine(textarea, (s, start, end) => {
         if (s.trim().startsWith("//")) {
-            textarea.selectionStart = start + 1;
+            textarea.selectionStart = end + 1;
             let p = getLine(textarea);
             textarea.setRangeText("", p[0], p[1]);
             return substringAfter(s, "//") + "\n";
@@ -2193,7 +2198,7 @@ function duplicateLine(textarea) {
             } else if (name === "vec3") {
                 value = "vec3(0.0, 0.0, 0.0)";
             } else if (name === "vec4") {
-                value = "vec4(0.0, 0.0, 0.0, 0.1)";
+                value = "vec4(0.0, 0.0, 0.0, 1.0)";
             } else if (name === "bool") {
                 value = "false";
             } else if (name === "mat2") {

@@ -249,6 +249,97 @@ ${content}`;
             textarea.value = formatGlslCode(textarea.value);
         }
         function mode1() {
+            mode10();
+            mode11();
+        }
+        function mode2() {
+            mode12()
+            mode13()
+        }
+        function mode10() {
+            const bottomBar = document.querySelector('.bar-renderer.top');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "preview",
+                    "预览",
+                    async () => {
+
+                        await preview();
+                    }
+                ],
+                [
+                    "content_copy",
+                    "复字",
+                    () => {
+                        copyWord(textarea)
+                    }
+                ],
+                [
+                    "content_copy",
+                    "粘字",
+                    () => {
+                        pasteWord(textarea)
+                    }
+                ],
+                [
+                    "content_copy",
+                    "复行",
+                    () => {
+                        copyLine(textarea)
+                    }
+                ],
+                [
+                    "close",
+                    "剪行",
+                    () => {
+
+                        deleteLine(textarea)
+                    }
+                ],
+                [
+                    "close",
+                    "剪块",
+                    () => {
+                        deleteBlock(textarea)
+                    }
+                ],
+                [
+                    "content_copy",
+                    "复行",
+                    () => {
+                        copyLine(textarea)
+                    }
+                ],
+                [
+                    "comment",
+                    "注释",
+                    () => {
+                        let selectionStart = textarea.selectionStart;
+                        let selectionEnd = textarea.selectionEnd;
+                        let s = `
+// ============================
+// 
+// ============================
+`;
+                        textarea.setRangeText(s, selectionStart, selectionEnd)
+
+
+                    }
+                ],
+
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+        function mode11() {
             const bottomBar = document.querySelector('.bar-renderer.bottom');
             bottomBar.innerHTML = '';
             [
@@ -323,7 +414,85 @@ ${content}`;
                 bottomBar.appendChild(div);
             })
         }
-        function mode2() {
+        function mode12() {
+            const bottomBar = document.querySelector('.bar-renderer.top');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "preview",
+                    "预览",
+                    async () => {
+
+                        await preview();
+                    }
+                ],
+                [
+                    "close",
+                    "剪行",
+                    () => {
+
+                        deleteLine(textarea)
+                    }
+                ],
+                [
+                    "close",
+                    "剪块",
+                    () => {
+                        deleteBlock(textarea)
+                    }
+                ],
+                [
+                    "code",
+                    "格式",
+                    () => {
+                        formatCode();
+                    }
+                ],
+                [
+                    "decimal_decrease",
+                    "简化",
+                    () => {
+                        decreaseCode(textarea)
+                        formatCode();
+                    }
+                ],
+
+                [
+                    "content_copy",
+                    "复行",
+                    () => {
+                        copyLine(textarea)
+                    }
+                ],
+                [
+                    "comment",
+                    "注释",
+                    () => {
+                        let selectionStart = textarea.selectionStart;
+                        let selectionEnd = textarea.selectionEnd;
+                        let s = `
+// ============================
+// 
+// ============================
+`;
+                        textarea.setRangeText(s, selectionStart, selectionEnd)
+
+
+                    }
+                ],
+
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+        function mode13() {
             const bottomBar = document.querySelector('.bar-renderer.bottom');
             bottomBar.innerHTML = '';
             [
@@ -408,6 +577,84 @@ ${content}`;
                 });
                 bottomBar.appendChild(div);
             })
+        }
+        function mode7() {
+            const bottomBar = document.querySelector('.bar-renderer.bottom');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "comment",
+                    "注释",
+                    () => {
+                        commentLine(textarea)
+                    }
+                ],
+
+                [
+                    "density_large",
+                    "正常",
+                    () => {
+                        duplicateLine(textarea);
+                    }
+                ],
+                [
+                    "density_large",
+                    "截断",
+                    () => {
+                        breakLine1(textarea);
+                    }
+                ],
+                [
+                    "density_large",
+                    "截断",
+                    () => {
+                        breakLine2(textarea);
+                    }
+                ],
+                [
+                    "content_copy",
+                    "复块",
+                    () => {
+                        copyBlock(textarea)
+                    }
+                ],
+
+                [
+                    "function",
+                    "展数",
+                    () => {
+                        functionsExpand(textarea);
+                    }
+                ], [
+                    "variables",
+                    "收变",
+                    () => {
+
+                        variables(textarea);
+                    }
+                ], [
+                    "data_object",
+                    "展变",
+                    () => {
+
+                        parentheses(textarea);
+                    }
+                ],
+
+
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "bar-item-tab";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+        function mode8() {
+           
         }
         function mode3() {
             const bottomBar = document.querySelector('.bar-renderer.bottom');
@@ -658,83 +905,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 bottomBar.appendChild(div);
             })
         }
-        function mode4() {
-            const bottomBar = document.querySelector('.bar-renderer.top');
-            bottomBar.innerHTML = '';
-            [
-                [
-                    "preview",
-                    "预览",
-                    async () => {
 
-                        await preview();
-                    }
-                ],
-                [
-                    "code",
-                    "格式",
-                    () => {
-                        formatCode();
-                    }
-                ],
-                [
-                    "decimal_decrease",
-                    "简化",
-                    () => {
-                        decreaseCode(textarea)
-                        formatCode();
-                    }
-                ],
-                [
-                    "close",
-                    "剪行",
-                    () => {
-
-                        deleteLine(textarea)
-                    }
-                ],
-                [
-                    "close",
-                    "剪块",
-                    () => {
-                        deleteBlock(textarea)
-                    }
-                ],
-                [
-                    "content_copy",
-                    "复行",
-                    () => {
-                        copyLine(textarea)
-                    }
-                ],
-                [
-                    "comment",
-                    "注释",
-                    () => {
-                        let selectionStart = textarea.selectionStart;
-                        let selectionEnd = textarea.selectionEnd;
-                        let s = `
-// ============================
-// 
-// ============================
-`;
-                        textarea.setRangeText(s, selectionStart, selectionEnd)
-
-
-                    }
-                ],
-
-            ].forEach(x => {
-                const div = document.createElement('div');
-                div.className = "bar-item-tab";
-                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
-            <div class="pivot-bar-item-title">${x[1]}</div>`;
-                div.addEventListener('click', evt => {
-                    x[2]();
-                });
-                bottomBar.appendChild(div);
-            })
-        }
         function mode5() {
             const bottomBar = document.querySelector('.items-wrapper.selected');
             bottomBar.innerHTML = '';
@@ -890,7 +1061,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             })
         }
         function initialize() {
-            mode4();
             mode5()
             const mode = parseInt(localStorage.getItem('light_mode')) || 1;
             setMode(mode);

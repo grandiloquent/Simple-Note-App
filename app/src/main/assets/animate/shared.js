@@ -1877,21 +1877,45 @@ function insertSnippet2() {
 
 }
 function decrease2(textarea, isAdd) {
-    let points = getNumber(textarea);
-    let s = parseFloat(textarea.value.substring(points[0], points[1]).trim());
-    if (!s) return;
-    let n = (isAdd ? s * 2 : s / 2) + '';
-    if (n.indexOf('.') === -1) {
-        n += ".0";
-    }
-    if (s == "0.0") {
-        if (isAdd)
-            n = "1.0";
-        else
-            n = "-1.0";
-    }
+    console.log('---------------------',textarea.value[textarea.selectionStart]);
+    if (textarea.value[textarea.selectionStart] === '('
+    || textarea.value[textarea.selectionStart-1] === '(') {
+        
+        
+        formatExpression(textarea, s => {
+            return s.replaceAll(/[0-9.]+/g, m => {
+                let s = parseFloat(m);
+                if (isNaN(s)) return m;
+                let n = (isAdd ? s * 2 : s / 2) + '';
+                if (n.indexOf('.') === -1) {
+                    n += ".0";
+                }
+                if (s == 0) {
+                    if (isAdd)
+                        n = "1.0";
+                    else
+                        n = "-1.0";
+                }
+                return n;
+            })
+        })
+    } else {
+        let points = getNumber(textarea);
+        let s = parseFloat(textarea.value.substring(points[0], points[1]).trim());
+        if (isNaN(s)) return;
+        let n = (isAdd ? s * 2 : s / 2) + '';
+        if (n.indexOf('.') === -1) {
+            n += ".0";
+        }
+        if (s == 0) {
+            if (isAdd)
+                n = "1.0";
+            else
+                n = "-1.0";
+        }
 
-    textarea.setRangeText(n, points[0], points[1]);
+        textarea.setRangeText(n, points[0], points[1]);
+    }
 }
 function breakLine1(textarea) {
     const p = getWord(textarea);
@@ -2199,7 +2223,7 @@ function duplicateLine(textarea) {
         if (s.trim().startsWith("//")) {
             textarea.selectionStart = end + 1;
             let p = getLine(textarea);
-            textarea.setRangeText("", p[0], p[1]+1);
+            textarea.setRangeText("", p[0], p[1] + 1);
             return substringAfter(s, "//");
         }
         let p = getWord(textarea);
@@ -2296,6 +2320,24 @@ function formatLine(textarea, fn) {
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
 }
 
+function formatExpression(textarea, fn) {
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '(') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    let count = 0;
+    while (selectionEnd + 1 < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === "(") {
+            count++;
+        }
+        if (count == 0 && textarea.value[selectionEnd] === ')') {
+            break;
+        }
+    }
+    textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
+}
 function deleteComments(textarea) {
     textarea.value = textarea.value.replaceAll(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
 }
@@ -2303,5 +2345,5 @@ function deleteComments(textarea) {
 function copyVariables(textarea) {
     let points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]);
-    writeText(`${substringBeforeLast(substringAfter(s,"("),")")},${substringAfter(substringBefore(s,'=').trim()," ")}`);
+    writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }

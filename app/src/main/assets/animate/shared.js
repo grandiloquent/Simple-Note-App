@@ -1871,6 +1871,144 @@ function decrease2(textarea, isAdd) {
 
     textarea.setRangeText(n, points[0], points[1]);
 }
+function breakLine1(textarea) {
+    const p = getWord(textarea);
+    const selectedString = textarea.value.substring(p[0], p[1]);
+    let start = p[0];
+    let end = p[1];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ">"
+            && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
+            break;
+        }
+        start--;
+    }
+    end = textarea.value.indexOf("</script>", end);
+    const s = textarea.value.substring(start, end);
+    const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
+    end = textarea.selectionEnd;
+    while (end < textarea.value.length && textarea.value[end] !== '\n') {
+        end++;
+    }
+    textarea.setRangeText(`
+    ${name}=vec4(${selectedString});
+return;
+    ` , end, end);
+
+    return;
+}
+function breakLine2(textarea) {
+    const p = getWord(textarea);
+    const selectedString = textarea.value.substring(p[0], p[1]);
+    let start = p[0];
+    let end = p[1];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ">"
+            && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
+            break;
+        }
+        start--;
+    }
+    end = textarea.value.indexOf("</script>", end);
+    const s = textarea.value.substring(start, end);
+    const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
+    end = textarea.selectionEnd;
+    while (end < textarea.value.length && textarea.value[end] !== '\n') {
+        end++;
+    }
+    textarea.setRangeText(`
+    if(${selectedString}==0.0){
+        ${name}=vec4(1.0,0.0,0.0,1.0);
+       }else if(${selectedString}==1.0){
+           ${name}=vec4(0.0,1.0,0.0,1.0);
+       }else if(${selectedString}>0.0 && ${selectedString}<0.5){
+           ${name}=vec4(1.0,1.0,0.0,1.0);
+       }else if(${selectedString}==0.5){
+           ${name}=vec4(0.0,1.0,1.0,1.0);
+       }else if(${selectedString}>0.5 && ${selectedString}<1.0){
+           ${name}=vec4(1.0,0.0,1.0,1.0);
+       }else if(${selectedString}>1.0){
+           ${name}=vec4(1.0,1.0,1.0,1.0);
+       }else if(${selectedString}<0.0){
+           ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+           ${name}=vec4(0.0,0.0,1.0,1.0);
+       }
+       return;
+    /*
+    
+    if(${selectedString}==0.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}==1.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}>0.0 && ${selectedString}<0.5){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}==0.5){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}>0.5 && ${selectedString}<1.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}>1.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}<1.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}<0.0){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+       if(${selectedString}-0.5<0.0001){
+        ${name}=vec4(0.0,0.0,0.0,1.0);
+       }else{
+        ${name}=vec4(1.0,1.0,1.0,1.0);
+       }
+       return;
+
+    */
+            ` , end, end);
+
+    return;
+}
+
+
+
+
 function duplicateLine(textarea) {
     //     if (textarea.selectionStart !== textarea.selectionEnd) {
     //         let start = textarea.selectionStart;
@@ -2040,7 +2178,7 @@ function duplicateLine(textarea) {
             textarea.selectionStart = start + 1;
             let p = getLine(textarea);
             textarea.setRangeText("", p[0], p[1]);
-            return substringAfter(s, "//");
+            return substringAfter(s, "//") + "\n";
         }
         let p = getWord(textarea);
         let index = s.indexOf("=", p[1] - start);
@@ -2051,11 +2189,11 @@ function duplicateLine(textarea) {
             if (name === "int") {
                 value = "0";
             } else if (name === "vec2") {
-                value = "vec2(0.0,0.0)";
+                value = "vec2(0.0, 0.0)";
             } else if (name === "vec3") {
-                value = "vec3(0.0,0.0,0.0)";
+                value = "vec3(0.0, 0.0, 0.0)";
             } else if (name === "vec4") {
-                value = "vec4(0.0,0.0,0.0,0.0)";
+                value = "vec4(0.0, 0.0, 0.0, 0.1)";
             } else if (name === "bool") {
                 value = "false";
             } else if (name === "mat2") {

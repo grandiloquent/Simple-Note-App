@@ -577,8 +577,11 @@ function deleteComment(textarea) {
 
     while (end + 1 < textarea.value.length) {
         end++;
-        if (textarea.value[end] !== '*' && end + 1 < textarea.value.length && textarea.value[end + 1] !== "/") {
+        if (textarea.value[end] === '*' &&
+         end + 1 < textarea.value.length &&
+          textarea.value[end + 1] === "/") {
             end += 2;
+            break;
         }
     }
     textarea.setRangeText("", start, end);

@@ -35,7 +35,7 @@ window.createProgram = function (gl, vertexShaderSource, fragmentShaderSource) {
 window.onerror = function (errMsg, url, line, column, error) {
     var result = !column ? '' : 'column: ' + column;
     result += !error;
-    document.write("\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result);
+    document.body.textContent = "\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result;
     var suppressErrorAlert = true;
     return suppressErrorAlert;
 };
@@ -45,21 +45,21 @@ document.addEventListener('visibilitychange', async evt => {
     }
 })
 var canvas = document.createElement('canvas');
-let canvasWidth = 300;
+let canvasWidth_ = 300;
 let canvasHeight = 300;
 let isDate = false;
 const dataset = document.body.dataset;
 if (dataset.size) {
     const array = dataset.size.split(' ');
-    canvasWidth = parseInt(array[0], 10);
+    canvasWidth_ = parseInt(array[0], 10);
     canvasHeight = parseInt(array[1], 10);
 }
 if (dataset.isdate) {
     isDate = true;
 }
-canvas.height = canvasWidth;
+canvas.height = canvasWidth_;
 canvas.width = canvasHeight;
-canvas.style.width = canvasWidth + 'px';
+canvas.style.width = canvasWidth_ + 'px';
 canvas.style.height = canvasHeight + 'px';
 document.body.appendChild(canvas);
 var gl = canvas.getContext('webgl2', {

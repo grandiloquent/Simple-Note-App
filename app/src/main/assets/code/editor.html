@@ -156,7 +156,7 @@
 
         const textarea = document.getElementById("textarea");
         findNextLineStart();
-       
+
         async function loadData() {
             const res = await fetch(`${baseUri}/code?id=${id}`, {
                 cache: "no-store"
@@ -172,6 +172,37 @@
             if (!s) return;
             let body = {
                 title: substringBefore(s, "\n").trim(),
+                content: substringAfter(s, "\n").trim()
+            };
+            if (id) {
+                body.id = parseInt(id, 10)
+            }
+            // await submitNote(getBaseUri(), JSON.stringify(body));
+            // document.getElementById('toast').setAttribute('message', '成功');
+            let res;
+            try {
+                res = await fetch(`${baseUri}/code`, {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                    cache: "no-store"
+                });
+                if (res.status !== 200) {
+                    throw new Error();
+                }
+                if (!id) {
+                    location.href = `/code/editor.html?id=${await res.text()}`;
+                    return;
+                }
+                toast.setAttribute('message', '成功');
+            } catch (error) {
+                toast.setAttribute('message', '错误');
+            }
+        }
+        async function saveDataWith(title) {
+            let s = textarea.value.trim();
+            if (!s) return;
+            let body = {
+                title,
                 content: substringAfter(s, "\n").trim()
             };
             if (id) {
@@ -282,7 +313,30 @@ ${content}`;
             const bottomBar = document.querySelector('.bar-renderer.bottom');
             bottomBar.innerHTML = '';
             [
+                [
+                    "save",
+                    "保存",
+                    async () => {
+                        await saveData();
 
+                    }
+                ],
+                [
+                    "favorite",
+                    "保存",
+                    async () => {
+                        await saveDataWith("WebGL 练习");
+
+                    }
+                ],
+                [
+                    "heart_minus",
+                    "保存",
+                    async () => {
+                        await saveDataWith("有问题");
+
+                    }
+                ],
                 [
                     "go_to_line",
                     "调试",

@@ -490,18 +490,17 @@ function escapeHtml(unsafe) {
 }
 
 function comment(textarea) {
-    const points = findExtendPosition(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    if (s.startsWith("/*") && s.endsWith("*/")) {
-        s = s.substring(2);
-        s = s.substring(0, s.length - 2);
-    } else {
-        s = `/*
-    ${s}
-    */`;
-    }
-
-    textarea.setRangeText(s, points[0], points[1]);
+    formatBlock(textarea, s => {
+        if (s.startsWith("/*") && s.endsWith("*/")) {
+            s = s.substring(2);
+            s = s.substring(0, s.length - 2);
+        } else {
+            s = `/*
+        ${s}
+        */`;
+        }
+        return s;
+    })
 }
 function commentLine(textarea) {
     const points = getLine(textarea);
@@ -555,10 +554,15 @@ async function translate(baseUri, textarea) {
     }
 }
 function deleteBlock(textarea) {
-    const points = findExtendPosition(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    writeText(s);
-    textarea.setRangeText("", points[0], points[1]);
+    // const points = findExtendPosition(textarea);
+    // let s = textarea.value.substring(points[0], points[1]).trim();
+    // writeText(s);
+    // textarea.setRangeText("", points[0], points[1]);
+    formatBlock(textarea, v => {
+        console.log("=" + v + "=");
+        writeText(v);
+        return ""
+    })
 }
 function deleteLine(textarea) {
     const points = getLine(textarea);
@@ -969,14 +973,14 @@ gl.uniform1i(frameLocation, frame);
         })
 }
 function findReplace(textarea) {
-    const points = findExtendPosition(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    const first = substringBefore(s, "\n");
-    const second = substringAfter(s, "\n");
-    const pieces = first.split(' ');
-    s = `${first}  
+    formatBlock(textarea, s => {
+        const first = substringBefore(s, "\n");
+        const second = substringAfter(s, "\n");
+        const pieces = first.split(' ');
+        s = `${first}  
 ${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
-    textarea.setRangeText(s, points[0], points[1]);
+        return s;
+    })
 
 }
 
@@ -1839,7 +1843,7 @@ function insertSnippet1() {
 
 </body>
   `;
-    textarea.value=textarea.value.replace("</body>", s);
+    textarea.value = textarea.value.replace("</body>", s);
 
 }
 function insertSnippet2() {
@@ -1868,161 +1872,267 @@ function decrease2(textarea, isAdd) {
     textarea.setRangeText(n, points[0], points[1]);
 }
 function duplicateLine(textarea) {
-    if (textarea.selectionStart !== textarea.selectionEnd) {
-        let start = textarea.selectionStart;
-        let end = textarea.selectionEnd;
-        const selectedString = textarea.value.substring(start, end);
+    //     if (textarea.selectionStart !== textarea.selectionEnd) {
+    //         let start = textarea.selectionStart;
+    //         let end = textarea.selectionEnd;
+    //         const selectedString = textarea.value.substring(start, end);
 
-        while (start - 1 > -1) {
-            if (textarea.value[start] === ">"
-                && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
-                break;
-            }
-            start--;
+    //         while (start - 1 > -1) {
+    //             if (textarea.value[start] === ">"
+    //                 && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
+    //                 break;
+    //             }
+    //             start--;
+    //         }
+    //         end = textarea.value.indexOf("</script>", end);
+    //         const s = textarea.value.substring(start, end);
+    //         const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
+    //         end = textarea.selectionEnd;
+    //         while (end < textarea.value.length && textarea.value[end] !== '\n') {
+    //             end++;
+    //         }
+    //         textarea.setRangeText(`
+    // if(${selectedString}==0.0){
+    //  ${name}=vec4(1.0,0.0,0.0,1.0);
+    // }else if(${selectedString}==1.0){
+    //     ${name}=vec4(0.0,1.0,0.0,1.0);
+    // }else if(${selectedString}>0.0 && ${selectedString}<0.5){
+    //     ${name}=vec4(1.0,1.0,0.0,1.0);
+    // }else if(${selectedString}==0.5){
+    //     ${name}=vec4(0.0,1.0,1.0,1.0);
+    // }else if(${selectedString}>0.5 && ${selectedString}<1.0){
+    //     ${name}=vec4(1.0,0.0,1.0,1.0);
+    // }else if(${selectedString}>1.0){
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    // }else if(${selectedString}<0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    // }else{
+    //     ${name}=vec4(0.0,0.0,1.0,1.0);
+    // }
+    // return;
+
+    // /*
+
+    // if(${selectedString}==0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}==1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>0.0 && ${selectedString}<0.5){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}==0.5){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>0.5 && ${selectedString}<1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}<1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}<0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}-0.5<0.0001){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    // */
+    //         ` , end, end);
+
+    //         return;
+    //     }
+    //     const points = getLine(textarea);
+    //     let s = textarea.value.substring(points[0], points[1]).trim();
+    //     if (s.startsWith("//")) {
+    //         textarea.selectionStart = points[1] + 1;
+    //         let p = getLine(textarea);
+    //         textarea.setRangeText("", p[0], p[1]);
+    //         textarea.setRangeText(substringAfter(s, "//"), points[0], points[1]);
+    //     } else {
+    //         let name = "";
+    //         let pn = getNumber(textarea);
+    //         console.log(pn, textarea.value.substring(pn[0], pn[1]).trim());
+    //         let number = parseFloat(textarea.value.substring(pn[0], pn[1]).trim());
+    //         if (!isNaN(number)) {
+    //             console.log(number)
+    //             if (number === 1.0) {
+    //                 name = "0.0";
+    //             } else if (number === 0.0) {
+    //                 name = "1.0";
+    //             } else {
+    //                 name = "0.0";
+    //             }
+
+    //             textarea.setRangeText(name, pn[0], pn[1]);
+    //             let selectionStart = textarea.selectionStart;
+    //             while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+    //                 selectionStart--;
+    //             }
+    //             textarea.setRangeText("\n// " + s, selectionStart, selectionStart);
+    //             return;
+    //         } else {
+    //             console.log("==============");
+    //             let start = textarea.selectionStart;
+    //             let end = textarea.selectionEnd;
+    //             while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start-1])) {
+    //                 start--;
+    //             }
+    //             while (end + 1 < textarea.value.length) {
+    //                 if (textarea.value[end + 1] !== ",") {
+    //                     console.log("==============",s.substring());
+    //                     let str = s.substring(0, start ) + "0.0" + s.substring(end);
+    //                     textarea.setRangeText("\n" + str, points[1], points[1]);
+    //                     break
+    //                 }
+    //                 end++;
+    //             }
+
+    //         }
+    //         let selectionEnd = textarea.selectionEnd;
+    //         while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+    //             selectionEnd++;
+    //         }
+    //         textarea.setRangeText("// ", points[0], points[0]);
+    //     }
+
+    formatLine(textarea, (s, start, end) => {
+        if (s.trim().startsWith("//")) {
+            textarea.selectionStart = start + 1;
+            let p = getLine(textarea);
+            textarea.setRangeText("", p[0], p[1]);
+            return substringAfter(s, "//");
         }
-        end = textarea.value.indexOf("</script>", end);
-        const s = textarea.value.substring(start, end);
-        const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
-        end = textarea.selectionEnd;
-        while (end < textarea.value.length && textarea.value[end] !== '\n') {
-            end++;
-        }
-        textarea.setRangeText(`
-if(${selectedString}==0.0){
- ${name}=vec4(1.0,0.0,0.0,1.0);
-}else if(${selectedString}==1.0){
-    ${name}=vec4(0.0,1.0,0.0,1.0);
-}else if(${selectedString}>0.0 && ${selectedString}<0.5){
-    ${name}=vec4(1.0,1.0,0.0,1.0);
-}else if(${selectedString}==0.5){
-    ${name}=vec4(0.0,1.0,1.0,1.0);
-}else if(${selectedString}>0.5 && ${selectedString}<1.0){
-    ${name}=vec4(1.0,0.0,1.0,1.0);
-}else if(${selectedString}>1.0){
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-}else if(${selectedString}<0.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-}else{
-    ${name}=vec4(0.0,0.0,1.0,1.0);
-}
-return;
-
-/*
-
-if(${selectedString}==0.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}==1.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}>0.0 && ${selectedString}<0.5){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}==0.5){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}>0.5 && ${selectedString}<1.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}>1.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-   
-   if(${selectedString}<1.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-
-   if(${selectedString}<0.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
- 
-   if(${selectedString}-0.5<0.0001){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
-    ${name}=vec4(1.0,1.0,1.0,1.0);
-   }
-   return;
-
-*/
-        ` , end, end);
-
-        return;
-    }
-    const points = getLine(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    if (s.startsWith("//")) {
-        textarea.selectionStart = points[1] + 1;
-        let p = getLine(textarea);
-        textarea.setRangeText("", p[0], p[1]);
-        textarea.setRangeText(substringAfter(s, "//"), points[0], points[1]);
-    } else {
-        let name = "";
-        let pn = getNumber(textarea);
-        console.log(pn, textarea.value.substring(pn[0], pn[1]).trim());
-        let number = parseFloat(textarea.value.substring(pn[0], pn[1]).trim());
-        if (!isNaN(number)) {
-            console.log(number)
-            if (number === 1.0) {
-                name = "0.0";
-            } else if (number === 0.0) {
-                name = "1.0";
-            } else {
-                name = "0.0";
+        let p = getWord(textarea);
+        let index = s.indexOf("=", p[1] - start);
+        if (index !== -1) {
+            const m = textarea.value.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+            let name = (m && m[0]) || "float";
+            let value = "0.0";
+            if (name === "int") {
+                value = "0";
+            } else if (name === "vec2") {
+                value = "vec2(0.0,0.0)";
+            } else if (name === "vec3") {
+                value = "vec3(0.0,0.0,0.0)";
+            } else if (name === "vec4") {
+                value = "vec4(0.0,0.0,0.0,0.0)";
+            } else if (name === "bool") {
+                value = "false";
+            } else if (name === "mat2") {
+                value = "mat2(vec2(0.0,0.0),vec2(0.0,0.0))";
             }
-
-            textarea.setRangeText(name, pn[0], pn[1]);
+            return `// ${s}
+${substringBefore(s, "=")} = ${value};
+            `
+        } else {
             let selectionStart = textarea.selectionStart;
-            while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+            while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {
                 selectionStart--;
             }
-            textarea.setRangeText("\n// " + s , selectionStart, selectionStart);
-            return;
-        } else {
-            let start = textarea.selectionStart;
-            let end = textarea.selectionEnd;
-            while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start])) {
-                start--;
+            let selectionEnd = textarea.selectionEnd;
+            let count = 0;
+            while (selectionEnd + 1 < textarea.value.length) {
+                selectionEnd++;
+                if (textarea.value[selectionEnd] === '(') {
+                    count++;
+                    while (selectionEnd + 1 < textarea.value.length) {
+                        if (textarea.value[selectionEnd] === ')') {
+                            count--;
+                            if (count === 0) {
+                                break;
+                            }
+                        }
+                        selectionEnd++;
+                    }
+                }
+                if (textarea.value[selectionEnd] === ',' || textarea.value[selectionEnd] === ';') {
+                    break;
+                }
             }
-            while (end + 1 < textarea.value.length && textarea.value[end+1] !== ",") {
-                end++;
-            }
-            let str = s.substring(0, start-1) + "0.0" + s.substring(end-1);
-            textarea.setRangeText("\n" + str, points[1], points[1]);
-        }
-        let selectionEnd = textarea.selectionEnd;
-        while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
-            selectionEnd++;
-        }
-        textarea.setRangeText("// ", points[0], points[0]);
-    }
+            // textarea.value.substring(selectionStart, selectionEnd)
 
+            return `// ${s}
+${textarea.value.substring(start, selectionStart)}1.0${textarea.value.substring(selectionEnd, end)};
+            `
+        }
+
+    });
+}
+
+let gStart = -1;
+
+function formatBlock(textarea, fn) {
+    if (gStart === -1) {
+        let selectionStart = textarea.selectionStart;
+        while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+            selectionStart--;
+        }
+        gStart = selectionStart;
+        return;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd + 1 < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n') {
+            break;
+        }
+    }
+    textarea.setRangeText(fn(textarea.value.substring(gStart, selectionEnd)), gStart, selectionEnd);
+    gStart = -1
+}
+
+
+function formatLine(textarea, fn) {
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd + 1 < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n') {
+            break;
+        }
+    }
+    textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
 }

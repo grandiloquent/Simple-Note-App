@@ -1059,7 +1059,7 @@ async function showSnippetDialog(baseUri, textarea) {
 function decreaseCode(textarea) {
     let s = textarea.value;
     let line = substringBefore(s.trim(), "\n");
-    let selection = s.match(/https:\/\/www\.shadertoy\.com\/view\/[a-A-Z0-9_]+/);
+    let selection = s.match(/https:\/\/www\.shadertoy\.com\/view\/[a-zA-Z0-9_]+/);
     if (selection)
         line += `<!-- ${selection} \n-->`;
 

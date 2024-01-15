@@ -679,11 +679,19 @@ function formatGlslCode(code) {
             .join('\n');
     } else {
         s = code.substring(points[0], points[1]);
-        if (typeof NativeAndroid !== 'undefined') {
-            s = NativeAndroid.formatGlsl(s);
-        } else {
-            s = GLSLX.format(s);
-        }
+        // if (typeof NativeAndroid !== 'undefined') {
+        //     s = NativeAndroid.formatGlsl(s);
+        // } else {
+            s = format(
+                s,
+                "main.cc",
+                JSON.stringify({
+                    BasedOnStyle: "Chromium",
+                    IndentWidth: 4,
+                    ColumnLimit: 80,
+                })
+            )
+        //}
         
         s = code.substring(0, points[0]) + s + code.substring(points[1]);
         s = s.split('\n')

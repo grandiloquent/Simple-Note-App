@@ -17,6 +17,12 @@
     <script src="../animate/editor.js"></script>
     <script src="../animate/glslx.js"></script>
     <script src="../animate/custom-dialog.js"></script>
+    <script type="module">
+        import init, { format } from './clang-format.js';
+        await init();
+        window.format = format;
+ 
+    </script>
 </head>
 
 <body data-mode="1">

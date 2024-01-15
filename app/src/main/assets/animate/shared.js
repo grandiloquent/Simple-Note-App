@@ -1058,10 +1058,10 @@ async function showSnippetDialog(baseUri, textarea) {
 
 function decreaseCode(textarea) {
     let s = textarea.value;
-    let line = substringBefore(s.trim(), "\n");
+    let line = substringBefore(s.trim(), "\n")+"\n\n";
     let selection = s.match(/https:\/\/www\.shadertoy\.com\/view\/[a-zA-Z0-9_]+/);
     if (selection)
-        line += `<!-- ${selection} \n-->`;
+        line += `<!-- ${selection} \n-->\n\n`;
 
     // if (s.indexOf("THREE.") !== -1) {
     //     return

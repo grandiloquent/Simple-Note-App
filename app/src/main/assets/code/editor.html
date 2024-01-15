@@ -544,11 +544,14 @@ ${content}`;
                         else
                             window.location.reload();
                     }
-                ], [
-                    "text_snippet",
-                    "图片",
+                ], 
+                
+
+                [
+                    "find_replace",
+                    "替换",
                     () => {
-                        insertSnippet1();
+                        findReplace(textarea);
                     }
                 ],
                 [
@@ -940,14 +943,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
 
                 [
-                    "find_replace",
-                    "替换",
-                    () => {
-                        findReplace(textarea);
-                    }
-                ],
-
-                [
                     "exposure_plus_2",
                     "放大",
                     () => {
@@ -961,6 +956,13 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                     () => {
                         decrease2(textarea);
 
+                    }
+                ],
+                [
+                    "text_snippet",
+                    "图片",
+                    () => {
+                        insertSnippet1();
                     }
                 ],
             ].forEach(x => {

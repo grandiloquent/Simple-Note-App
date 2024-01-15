@@ -45,8 +45,8 @@ document.addEventListener('visibilitychange', async evt => {
     }
 })
 var canvas = document.createElement('canvas');
-let canvasWidth_ = 300;
-let canvasHeight = 300;
+let canvasWidth_ = 512;
+let canvasHeight = 288;
 let isDate = false;
 const dataset = document.body.dataset;
 if (dataset.size) {
@@ -57,10 +57,13 @@ if (dataset.size) {
 if (dataset.isdate) {
     isDate = true;
 }
-canvas.height = canvasWidth_;
-canvas.width = canvasHeight;
-canvas.style.width = canvasWidth_ + 'px';
-canvas.style.height = canvasHeight + 'px';
+canvas.height =canvasHeight;
+canvas.width = canvasWidth_ ;
+canvas.style.width = '100%';
+if(window.innerWidth > 512){
+    canvas.style.width = '512px';
+}
+//canvas.style.height = canvasHeight + 'px';
 document.body.appendChild(canvas);
 var gl = canvas.getContext('webgl2', {
     antialias: false

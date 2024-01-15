@@ -8,9 +8,9 @@
     <title>编辑器</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-css.min.js"></script>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify-html.min.js"></script>
+    <script async src="https://fastly.jsdelivr.net/npm/js-beautify@1.14.11/js/lib/beautify.min.js"></script>
+    <script async src="https://fastly.jsdelivr.net/npm/js-beautify@1.14.11/js/lib/beautify-css.min.js"></script>
+    <script async src="https://fastly.jsdelivr.net/npm/js-beautify@1.14.11/js/lib/beautify-html.min.js"></script>
     <link rel="stylesheet" href="index.css">
     <script src="../animate/custom-toast.js"></script>
     <script src="../animate/shared.js"></script>
@@ -297,10 +297,19 @@ ${content}`;
                     }
                 ],
                 [
-                    "content_copy",
-                    "粘字",
+                    "comment",
+                    "注块",
                     () => {
-                        pasteWord(textarea)
+                        //                         let selectionStart = textarea.selectionStart;
+                        //                         let selectionEnd = textarea.selectionEnd;
+                        //                         let s = `
+                        // // ============================
+                        // // 
+                        // // ============================
+                        // `;
+                        //                         textarea.setRangeText(s, selectionStart, selectionEnd)
+                        commentBlock(textarea);
+
                     }
                 ],
                 [
@@ -448,19 +457,10 @@ ${content}`;
                     }
                 ],
                 [
-                    "comment",
-                    "注块",
+                    "content_copy",
+                    "粘字",
                     () => {
-                        //                         let selectionStart = textarea.selectionStart;
-                        //                         let selectionEnd = textarea.selectionEnd;
-                        //                         let s = `
-                        // // ============================
-                        // // 
-                        // // ============================
-                        // `;
-                        //                         textarea.setRangeText(s, selectionStart, selectionEnd)
-                        commentBlock(textarea);
-
+                        pasteWord(textarea)
                     }
                 ],
                 [

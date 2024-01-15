@@ -582,8 +582,8 @@ function deleteBlock(textarea) {
             let l = textarea.value.substring(p[0], p[1]).trim();
             if (l.startsWith("//")) {
                 end = p[1];
-            }else{
-                break;  
+            } else {
+                break;
             }
         }
         let s = textarea.value.substring(points[0], end + 1);
@@ -679,7 +679,12 @@ function formatGlslCode(code) {
             .join('\n');
     } else {
         s = code.substring(points[0], points[1]);
-        s = GLSLX.format(s);
+        if (typeof NativeAndroid !== 'undefined') {
+            s = NativeAndroid.formatGlsl(s);
+        } else {
+            s = GLSLX.format(s);
+        }
+        
         s = code.substring(0, points[0]) + s + code.substring(points[1]);
         s = s.split('\n')
             .filter(x => x.trim())
@@ -2331,9 +2336,9 @@ function copyVariables(textarea) {
     let s = textarea.value.substring(points[0], points[1]);
     writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }
-function commentBlock(textarea){
+function commentBlock(textarea) {
     let selectionStart = textarea.selectionStart;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '(') {
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
         selectionStart--;
     }
     let selectionEnd = textarea.selectionEnd;
@@ -2347,6 +2352,14 @@ function commentBlock(textarea){
             break;
         }
     }
-  console.log(textarea.value.substring(selectionStart, selectionEnd));
+    let s = textarea.value.substring(selectionStart, selectionEnd);
+
+    if (s.startsWith("/*") && s.endsWith("*/")) {
+        s = s.trim();
+        s = s.substring(2, s.length - 2);
+    } else {
+        s = `/*${s}*/`;
+    }
+    textarea.setRangeText(s, selectionStart, selectionEnd)
 
 }

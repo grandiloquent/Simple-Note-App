@@ -301,8 +301,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
             }
             res.set_content(doc.dump(), "application/json");
-        } else
-        {
+        } else {
 
             static const char queryv[]
                     = R"(SELECT id,title,update_at FROM code)";
@@ -460,8 +459,20 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::string_view content;
 
         if (fetch_row(content)) {
-
-            res.set_content(content.data(), content.size(), "text/html");
+            std::string s{R"(<html lang='en'>
+<head>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <script id="vs" type="x-shader/x-vertex">
+    #version 300 es
+     in vec4 a_position;
+     void main() {
+       gl_Position = a_position;
+     }
+     </script>
+</head>
+<body>)"};
+            res.set_content(s + content.data()+R"(</body>
+</html>)", "text/html");
         }
     });
 

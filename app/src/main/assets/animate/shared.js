@@ -1058,20 +1058,39 @@ async function showSnippetDialog(baseUri, textarea) {
 
 function decreaseCode(textarea) {
     let s = textarea.value;
-    if (s.indexOf("THREE.") !== -1) {
-        return
+    let line = substringBefore(s.trim(), "\n");
+    let selection = s.match(/https:\/\/www\.shadertoy\.com\/view\/[a-A-Z0-9_]+/);
+    if (selection)
+        line += `<!-- ${selection} \n-->`;
+
+    // if (s.indexOf("THREE.") !== -1) {
+    //     return
+    // }
+    // s = removeSubstring(s, `<!DOCTYPE html>`, `<html lang='en'>`);
+    // s = removeSubstring(s, `<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
+    // s = removeSubstring(s, `uniform vec4 iMouse;`, `uniform float iTime;`);
+    // s = removeSubstring(s, `window.loadImage = function(url, onload) {`, `})();`);
+    // s = removeSubstring(s, ` // const channel0Location = gl.getUniformLocation(program, 'iChannel0');`, ` const timeLocation = gl.getUniformLocation(program, "iTime");`);
+    // s = removeSubstring(s, `let mouseX = 0;`, `let frame = 0;`);
+    // s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
+    // s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
+    // s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
+    // s = removeSubstring(s, `<body>`, `</html>`);
+    s = removeSubstring(s, `<script id="vs" type="x-shader/x-vertex">`, `</script>`);
+    let start = 0;
+    let offset = 0;
+    const buffer = [];
+    while (start < s.length) {
+        start = s.indexOf("<script", offset);
+        if (start === -1) break;
+        offset = start;
+        start = s.indexOf("</script>", offset)
+        if (start === -1) break;
+        start += 9;
+        buffer.push(s.substring(offset, start));
+        offset = start;
     }
-    s = removeSubstring(s, `<!DOCTYPE html>`, `<html lang='en'>`);
-    s = removeSubstring(s, `<meta charset='UTF-8' />`, ` <script id="vs" type="x-shader/x-vertex">`);
-    s = removeSubstring(s, `uniform vec4 iMouse;`, `uniform float iTime;`);
-    s = removeSubstring(s, `window.loadImage = function(url, onload) {`, `})();`);
-    s = removeSubstring(s, ` // const channel0Location = gl.getUniformLocation(program, 'iChannel0');`, ` const timeLocation = gl.getUniformLocation(program, "iTime");`);
-    s = removeSubstring(s, `let mouseX = 0;`, `let frame = 0;`);
-    s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
-    s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
-    s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
-    s = removeSubstring(s, `<body>`, `</html>`);
-    //s = removeSubstring(s,``, ``);
+    s = buffer.join("\n");
     s = s.replace(/void mainImage\([^)]+\)[\r\n ]*\{/, m => {
         return `
         
@@ -1081,14 +1100,14 @@ vec4 iMouse=vec4(0.0);
 vec2 ${m.match(/(?<=in +vec2 )[^)]+/) || m.match(/(?<=vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
-        .replace(`</html>`, '')
-        + `<body>
-    <script src="/file?path=/storage/emulated/0/.editor/gl.js"></script>
-  </body>
-  </html>`
+    //         .replace(`</html>`, '')
+    //         + `<body>
+    //     <script src="/file?path=/storage/emulated/0/.editor/gl.js"></script>
+    //   </body>
+    //   </html>`
 
 
-    textarea.value = s;
+    textarea.value = line + s;
 }
 function removeSubstring(strings, prefix, suffix) {
     let start = strings.indexOf(prefix);
@@ -1877,11 +1896,11 @@ function insertSnippet2() {
 
 }
 function decrease2(textarea, isAdd) {
-    console.log('---------------------',textarea.value[textarea.selectionStart]);
+    console.log('---------------------', textarea.value[textarea.selectionStart]);
     if (textarea.value[textarea.selectionStart] === '('
-    || textarea.value[textarea.selectionStart-1] === '(') {
-        
-        
+        || textarea.value[textarea.selectionStart - 1] === '(') {
+
+
         formatExpression(textarea, s => {
             return s.replaceAll(/[0-9.]+/g, m => {
                 let s = parseFloat(m);

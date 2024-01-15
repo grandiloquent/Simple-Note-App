@@ -155,7 +155,6 @@
         const id = new URL(window.location).searchParams.get('id');
 
         const textarea = document.getElementById("textarea");
-        findNextLineStart();
 
         async function loadData() {
             const res = await fetch(`${baseUri}/code?id=${id}`, {
@@ -439,15 +438,15 @@ ${content}`;
                         copyVariables(textarea)
                     }
                 ],
+               
+
                 [
-                    "decimal_decrease",
-                    "简化",
+                    "comment",
+                    "注释",
                     () => {
-                        decreaseCode(textarea)
-                        formatCode();
+                        comment(textarea);
                     }
                 ],
-
                 [
                     "comment",
                     "注释",
@@ -518,13 +517,7 @@ ${content}`;
 
                     }
                 ],
-                [
-                    "go_to_line",
-                    "调试",
-                    () => {
-                        goToLine(textarea);
-                    }
-                ],
+               
                 [
                     "switch_right",
                     "交换",
@@ -915,7 +908,21 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                         formatCode();
                     }
                 ],
-
+                [
+                    "decimal_decrease",
+                    "简化",
+                    () => {
+                        decreaseCode(textarea)
+                        formatCode();
+                    }
+                ],
+                [
+                    "go_to_line",
+                    "调试",
+                    () => {
+                        goToLine(textarea);
+                    }
+                ],
 
                 [
                     "text_snippet",
@@ -937,13 +944,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                     "替换",
                     () => {
                         findReplace(textarea);
-                    }
-                ],
-                [
-                    "comment",
-                    "注释",
-                    () => {
-                        comment(textarea);
                     }
                 ],
 

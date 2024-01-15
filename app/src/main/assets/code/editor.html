@@ -21,8 +21,7 @@
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px">// 12345
-678910</textarea>
+        <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>
@@ -450,17 +449,17 @@ ${content}`;
                 ],
                 [
                     "comment",
-                    "注释",
+                    "注块",
                     () => {
-                        let selectionStart = textarea.selectionStart;
-                        let selectionEnd = textarea.selectionEnd;
-                        let s = `
-// ============================
-// 
-// ============================
-`;
-                        textarea.setRangeText(s, selectionStart, selectionEnd)
-
+                        //                         let selectionStart = textarea.selectionStart;
+                        //                         let selectionEnd = textarea.selectionEnd;
+                        //                         let s = `
+                        // // ============================
+                        // // 
+                        // // ============================
+                        // `;
+                        //                         textarea.setRangeText(s, selectionStart, selectionEnd)
+                        commentBlock(textarea);
 
                     }
                 ],

@@ -2331,3 +2331,22 @@ function copyVariables(textarea) {
     let s = textarea.value.substring(points[0], points[1]);
     writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }
+function commentBlock(textarea){
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '(') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    let count = 0;
+    while (selectionEnd + 1 < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === "{") {
+            count++;
+        }
+        if (count == 0 && textarea.value[selectionEnd] === '}') {
+            break;
+        }
+    }
+  console.log(textarea.value.substring(selectionStart, selectionEnd));
+
+}

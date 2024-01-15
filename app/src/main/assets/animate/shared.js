@@ -686,7 +686,7 @@ function formatGlslCode(code) {
                 s,
                 "main.cc",
                 JSON.stringify({
-                    BasedOnStyle: "Chromium",
+                    BasedOnStyle: "Google",
                     IndentWidth: 4,
                     ColumnLimit: 80,
                 })

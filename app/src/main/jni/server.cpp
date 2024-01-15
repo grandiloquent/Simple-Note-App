@@ -197,7 +197,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             env->FindClass("psycho/euphoria/app/ImageUitls")));
     JavaVM *jvm;
     env->GetJavaVM(&jvm);
-    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm))?)",
                [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
                                             httplib::Response &res) {
 

@@ -238,6 +238,21 @@ function getLine(textarea) {
     }
     return [start, end + 1];
 }
+function getLineAt(textarea, start) {
+
+
+    if (textarea.value[start] === '\n' && start + 1 < textarea.value.length) {
+        start++;
+    }
+    let end = start;
+    while (start - 1 > -1 && textarea.value[start - 1] !== '\n') {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && textarea.value[end + 1] !== '\n') {
+        end++;
+    }
+    return [start, end + 1];
+}
 function getStatement(textarea) {
     let start = textarea.selectionStart;
     let end = textarea.selectionEnd;
@@ -558,11 +573,34 @@ function deleteBlock(textarea) {
     // let s = textarea.value.substring(points[0], points[1]).trim();
     // writeText(s);
     // textarea.setRangeText("", points[0], points[1]);
-    formatBlock(textarea, v => {
-        console.log("=" + v + "=");
-        writeText(v);
-        return ""
-    })
+    let points = getLine(textarea);
+    let line = textarea.value.substring(points[0], points[1]).trim();
+    if (line.startsWith("//")) {
+        let end = points[1];
+        while (true) {
+            let p = getLineAt(textarea, end);
+            let l = textarea.value.substring(p[0], p[1]).trim();
+            if (l.startsWith("//")) {
+                end = p[1];
+            }else{
+                break;  
+            }
+        }
+        let s = textarea.value.substring(points[0], end + 1);
+        writeText(s);
+        textarea.setRangeText("", points[0], end + 1);
+    }
+    else if (line.startsWith("/*")) {
+        let end = textarea.value.indexOf("*/", points[0]);
+        let s = textarea.value.substring(points[0], end + 2);
+        writeText(s);
+        textarea.setRangeText("", points[0], end + 2);
+    } else {
+        formatBlock(textarea, v => {
+            writeText(v);
+            return ""
+        })
+    }
 }
 function deleteLine(textarea) {
     const points = getLine(textarea);
@@ -1058,7 +1096,7 @@ async function showSnippetDialog(baseUri, textarea) {
 
 function decreaseCode(textarea) {
     let s = textarea.value;
-    let line = substringBefore(s.trim(), "\n")+"\n\n";
+    let line = substringBefore(s.trim(), "\n") + "\n\n";
     let selection = s.match(/https:\/\/www\.shadertoy\.com\/view\/[a-zA-Z0-9_]+/);
     if (selection)
         line += `<!-- ${selection} \n-->\n\n`;
@@ -1811,7 +1849,7 @@ function insertSnippet1() {
 
   </script>
   `;
-    textarea.value +=  s;
+    textarea.value += s;
 
 }
 function insertSnippet2() {

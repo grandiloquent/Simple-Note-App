@@ -21,7 +21,8 @@
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px"></textarea>
+        <textarea id="textarea" style="font-size: 14px">// 12345
+678910</textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>
@@ -438,7 +439,7 @@ ${content}`;
                         copyVariables(textarea)
                     }
                 ],
-               
+
 
                 [
                     "comment",
@@ -517,7 +518,7 @@ ${content}`;
 
                     }
                 ],
-               
+
                 [
                     "switch_right",
                     "交换",
@@ -544,8 +545,8 @@ ${content}`;
                         else
                             window.location.reload();
                     }
-                ], 
-                
+                ],
+
 
                 [
                     "find_replace",
@@ -903,68 +904,68 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         function mode5() {
             const bottomBar = document.querySelector('.items-wrapper.selected');
             bottomBar.innerHTML = '';
+            [[
+                "decimal_decrease",
+                "简化",
+                () => {
+                    decreaseCode(textarea)
+                    formatCode();
+                }
+            ],
             [
-                [
-                    "code",
-                    "格式",
-                    () => {
-                        formatCode();
-                    }
-                ],
-                [
-                    "decimal_decrease",
-                    "简化",
-                    () => {
-                        decreaseCode(textarea)
-                        formatCode();
-                    }
-                ],
-                [
-                    "go_to_line",
-                    "调试",
-                    () => {
-                        goToLine(textarea);
-                    }
-                ],
+                "code",
+                "格式",
+                () => {
+                    formatCode();
+                }
+            ],
 
-                [
-                    "text_snippet",
-                    "代码",
-                    async () => {
+            [
+                "go_to_line",
+                "调试",
+                () => {
+                    goToLine(textarea);
+                }
+            ],
 
-                        await saveData();
-                        if (typeof NativeAndroid !== 'undefined') {
-                            NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
-                        } else {
-                            window.open('notes.html', '_blank');
-                        }
+            [
+                "text_snippet",
+                "代码",
+                async () => {
+
+                    await saveData();
+                    if (typeof NativeAndroid !== 'undefined') {
+                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                    } else {
+                        window.open('notes.html', '_blank');
                     }
-                ],
+                }
+            ],
 
 
-                [
-                    "exposure_plus_2",
-                    "放大",
-                    () => {
-                        decrease2(textarea, true);
+            [
+                "exposure_plus_2",
+                "放大",
+                () => {
+                    decrease2(textarea, true);
 
-                    }
-                ],
-                [
-                    "exposure_neg_2",
-                    "缩小",
-                    () => {
-                        decrease2(textarea);
+                }
+            ],
+            [
+                "exposure_neg_2",
+                "缩小",
+                () => {
+                    decrease2(textarea);
 
-                    }
-                ],
-                [
-                    "text_snippet",
-                    "图片",
-                    () => {
-                        insertSnippet1();
-                    }
-                ],
+                }
+            ],
+            [
+                "text_snippet",
+                "图片",
+                () => {
+                    insertSnippet1();
+                }
+            ],
             ].forEach(x => {
                 const div = document.createElement('div');
                 div.className = "item";

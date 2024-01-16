@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <script id="vs" type="x-shader/x-vertex">
+        varying vec2 vUv;
+    
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        }</script>
+    <!--https://www.shadertoy.com/view/fllXD4-->
+    <script src="https://fastly.jsdelivr.net/npm/three@0.120.0/build/three.js"></script>
+    <script>
+        console.error = function (e) {
+            document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
+        }
+    </script>
+    <script id="fs" type="x-shader/x-fragment">
+    precision highp float;
+    precision highp sampler2D;
+    uniform vec3 iResolution;
+    uniform sampler2D iChannel0;
+    out vec4 fragColor;
+    void main() {
+    fragColor = vec4(1.0, 0., 0., 1.);
+    }
+    </script>
+    <script>
+        window.getShaderSource = function (id) {
+
+            return document.getElementById(id).textContent.replace(/^\s+|\s+$/g, '');
+        };
+    </script>
+    <script>
+        class App {
+            constructor() {
+                this.width = 300;
+                this.height = 300;
+                this.renderer = new THREE.WebGLRenderer();
+                this.loader = new THREE.TextureLoader();
+                this.clock = new THREE.Clock();
+                this.mousePosition = new THREE.Vector4();
+                this.orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+                this.counter = 0;
+                this.renderer.setSize(this.width, this.height);
+                document.body.appendChild(this.renderer.domElement);
+                this.renderer.domElement.addEventListener('mousedown', () => {
+                    this.mousePosition.setZ(1);
+                    this.counter = 0;
+                });
+                this.renderer.domElement.addEventListener('mouseup', () => {
+                    this.mousePosition.setZ(0);
+                });
+                this.renderer.domElement.addEventListener('mousemove', event => {
+                    this.mousePosition.setX(event.clientX);
+                    this.mousePosition.setY(this.height - event.clientY);
+                });
+                // this.targetA = new BufferManager(this.renderer, {
+                // width: this.width,
+                // height: this.height
+                // });
+                this.targetC = new BufferManager(this.renderer, {
+                    width: this.width,
+                    height: this.height
+                });
+            }
+            start() {
+                const resolution = new THREE.Vector3(this.width, this.height, window.devicePixelRatio);
+
+                this.bufferImage = new BufferShader(getShaderSource('fs'), {
+                    iTime: {
+                        value: 0
+                    },
+                    iResolution: {
+                        value: resolution
+                    },
+                    iChannel0: {
+                        value: null
+                    }
+                });
+                this.animate();
+            }
+            animate() {
+                requestAnimationFrame(() => {
+                    this.targetC.render(this.bufferImage.scene, this.orthoCamera, true);
+                    this.animate();
+                });
+            }
+        }
+        class BufferShader {
+            constructor(fragmentShader, uniforms = {}) {
+                this.uniforms = uniforms;
+                this.material = new THREE.ShaderMaterial({
+                    fragmentShader: fragmentShader,
+                    vertexShader: getShaderSource('vs'),
+                    uniforms: uniforms,
+                    glslVersion: THREE.GLSL3
+                });
+                this.scene = new THREE.Scene();
+                this.scene.add(
+                    new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.material)
+                );
+            }
+        }
+        class BufferManager {
+            constructor(renderer, size) {
+                this.renderer = renderer;
+                this.readBuffer = new THREE.WebGLRenderTarget(size.width, size.height, {
+                    minFilter: THREE.LinearFilter,
+                    magFilter: THREE.LinearFilter,
+                    format: THREE.RGBAFormat,
+                    type: THREE.FloatType,
+                    stencilBuffer: false
+                });
+                this.writeBuffer = this.readBuffer.clone();
+            }
+            swap() {
+                const temp = this.readBuffer;
+                this.readBuffer = this.writeBuffer;
+                this.writeBuffer = temp;
+            }
+            render(scene, camera, toScreen = false) {
+                if (toScreen) {
+                    console.log(this.renderer,scene);
+                    this.renderer.render(scene, camera);
+                } else {
+                    this.renderer.setRenderTarget(this.writeBuffer);
+                    this.renderer.clear();
+                    this.renderer.render(scene, camera)
+                    this.renderer.setRenderTarget(null);
+                }
+                this.swap();
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            (new App()).start();
+        });
+      // https://github.com/Shakthi/three-shadertoy-material/blob/dfbe69be12e9229877e0ddb4840d36f984611c35/src/ShaderToyMaterial.js#L142
+    </script>
+
+    </script>
+</body>
+
+</html>

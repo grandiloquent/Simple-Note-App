@@ -27,27 +27,7 @@
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px">float legendre(float x, float l, float m) {
-            float p0 = 1.;
-            for (float i = 0.; i < m; i++) p0 = (1. - 2. * i) * sqrt(1. - x * x) * p0;
-            if (l == m) return p0;
-            float p1 = (2. * m + 1.) * x * p0;
-            for (float i = m + 2.; i < l; i++) {
-                float t = ((2. * i - 1.) * x * p1 - (i + m - 1.) * p0) / (i - m);
-                p0 = p1;
-                p1 = t;
-            }
-            return p1;
-        }
-        float laguerre(float x, float k, float a) {*/    float _0 = 1.;
-            float _1 = 1. + a - x;
-            for (float i = 0.; i < k; i++) {
-                float t = ((2. * i + 1. + a - x) * _1 - (i + a) * _0) / (i + 1.);
-                _0 = _1;
-                _1 = t;
-            }
-            return _0;
-        }</textarea>
+        <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>

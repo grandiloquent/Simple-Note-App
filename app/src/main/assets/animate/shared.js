@@ -468,6 +468,24 @@ function substringNearest(string, index, start, end) {
     }
     return string.substring(j, k);
 }
+function substringAll(strings, prefix, suffix, fn) {
+    let offset = 0;
+    while (true) {
+        let start = strings.indexOf(prefix, offset);
+        if (start === -1) {
+            return strings;
+        }
+        start += prefix.length;
+        let end = strings.indexOf(suffix, start + prefix.length);
+        if (end === -1) {
+            return strings;
+        }
+        let s = fn(strings.substring(start, end));
+        strings = strings.substring(0, start) + s + strings.substring(end);
+        offset += start + s.length + suffix.length;
+    }
+    return strings;
+}
 
 function upperCamel(string) {
     string = camel(string);
@@ -603,10 +621,30 @@ function deleteBlock(textarea) {
     }
     else if (line.startsWith("<script")) {
         let end = textarea.value.indexOf("</script>", points[0]);
-        let s = textarea.value.substring(points[0], end + 8);
+        let s = textarea.value.substring(points[0], end + 9);
         writeText(s);
         textarea.setRangeText("", points[0], end + 9);
     }
+    else if (line.indexOf("{") !== -1) {
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        let s = textarea.value.substring(points[0], end);
+        writeText(s);
+        textarea.setRangeText("", points[0], end);
+    }
+
     else {
         formatBlock(textarea, v => {
             writeText(v);
@@ -683,6 +721,18 @@ const WEBGL = ["<!DOCTYPE html>\r\n<html lang='en'>\r\n<head>\r\n  <meta charset
 function formatGlslCode(code) {
     const options = { indent_size: 2, space_in_empty_paren: true }
     code = html_beautify(code, options);
+    code = substringAll(code, `type="x-shader/x-fragment">`, "</script>", s => {
+        return format(
+            s,
+            "main.cc",
+            JSON.stringify({
+                BasedOnStyle: "Google",
+                IndentWidth: 4,
+                ColumnLimit: 80,
+            })
+        )
+    })
+    /*
     const points = substring(code, `type="x-shader/x-fragment">`, `</script>`);
     let s = "";
     if (points[0] === 0 && points[1] === 0) {
@@ -710,7 +760,11 @@ function formatGlslCode(code) {
             .filter(x => x.trim())
             .join('\n');
     }
-    return s.replace('https://unpkg.com/three@0.160.0/build/three.module.js', 'https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
+    */
+    code = code.split('\n')
+        .filter(x => x.trim())
+        .join('\n');
+    return code.replace('https://unpkg.com/three@0.160.0/build/three.module.js', 'https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
         .replace('https://unpkg.com/three/build/three.module.js', 'https://fastly.jsdelivr.net/npm/three@0.160.0/build/three.module.js')
         .replace('https://unpkg.com/three@0.160.0/examples/jsm/', 'https://fastly.jsdelivr.net/npm/three@0.160.0/examples/jsm/');
     ;
@@ -1053,14 +1107,52 @@ gl.uniform1i(frameLocation, frame);
         })
 }
 function findReplace(textarea) {
-    formatBlock(textarea, s => {
+
+    let points = getLine(textarea);
+    let first = textarea.value.substring(points[0], points[1]).trim();;
+    let p = getLineAt(textarea, points[1] + 1);
+    let line = textarea.value.substring(p[0], p[1]).trim()
+    if (line.startsWith("<script")) {
+        let end = textarea.value.indexOf("</script>", points[0]);
+        let s = textarea.value.substring(points[1], end);
+        const pieces = first.split(/ +/);
+        textarea.setRangeText(s.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1]), points[1], end);
+    }
+    else if (line.indexOf("{") !== -1) {
+        console.log(line);
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        let s = textarea.value.substring(points[1], end);
+        const pieces = first.split(/ +/);
+        console.log(s.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g')))
+        textarea.setRangeText(s.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1]), points[1], end);
+
+    }
+
+    else {
+
+
+        const points = findExtendPosition(textarea);
+        let s = textarea.value.substring(points[0], points[1]).trim();
         const first = substringBefore(s, "\n");
         const second = substringAfter(s, "\n");
-        const pieces = first.split(' ');
+        const pieces = first.split(/ +/);
         s = `${first}  
 ${second.replaceAll(new RegExp("\\b" + pieces[0] + "\\b", 'g'), pieces[1])}`;
-        return s;
-    })
+        textarea.setRangeText(s, points[0], points[1]);
+    }
 
 }
 
@@ -2313,7 +2405,6 @@ function formatBlock(textarea, fn) {
     gStart = -1
 }
 
-
 function formatLine(textarea, fn) {
     let selectionStart = textarea.selectionStart;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
@@ -2409,14 +2500,14 @@ function commentBlock(textarea) {
             }
             if (textarea.value[selectionEnd] === '}') {
                 count--;
-                if (count === -1){
+                if (count === -1) {
                     break;
                 }
             }
         }
-        
+
         let s = textarea.value.substring(selectionStart, selectionEnd).trim();
-    
+
         if (s.startsWith("/*") && s.endsWith("*/")) {
             s = s.trim();
             s = s.substring(2, s.length - 2);

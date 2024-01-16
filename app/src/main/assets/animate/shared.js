@@ -595,7 +595,14 @@ function deleteBlock(textarea) {
         let s = textarea.value.substring(points[0], end + 2);
         writeText(s);
         textarea.setRangeText("", points[0], end + 2);
-    } else {
+    }
+    else if (line.startsWith("<script")) {
+        let end = textarea.value.indexOf("<script>", points[0]);
+        let s = textarea.value.substring(points[0], end + 8);
+        writeText(s);
+        textarea.setRangeText("", points[0], end + 8);
+    }
+    else {
         formatBlock(textarea, v => {
             writeText(v);
             return ""
@@ -682,17 +689,17 @@ function formatGlslCode(code) {
         // if (typeof NativeAndroid !== 'undefined') {
         //     s = NativeAndroid.formatGlsl(s);
         // } else {
-            s = format(
-                s,
-                "main.cc",
-                JSON.stringify({
-                    BasedOnStyle: "Google",
-                    IndentWidth: 4,
-                    ColumnLimit: 80,
-                })
-            )
+        s = format(
+            s,
+            "main.cc",
+            JSON.stringify({
+                BasedOnStyle: "Google",
+                IndentWidth: 4,
+                ColumnLimit: 80,
+            })
+        )
         //}
-        
+
         s = code.substring(0, points[0]) + s + code.substring(points[1]);
         s = s.split('\n')
             .filter(x => x.trim())

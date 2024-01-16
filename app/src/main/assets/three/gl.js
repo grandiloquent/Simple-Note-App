@@ -118,9 +118,12 @@ canvas.addEventListener('touchmove', (e) => {
 }, {
     passive: false
 });
+
 let frame = 0;
 let then = 0;
 gl.useProgram(program);
+gl.uniform1i(gl.getUniformLocation(program, "iChannel0"),0);
+gl.uniform1i(gl.getUniformLocation(program, "iChannel1"),1);
 gl.bindVertexArray(vao);
 function render(time) {
     time *= 0.001;

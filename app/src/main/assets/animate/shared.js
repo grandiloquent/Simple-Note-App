@@ -379,6 +379,11 @@ async function readText() {
     }
     return strings
 }
+function changeInputMethod() {
+    if (typeof NativeAndroid !== 'undefined') {
+        NativeAndroid.launchInputPicker()
+    }
+}
 
 function findNextLineStart() {
     let selectionEnd = textarea.selectionEnd;
@@ -597,10 +602,10 @@ function deleteBlock(textarea) {
         textarea.setRangeText("", points[0], end + 2);
     }
     else if (line.startsWith("<script")) {
-        let end = textarea.value.indexOf("<script>", points[0]);
+        let end = textarea.value.indexOf("</script>", points[0]);
         let s = textarea.value.substring(points[0], end + 8);
         writeText(s);
-        textarea.setRangeText("", points[0], end + 8);
+        textarea.setRangeText("", points[0], end + 9);
     }
     else {
         formatBlock(textarea, v => {
@@ -2352,29 +2357,31 @@ function copyVariables(textarea) {
     writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }
 function commentBlock(textarea) {
-    let selectionStart = textarea.selectionStart;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
-        selectionStart--;
-    }
-    let selectionEnd = textarea.selectionEnd;
-    let count = 0;
-    while (selectionEnd + 1 < textarea.value.length) {
-        selectionEnd++;
-        if (textarea.value[selectionEnd] === "{") {
-            count++;
+   
+        let selectionStart = textarea.selectionStart;
+        while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+            selectionStart--;
         }
-        if (count == 0 && textarea.value[selectionEnd] === '}') {
-            break;
+        let selectionEnd = textarea.selectionEnd;
+        let count = 0;
+        while (selectionEnd + 1 < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === "{") {
+                count++;
+            }
+            if (count == 0 && textarea.value[selectionEnd] === '}') {
+                break;
+            }
         }
-    }
-    let s = textarea.value.substring(selectionStart, selectionEnd);
+        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
 
-    if (s.startsWith("/*") && s.endsWith("*/")) {
-        s = s.trim();
-        s = s.substring(2, s.length - 2);
-    } else {
-        s = `/*${s}*/`;
-    }
-    textarea.setRangeText(s, selectionStart, selectionEnd)
+        if (s.startsWith("/*") && s.endsWith("*/")) {
+            s = s.trim();
+            s = s.substring(2, s.length - 2);
+        } else {
+            s = `/*${s}*/`;
+        }
+        textarea.setRangeText(s, selectionStart, selectionEnd)
+
 
 }

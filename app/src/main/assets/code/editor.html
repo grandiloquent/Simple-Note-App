@@ -27,7 +27,17 @@
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px"></textarea>
+        <textarea id="textarea" style="font-size: 14px">vec2 marcher(vec3 ro, vec3 rd, int maxsteps, float sg) {
+            float d = 0.;
+            float m = 0.;
+            for (int i = 0; i < maxsteps; i++) {
+                vec2 ray = map(ro + rd * d, sg);
+                if (ray.x < MIN_DIST * d || d > MAX_DIST) break;
+                d += i < 32 ? ray.x * .5 : ray.x;
+                m = ray.y;
+            }
+            return vec2(d, m);
+        }</textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>
@@ -296,10 +306,10 @@ ${content}`;
                     }
                 ],
                 [
-                    "content_copy",
-                    "复字",
+                    "keyboard",
+                    "输入法",
                     () => {
-                        copyWord(textarea)
+                        changeInputMethod();
                     }
                 ],
                 [

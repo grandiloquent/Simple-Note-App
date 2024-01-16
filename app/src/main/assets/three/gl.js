@@ -48,7 +48,7 @@ var canvas = document.createElement('canvas');
 let canvasWidth_ = 512;
 let canvasHeight = 288;
 let isDate = false;
-const dataset = document.body.dataset;
+const dataset = document.querySelector("script#fs").dataset;
 if (dataset.size) {
     const array = dataset.size.split(' ');
     canvasWidth_ = parseInt(array[0], 10);

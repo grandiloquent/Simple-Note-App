@@ -2357,31 +2357,33 @@ function copyVariables(textarea) {
     writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }
 function commentBlock(textarea) {
-   
-        let selectionStart = textarea.selectionStart;
-        while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
-            selectionStart--;
-        }
-        let selectionEnd = textarea.selectionEnd;
-        let count = 0;
-        while (selectionEnd + 1 < textarea.value.length) {
-            selectionEnd++;
-            if (textarea.value[selectionEnd] === "{") {
-                count++;
-            }
-            if (count == 0 && textarea.value[selectionEnd] === '}') {
-                break;
-            }
-        }
-        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
 
-        if (s.startsWith("/*") && s.endsWith("*/")) {
-            s = s.trim();
-            s = s.substring(2, s.length - 2);
-        } else {
-            s = `/*${s}*/`;
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    let count = 0;
+    while (selectionEnd + 1 < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === "{") {
+            count++;
         }
-        textarea.setRangeText(s, selectionStart, selectionEnd)
+        if (textarea.value[selectionEnd] === '}') {
+            count--;
+            if (count === 0)
+                break;
+        }
+    }
+    let s = textarea.value.substring(selectionStart, selectionEnd).trim();
+
+    if (s.startsWith("/*") && s.endsWith("*/")) {
+        s = s.trim();
+        s = s.substring(2, s.length - 2);
+    } else {
+        s = `/*${s}*/`;
+    }
+    textarea.setRangeText(s, selectionStart, selectionEnd)
 
 
 }

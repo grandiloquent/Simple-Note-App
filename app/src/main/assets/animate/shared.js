@@ -2358,32 +2358,73 @@ function copyVariables(textarea) {
 }
 function commentBlock(textarea) {
 
-    let selectionStart = textarea.selectionStart;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
-        selectionStart--;
-    }
-    let selectionEnd = textarea.selectionEnd;
-    let count = 0;
-    while (selectionEnd + 1 < textarea.value.length) {
-        selectionEnd++;
-        if (textarea.value[selectionEnd] === "{") {
-            count++;
+    let points = getLine(textarea);
+    let line = textarea.value.substring(points[0], points[1]);
+    if (line.indexOf("{") !== -1) {
+        let selectionStart = textarea.selectionStart;
+        while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+            selectionStart--;
         }
-        if (textarea.value[selectionEnd] === '}') {
-            count--;
-            if (count === 0)
+        let selectionEnd = textarea.selectionEnd;
+        let count = 0;
+        while (selectionEnd + 1 < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === "{") {
+                count++;
+            }
+            if (textarea.value[selectionEnd] === '}') {
+                count--;
+                if (count === 0) {
+                    selectionEnd++;
+                    break;
+                }
+            }
+        }
+        while (selectionEnd + 1 < textarea.value.length) {
+            if (textarea.value[selectionEnd] === '\n') {
                 break;
+            }
+            selectionEnd++;
         }
-    }
-    let s = textarea.value.substring(selectionStart, selectionEnd).trim();
+        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
 
-    if (s.startsWith("/*") && s.endsWith("*/")) {
-        s = s.trim();
-        s = s.substring(2, s.length - 2);
+        if (s.startsWith("/*") && s.endsWith("*/")) {
+            s = s.trim();
+            s = s.substring(2, s.length - 2);
+        } else {
+            s = `/*${s}*/`;
+        }
+        textarea.setRangeText(s, selectionStart, selectionEnd)
     } else {
-        s = `/*${s}*/`;
+        let selectionStart = textarea.selectionStart;
+        while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+            selectionStart--;
+        }
+        let selectionEnd = textarea.selectionEnd;
+        let count = 0;
+        while (selectionEnd + 1 < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === "{") {
+                count++;
+            }
+            if (textarea.value[selectionEnd] === '}') {
+                count--;
+                if (count === -1){
+                    break;
+                }
+            }
+        }
+        
+        let s = textarea.value.substring(selectionStart, selectionEnd).trim();
+    
+        if (s.startsWith("/*") && s.endsWith("*/")) {
+            s = s.trim();
+            s = s.substring(2, s.length - 2);
+        } else {
+            s = `/*${s}*/`;
+        }
+        textarea.setRangeText(s, selectionStart, selectionEnd)
     }
-    textarea.setRangeText(s, selectionStart, selectionEnd)
 
 
 }

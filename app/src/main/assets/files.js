@@ -4,6 +4,8 @@ const binaryRe = new RegExp(/\.(?:pdf|epub|apk|azw3|mobi)$/);
 const audioRe = new RegExp(/\.(?:mp3|wav|m4a)$/);
 const videoRe = new RegExp(/\.(?:mp4)$/, 'i');
 const zipRe = new RegExp(/\.(?:zip|gzip|epub)$/);
+const txtRe = new RegExp(/\.(?:txt|java|js|css)$/);
+
 
 const toast = document.querySelector('.toast');
 
@@ -27,6 +29,10 @@ function onItemClick(evt) {
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
         window.location = `/video.html?path=${path}`
+        return;
+    }
+    if (txtRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
+        window.location = `/code/editor.html?path=${path}`
         return;
     }
     if (path.endsWith(".pdf")) {

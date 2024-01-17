@@ -159,48 +159,78 @@
     <script>
         let baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "..";
         const id = new URL(window.location).searchParams.get('id');
-
+        const path = new URL(window.location).searchParams.get('path');
         const textarea = document.getElementById("textarea");
 
         async function loadData() {
-            const res = await fetch(`${baseUri}/code?id=${id}`, {
-                cache: "no-store"
-            });
-            if (res.status !== 200)
-                throw new Error(res.status);
-            return await res.json();
+            if (path) {
+                const res = await fetch(`${baseUri}/file?path=${encodeURIComponent(path)}`, {
+                    cache: "no-store"
+                });
+                if (res.status !== 200)
+                    throw new Error(res.status);
+                return await res.text();
+            }
+            else {
+                const res = await fetch(`${baseUri}/code?id=${id}`, {
+                    cache: "no-store"
+                });
+                if (res.status !== 200)
+                    throw new Error(res.status);
+                return await res.json();
+            }
 
 
         }
         async function saveData() {
-            let s = textarea.value.trim();
-            if (!s) return;
-            let body = {
-                title: substringBefore(s, "\n").trim(),
-                content: substringAfter(s, "\n").trim()
-            };
-            if (id) {
-                body.id = parseInt(id, 10)
+            if (path) {
+                let s = textarea.value.trim();
+                if (!s) return;
+                try {
+                    res = await fetch(`${baseUri}/file/write?path=${encodeURIComponent(path)}`, {
+                        method: 'POST',
+                        body: s,
+                        cache: "no-store"
+                    });
+                    if (res.status !== 200) {
+                        throw new Error();
+                    }
+                    toast.setAttribute('message', '成功');
+                } catch (error) {
+                    toast.setAttribute('message', '错误');
+                }
             }
-            // await submitNote(getBaseUri(), JSON.stringify(body));
-            // document.getElementById('toast').setAttribute('message', '成功');
-            let res;
-            try {
-                res = await fetch(`${baseUri}/code`, {
-                    method: 'POST',
-                    body: JSON.stringify(body),
-                    cache: "no-store"
-                });
-                if (res.status !== 200) {
-                    throw new Error();
+            else {
+
+                let s = textarea.value.trim();
+                if (!s) return;
+                let body = {
+                    title: substringBefore(s, "\n").trim(),
+                    content: substringAfter(s, "\n").trim()
+                };
+                if (id) {
+                    body.id = parseInt(id, 10)
                 }
-                if (!id) {
-                    location.href = `/code/editor.html?id=${await res.text()}`;
-                    return;
+                // await submitNote(getBaseUri(), JSON.stringify(body));
+                // document.getElementById('toast').setAttribute('message', '成功');
+                let res;
+                try {
+                    res = await fetch(`${baseUri}/code`, {
+                        method: 'POST',
+                        body: JSON.stringify(body),
+                        cache: "no-store"
+                    });
+                    if (res.status !== 200) {
+                        throw new Error();
+                    }
+                    if (!id) {
+                        location.href = `/code/editor.html?id=${await res.text()}`;
+                        return;
+                    }
+                    toast.setAttribute('message', '成功');
+                } catch (error) {
+                    toast.setAttribute('message', '错误');
                 }
-                toast.setAttribute('message', '成功');
-            } catch (error) {
-                toast.setAttribute('message', '错误');
             }
         }
         async function saveDataWith(title) {
@@ -235,18 +265,29 @@
             }
         }
         async function cacheCode() {
-            try {
-                const data = await loadData();
-                let content = data["content"];
-                if (content.startsWith('"') && content.endsWith('"')) {
-                    content = JSON.parse(content)
+            if (path) {
+                try {
+                    const data = await loadData();
+                    textarea.value = data;
+                } catch (error) {
+                    //textarea.value = localStorage.getItem('code.editor');
                 }
-                document.title = data["title"];
-                textarea.value = `${data["title"]}
+
+            } else {
+                try {
+                    const data = await loadData();
+                    let content = data["content"];
+                    if (content.startsWith('"') && content.endsWith('"')) {
+                        content = JSON.parse(content)
+                    }
+                    document.title = data["title"];
+                    textarea.value = `${data["title"]}
     
 ${content}`;
-            } catch (error) {
-                //textarea.value = localStorage.getItem('code.editor');
+                } catch (error) {
+                    //textarea.value = localStorage.getItem('code.editor');
+                }
+
             }
 
         }
@@ -288,13 +329,6 @@ ${content}`;
                     "剪块",
                     () => {
                         deleteBlock(textarea)
-                    }
-                ],
-                [
-                    "close",
-                    "剪评",
-                    () => {
-                        deleteComment(textarea)
                     }
                 ],
                 [
@@ -378,13 +412,6 @@ ${content}`;
                     "截断",
                     () => {
                         breakLine1(textarea);
-                    }
-                ],
-                [
-                    "density_large",
-                    "截断",
-                    () => {
-                        breakLine2(textarea);
                     }
                 ],
                 [
@@ -506,6 +533,22 @@ ${content}`;
                     "保存",
                     async () => {
                         await saveData();
+                        if (!path) {
+                            if (id) {
+                                try {
+                                    const response = await fetch(`${baseUri}/code/random`);
+                                    if (response.status > 399 || response.status < 200) {
+                                        throw new Error(`${response.status}: ${response.statusText}`)
+                                    }
+                                    const results = await response.text();
+                                    window.location.href = `?id=${results}`
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                            else
+                                window.location.reload();
+                        }
 
                     }
                 ],
@@ -514,7 +557,20 @@ ${content}`;
                     "保存",
                     async () => {
                         await saveDataWith("WebGL 练习");
-
+                        if (id) {
+                            try {
+                                const response = await fetch(`${baseUri}/code/random`);
+                                if (response.status > 399 || response.status < 200) {
+                                    throw new Error(`${response.status}: ${response.statusText}`)
+                                }
+                                const results = await response.text();
+                                window.location.href = `?id=${results}`
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        }
+                        else
+                            window.location.reload();
                     }
                 ],
                 [
@@ -522,21 +578,6 @@ ${content}`;
                     "保存",
                     async () => {
                         await saveDataWith("有问题");
-
-                    }
-                ],
-
-                [
-                    "switch_right",
-                    "交换",
-                    () => {
-                        switchStatement(textarea);
-                    }
-                ],
-                [
-                    "shuffle",
-                    "随机",
-                    async () => {
                         if (id) {
                             try {
                                 const response = await fetch(`${baseUri}/code/random`);
@@ -554,7 +595,13 @@ ${content}`;
                     }
                 ],
 
-
+                [
+                    "switch_right",
+                    "交换",
+                    () => {
+                        switchStatement(textarea);
+                    }
+                ],
                 [
                     "find_replace",
                     "替换",
@@ -567,6 +614,23 @@ ${content}`;
                     "颜色",
                     () => {
                         insertSnippet2();
+                    }
+                ],
+
+                [
+                    "exposure_plus_2",
+                    "放大",
+                    () => {
+                        decrease2(textarea, true);
+
+                    }
+                ],
+                [
+                    "exposure_neg_2",
+                    "缩小",
+                    () => {
+                        decrease2(textarea);
+
                     }
                 ],
             ].forEach(x => {
@@ -951,22 +1015,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
 
             [
-                "exposure_plus_2",
-                "放大",
-                () => {
-                    decrease2(textarea, true);
-
-                }
-            ],
-            [
-                "exposure_neg_2",
-                "缩小",
-                () => {
-                    decrease2(textarea);
-
-                }
-            ],
-            [
                 "text_snippet",
                 "图片",
                 () => {
@@ -1038,7 +1086,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
                     }
                 ],
-                
+
 
             ].forEach(x => {
                 const div = document.createElement('div');

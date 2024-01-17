@@ -598,7 +598,17 @@ function deleteBlock(textarea) {
     // textarea.setRangeText("", points[0], points[1]);
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
-    if (line.startsWith("//")) {
+    //       //===
+    if (line.startsWith("//===")) {
+        let end = textarea.value.indexOf("//===", points[0] + 5);
+        if(end !== -1) {
+            let s = textarea.value.substring(points[0], end + 5);
+            writeText(s);
+            textarea.setRangeText("", points[0], end + 5);
+        }
+       
+    }
+    else if (line.startsWith("//")) {
         let end = points[1];
         while (true) {
             let p = getLineAt(textarea, end);
@@ -1320,15 +1330,15 @@ function variables(textarea) {
         } else if ((
             textarea.value[selectionEnd] === ',' ||
             textarea.value[selectionEnd] === '?' ||
-            textarea.value[selectionEnd] === ':' ||
+            textarea.value[selectionEnd] === ':'
         ) && count === 0) {
             break;
         }
     }
 
     let s = textarea.value.substring(selectionStart, selectionEnd);
-    let n = /[a-z]/.match(s);
-    let name = n ? `${n}0` ?: `v0`;
+    let n = s.match(/[a-z]/);
+    let name = n ? `${n}0` : `v0`;
 
     let i = 0;
     while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
@@ -2042,8 +2052,26 @@ function breakLine1(textarea) {
         end++;
     }
     textarea.setRangeText(`
+//===
     ${name}=vec4(${selectedString}, ${selectedString}, ${selectedString}, 1.0);
 return;
+if(${selectedString}==0.0){
+// if(${selectedString}==0.5){
+// if(${selectedString}==1.0){
+// if(${selectedString}>0.0){
+// if(${selectedString}<1.0){
+// if(${selectedString}==-0.5){
+// if(${selectedString}==-1.0){
+// if(${selectedString}>=0.0 && ${selectedString}<=0.5){
+// if(${selectedString}>=0.5 && ${selectedString}<=1.){	
+// if(${selectedString}<0. && ${selectedString}>=-1.){	
+
+    ${name}=vec4(0.0,0.0,0.0,1.0);
+   }else{
+    ${name}=vec4(1.0,0.0,0.0,1.0);
+   }
+   return;
+//===
     ` , end, end);
 
     return;

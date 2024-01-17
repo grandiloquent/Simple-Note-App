@@ -1311,20 +1311,24 @@ function variables(textarea) {
                 break;
             }
             count--;
-            if (count === 0) {
+            if (count === -1) {
                 selectionEnd++;
                 break;
             }
-        } else if (textarea.value[selectionEnd] === ';' || textarea.value[selectionEnd] === '\n') {
+        } else if (textarea.value[selectionEnd] === ';') {
             break;
-        } else if (textarea.value[selectionEnd] === ',' && count === 0) {
+        } else if ((
+            textarea.value[selectionEnd] === ',' ||
+            textarea.value[selectionEnd] === '?' ||
+            textarea.value[selectionEnd] === ':' ||
+        ) && count === 0) {
             break;
         }
     }
 
     let s = textarea.value.substring(selectionStart, selectionEnd);
-    let name = `${s[0]}0`;
-
+    let n = /[a-z]/.match(s);
+    let name = n ? `${n}0` ?: `v0`;
 
     let i = 0;
     while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
@@ -2565,30 +2569,30 @@ function expandInline(textarea) {
         }
     }
     if (offset + 1 < s.length) {
-        buffer.push(s.substring(offset, s.length-1));
+        buffer.push(s.substring(offset, s.length - 1));
     }
-    let str="";
-    let prefix=name&&name[1] || '';
+    let str = "";
+    let prefix = name && name[1] || '';
     for (let i = 0; i < buffer.length; i++) {
-        str+=`${ i===0? '': prefix} ${buffer[i].trim()};\n`;
+        str += `${i === 0 ? '' : prefix} ${buffer[i].trim()};\n`;
     }
-    let back=selectionStart-1;
-    while (back-1>-1 && textarea.value[back-1]!=='\n'){
+    let back = selectionStart - 1;
+    while (back - 1 > -1 && textarea.value[back - 1] !== '\n') {
         back--;
     }
-    console.log(textarea.value.substring(back,selectionStart));
-    if(textarea.value.substring(back,selectionStart).trim().startsWith("if")){
+    console.log(textarea.value.substring(back, selectionStart));
+    if (textarea.value.substring(back, selectionStart).trim().startsWith("if")) {
         textarea.setRangeText(`
         {
         ${str}
         }`, selectionStart, selectionEnd);
-    }else{
+    } else {
         textarea.setRangeText(`${str}`, selectionStart, selectionEnd);
     }
 
 
 }
-function expandDefine(textarea){
+function expandDefine(textarea) {
     let selectionStart = textarea.selectionStart;
     let selectionEnd = textarea.selectionEnd;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== "\n") {
@@ -2621,7 +2625,7 @@ function expandDefine(textarea){
         s = s.replaceAll(new RegExp("\\b" + argumentsFunction[i] + "\\b", 'g'),
             inputsFunction[i]);
     }
-    s = s.replaceAll(/\\\s+/g,'\n');
+    s = s.replaceAll(/\\\s+/g, '\n');
     writeText(substringBeforeLast(substringAfter(s, "{"), "}"))
     s = `/*
 ${textarea.value.substring(p[1], selectionEnd)}

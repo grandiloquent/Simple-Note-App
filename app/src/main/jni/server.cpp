@@ -197,6 +197,26 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             env->FindClass("psycho/euphoria/app/ImageUitls")));
     JavaVM *jvm;
     env->GetJavaVM(&jvm);
+    server.Post("/file/write", [](const httplib::Request &req, httplib::Response &res,
+                                  const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        auto path = req.get_param_value("path");
+        std::ofstream wf(path, std::ios::out | std::ios::binary);
+        if (!wf) {
+            res.status = 500;
+            return;
+        }
+        wf.write(body.c_str(), body.size());
+        res.set_content("Success",
+                        "text/plain; charset=UTF-8");
+
+    });
     server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm))?)",
                [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
                                             httplib::Response &res) {
@@ -805,26 +825,7 @@ in vec4 a_position;
                         "text/plain; charset=UTF-8");
 
     });
-    server.Post("/fn", [](const httplib::Request &req, httplib::Response &res,
-                          const httplib::ContentReader &content_reader) {
-        res.set_header("Access-Control-Allow-Origin", "*");
 
-        std::string body;
-        content_reader([&](const char *data, size_t data_length) {
-            body.append(data, data_length);
-            return true;
-        });
-        auto path = req.get_param_value("path");
-        std::ofstream wf(path, std::ios::out | std::ios::binary);
-        if (!wf) {
-            res.status = 500;
-            return;
-        }
-        wf.write(body.c_str(), body.size());
-        res.set_content("Success",
-                        "text/plain; charset=UTF-8");
-
-    });
     server.Get("/jn", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]

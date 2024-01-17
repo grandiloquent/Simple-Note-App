@@ -21,7 +21,7 @@
         import init, { format } from './clang-format.js';
         await init();
         window.format = format;
- 
+
     </script>
 </head>
 
@@ -256,10 +256,12 @@ ${content}`;
         function mode1() {
             mode10();
             mode11();
+            mode6()
         }
         function mode2() {
             mode12()
             mode13()
+            mode5()
         }
         function mode10() {
             const bottomBar = document.querySelector('.bar-renderer.top');
@@ -984,6 +986,73 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             })
         }
         function mode6() {
+            const bottomBar = document.querySelector('.items-wrapper.selected');
+            bottomBar.innerHTML = '';
+            [
+                [
+                    "code",
+                    "格式",
+                    () => {
+                        formatCode();
+                    }
+                ],
+                [
+                    "exposure_neg_2",
+                    "展开",
+                    () => {
+                        expandInline(textarea);
+
+                    }
+                ],
+                [
+                    "exposure_neg_2",
+                    "展定",
+                    () => {
+                        expandDefine(textarea);
+
+                    }
+                ],
+                [
+                    "go_to_line",
+                    "调试",
+                    () => {
+                        goToLine(textarea);
+                    }
+                ],
+
+
+
+                [
+                    "exposure_plus_2",
+                    "放大",
+                    () => {
+                        decrease2(textarea, true);
+
+                    }
+                ],
+                [
+                    "exposure_neg_2",
+                    "缩小",
+                    () => {
+                        decrease2(textarea);
+
+                    }
+                ],
+                
+
+            ].forEach(x => {
+                const div = document.createElement('div');
+                div.className = "item";
+                div.innerHTML = `<span class="material-symbols-outlined">${x[0]}</span>
+            <div class="pivot-bar-item-title">${x[1]}</div>`;
+                div.addEventListener('click', evt => {
+                    evt.stopPropagation();
+                    x[2]();
+                });
+                bottomBar.appendChild(div);
+            })
+        }
+        function mode7() {
             const bottomBar = document.querySelector('.items-wrapper');
             bottomBar.innerHTML = '';
             [
@@ -1061,7 +1130,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             })
         }
         function initialize() {
-            mode5()
+
             const mode = parseInt(localStorage.getItem('light_mode')) || 1;
             setMode(mode);
 

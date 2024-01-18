@@ -601,12 +601,12 @@ function deleteBlock(textarea) {
     //       //===
     if (line.startsWith("//===")) {
         let end = textarea.value.indexOf("//===", points[0] + 5);
-        if(end !== -1) {
+        if (end !== -1) {
             let s = textarea.value.substring(points[0], end + 5);
             writeText(s);
             textarea.setRangeText("", points[0], end + 5);
         }
-       
+
     }
     else if (line.startsWith("//")) {
         let end = points[1];
@@ -1349,8 +1349,11 @@ function variables(textarea) {
     let str = `
 float ${name} = ${s};
     `;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== ';') {
         selectionStart--;
+    }
+    while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart] !== '\n') {
+        selectionStart++;
     }
     textarea.setRangeText(str, selectionStart, selectionStart);
 
@@ -1635,6 +1638,39 @@ function parentheses(textarea) {
 }
 
 function switchStatement(textarea) {
+    // let s = textarea.value;
+    // let start = textarea.selectionStart
+    // let end = textarea.selectionEnd;
+    // while (start - 1 > -1) {
+    //     if (textarea.value[start - 1] !== '(' && textarea.value[start - 1] !== '\n')
+    //         start--;
+    //     else
+    //         break;
+    // }
+    // let i = 0;
+    // while (end < s.length) {
+    //     if (s[end] === '(') {
+    //         i++;
+    //         end++;
+
+    //     } else if (s[end] === ')') {
+    //         end++;
+    //         i--;
+    //         if (i === -1) {
+    //             break;
+    //         }
+    //     } else if (s[end] !== '\n') {
+    //         end++;
+    //     } else {
+    //         break;
+    //     }
+    // }
+    // let str = textarea.value.substring(start, end - 1);
+    // if (str.indexOf(',') === -1) {
+    //     return;
+    // }
+    // textarea.setRangeText(`${substringAfter(str, ",")},${substringBefore(str, ",")}`, start, end - 1);
+
     let s = textarea.value;
     let start = textarea.selectionStart
     let end = textarea.selectionEnd;
@@ -1645,28 +1681,39 @@ function switchStatement(textarea) {
             break;
     }
     let i = 0;
+    let k = 0;
     while (end < s.length) {
         if (s[end] === '(') {
             i++;
             end++;
 
         } else if (s[end] === ')') {
-            end++;
+            
             i--;
-            if (i === -1) {
+            if (i === -1) { 
                 break;
             }
-        } else if (s[end] !== '\n') {
             end++;
-        } else {
+        } else if (i === 0 && s[end] === ',') {
+            end++;
+            if (k === 1) {
+                end++;
+                break;
+            }
+            k++;
+        } else if (i === 0 && s[end] === '\n') {
             break;
+        } else {
+            end++;
         }
     }
-    let str = textarea.value.substring(start, end - 1);
+    let str = textarea.value.substring(start, end);
+    console.log(str, start, end);
     if (str.indexOf(',') === -1) {
         return;
     }
-    textarea.setRangeText(`${substringAfter(str, ",")},${substringBefore(str, ",")}`, start, end - 1);
+    textarea.setRangeText(`${substringAfter(str, ",")},${substringBefore(str, ",")}`, start, end);
+
 }
 // function duplicateLine(textarea) {
 //     if (textarea.selectionStart !== textarea.selectionEnd) {
@@ -1975,6 +2022,104 @@ function breakLine1(textarea) {
     while (end < textarea.value.length && textarea.value[end] !== '\n') {
         end++;
     }
+    const m = s.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+    let namev = (m && m[0]) || "float";
+
+    if (namev === "int") {
+        textarea.setRangeText(`
+        //===
+            ${name}=vec4(vec3(${selectedString}), 1.0);
+        return;
+        if(${selectedString}==0){
+        // if(${selectedString}==1){
+            ${name}=vec4(0.0,0.0,0.0,1.0);
+           }else{
+            ${name}=vec4(1.0,0.0,0.0,1.0);
+           }
+           return;
+        //===
+            ` , end, end);
+
+        return;
+    } else if (namev === "vec2") {
+        textarea.setRangeText(`
+//===
+    ${name}=vec4(${selectedString},0.0, 1.0);
+return;
+if(${selectedString}.x==0.0){
+// if(${selectedString}.x==0.5){
+// if(${selectedString}.x==1.0){
+// if(${selectedString}.x>0.0){
+// if(${selectedString}.x<1.0){
+// if(${selectedString}.x==-0.5){
+// if(${selectedString}.x==-1.0){
+// if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+// if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
+// if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
+// if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
+
+    ${name}=vec4(0.0,0.0,0.0,1.0);
+   }else{
+    ${name}=vec4(1.0,0.0,0.0,1.0);
+   }
+   return;
+//===
+    ` , end, end);
+
+        return;
+    } else if (namev === "vec3") {
+        textarea.setRangeText(`
+        //===
+            ${name}=vec4(${selectedString},1.0);
+        return;
+        if(${selectedString}.x==0.0){
+        // if(${selectedString}.x==0.5){
+        // if(${selectedString}.x==1.0){
+        // if(${selectedString}.x>0.0){
+        // if(${selectedString}.x<1.0){
+        // if(${selectedString}.x==-0.5){
+        // if(${selectedString}.x==-1.0){
+        // if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+        // if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
+        // if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
+        // if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
+        
+            ${name}=vec4(0.0,0.0,0.0,1.0);
+           }else{
+            ${name}=vec4(1.0,0.0,0.0,1.0);
+           }
+           return;
+        //===
+            ` , end, end);
+
+        return;
+    } else if (namev === "vec4") {
+        textarea.setRangeText(`
+        //===
+            ${name}=${selectedString};
+        return;
+        if(${selectedString}.x==0.0){
+        // if(${selectedString}.x==0.5){
+        // if(${selectedString}.x==1.0){
+        // if(${selectedString}.x>0.0){
+        // if(${selectedString}.x<1.0){
+        // if(${selectedString}.x==-0.5){
+        // if(${selectedString}.x==-1.0){
+        // if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+        // if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
+        // if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
+        // if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
+        
+            ${name}=vec4(0.0,0.0,0.0,1.0);
+           }else{
+            ${name}=vec4(1.0,0.0,0.0,1.0);
+           }
+           return;
+        //===
+            ` , end, end);
+
+        return;
+    }
     textarea.setRangeText(`
 //===
     ${name}=vec4(${selectedString}, ${selectedString}, ${selectedString}, 1.0);
@@ -1986,7 +2131,8 @@ if(${selectedString}==0.0){
 // if(${selectedString}<1.0){
 // if(${selectedString}==-0.5){
 // if(${selectedString}==-1.0){
-// if(${selectedString}>=0.0 && ${selectedString}<=0.5){
+// if(${selectedString}>0.0 && ${selectedString}<0.5){
+// if(${selectedString}>0.5 && ${selectedString}<1.){	
 // if(${selectedString}>=0.5 && ${selectedString}<=1.){	
 // if(${selectedString}<0. && ${selectedString}>=-1.){	
 

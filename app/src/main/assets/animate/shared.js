@@ -553,10 +553,10 @@ function commentLine(textarea) {
     // */`;
     //     }
     console.log(s)
-    if (!s.trim() || (textarea.selectionStart === textarea.selectionEnd 
+    if (!s.trim() || (textarea.selectionStart === textarea.selectionEnd
         && textarea.value[textarea.selectionEnd] === '\n'
-        && textarea.value[textarea.selectionEnd-1] === '\n'
-        )) {
+        && textarea.value[textarea.selectionEnd - 1] === '\n'
+    )) {
         console.log('=======1');
         end = points[1];
         let count = 0;
@@ -1487,6 +1487,10 @@ ${s.replace(/(?<=[a-zA-Z0-9] )[a-zA-Z0-9_]+(?= =)/, name)}`;
     }
     textarea.setRangeText(str.replace(/(?<=iChannel)\d+/, m => {
         return parseInt(m) + 1;
+    }).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g,m=>{
+        return String.fromCharCode(m.codePointAt(0)+1)
+    }).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g,m=>{
+        return String.fromCharCode(m.codePointAt(0)+1)
     }), selectionEnd, selectionEnd);
 
 }
@@ -1537,7 +1541,14 @@ function copyBlock(textarea) {
     }
     textarea.setRangeText(`
 
-${s}
+${s.replace(/(?<=iChannel)\d+/, m => {
+    return parseInt(m) + 1;
+}).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g,m=>{
+    return String.fromCharCode(m.codePointAt(0)+1)
+}).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g,m=>{
+    return String.fromCharCode(m.codePointAt(0)+1)
+})
+}
 `, selectionEnd, selectionEnd);
 
 }
@@ -2086,21 +2097,20 @@ function breakLine1(textarea) {
 //===
     ${name}=vec4(${selectedString},0.0, 1.0);
 return;
-if(${selectedString}.x==0.0){
-// if(${selectedString}.x==0.5){
-// if(${selectedString}.x==1.0){
-// if(${selectedString}.x>0.0){
-// if(${selectedString}.x<1.0){
-// if(${selectedString}.x==-0.5){
-// if(${selectedString}.x==-1.0){
-// if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
-// if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
-// if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
-// if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
-
+    if(${selectedString}.x==0.0){
     ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
+   }else if(${selectedString}.x==1.0){
     ${name}=vec4(1.0,0.0,0.0,1.0);
+   }else if(${selectedString}.x==.5){
+    ${name}=vec4(0.0,1.0,0.0,1.0);
+   }else if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+    ${name}=vec4(.0,0.0,1.0,1.0);
+   }else if(${selectedString}.x>0.5 && ${selectedString}.x<1.){
+    ${name}=vec4(1.0,1.0,0.0,1.0);
+   }else if(${selectedString}.x>1.0){
+    ${name}=vec4(0.0,1.0,1.0,1.0);
+   }else if(${selectedString}.x<0.){
+    ${name}=vec4(1.0,0.0,1.0,1.0);
    }
    return;
 //===

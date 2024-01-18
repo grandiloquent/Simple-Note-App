@@ -1688,18 +1688,19 @@ function switchStatement(textarea) {
             end++;
 
         } else if (s[end] === ')') {
-            
+
             i--;
-            if (i === -1) { 
+            if (i === -1) {
                 break;
             }
             end++;
         } else if (i === 0 && s[end] === ',') {
-            end++;
+
             if (k === 1) {
-                end++;
+
                 break;
             }
+            end++;
             k++;
         } else if (i === 0 && s[end] === '\n') {
             break;

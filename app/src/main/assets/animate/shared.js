@@ -551,6 +551,39 @@ function commentLine(textarea) {
     // ${s}
     // */`;
     //     }
+    if (!s.trim()) {
+        end = points[1];
+        let count = 0;
+        while (end < textarea.value.length) {
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === -1) {
+                    console.log("--------------------------------")
+                    while (end - 1 > -1 && textarea.value[end] !== '\n') {
+                        end--;
+                    }
+                    break
+                }
+            }
+            end++;
+        }
+
+        s = textarea.value.substring(points[1] + 1, end);
+        if (s.startsWith('//')) {
+            textarea.setRangeText(s
+                .split('\n').map(x => x.trim().startsWith("//") ? x.trim().substring(2) : x.trim()).join('\n')
+
+                , points[1] + 1, end);
+        } else {
+            textarea.setRangeText(s
+                .split('\n').map(x => "//" + x.trim()).join('\n') + "\n"
+                , points[1] + 1, end);
+        }
+
+        return;
+    }
     if (s.startsWith("//")) {
         s = s.substring(2);
     } else {
@@ -2433,7 +2466,9 @@ function duplicateLine(textarea) {
         let p = getWord(textarea);
         let index = s.indexOf("=", p[1] - start);
         if (index !== -1) {
-            const m = textarea.value.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+            let lp = getLine(textarea);
+            let line = textarea.value.substring(lp[0], lp[1]);
+            let m = line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`)) || textarea.value.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
             let name = (m && m[0]) || "float";
             let value = "0.0";
             if (name === "int") {

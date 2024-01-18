@@ -487,6 +487,14 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
+<script>
+    document.addEventListener('keydown', evt => {
+        if (evt.key === 'F2') {
+            evt.preventDefault();
+            location.href = '?id=' + parseInt(new URL(window.location.href).searchParams.get('id') - 1);
+        }
+    })
+</script>
 <script id="vs" type="x-shader/x-vertex">varying vec2 vUv;
 
         void main() {
@@ -506,6 +514,14 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
+<script>
+    document.addEventListener('keydown', evt => {
+        if (evt.key === 'F2') {
+            evt.preventDefault();
+            location.href = '?id=' + parseInt(new URL(window.location.href).searchParams.get('id') - 1);
+        }
+    })
+</script>
 <script id="vs" type="x-shader/x-vertex">#version 300 es
 in vec4 a_position;
      void main() {

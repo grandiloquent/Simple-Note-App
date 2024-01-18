@@ -332,6 +332,20 @@ ${content}`;
                     }
                 ],
                 [
+                    "close",
+                    "删注",
+                    () => {
+
+                        deleteComments(textarea)
+                    }
+                ], [
+                    "content_copy",
+                    "复等",
+                    () => {
+                        copyVariables(textarea)
+                    }
+                ],
+                [
                     "keyboard",
                     "输入法",
                     () => {
@@ -452,20 +466,7 @@ ${content}`;
                         await preview();
                     }
                 ],
-                [
-                    "close",
-                    "删注",
-                    () => {
 
-                        deleteComments(textarea)
-                    }
-                ], [
-                    "content_copy",
-                    "复等",
-                    () => {
-                        copyVariables(textarea)
-                    }
-                ],
 
 
                 [

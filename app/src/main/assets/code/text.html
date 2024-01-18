@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            row-gap: 8px;
+            padding: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <input value="500">
+        <input value="30px 苹方">
+        <input value="50">
+        <input value="中国人">
+        <input value="#000">
+        <input>
+
+    </div>
+
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector("canvas");
+
+        function drawText() {
+            canvas.width = parseInt(document.querySelector('input:nth-child(1)').value);
+            const x = parseInt(document.querySelector('input:nth-child(3)').value);
+            const s = document.querySelector('input:nth-child(4)').value;
+            canvas.height = ((s.length + 10) / 10 | 0) * x;
+            const ctx = canvas.getContext("2d");
+            ctx.textBaseline = 'middle';
+            // ctx.textAlign = "center";
+            ctx.font = `${document.querySelector('input:nth-child(2)').value}`
+            //console.log(ctx.measureText(s[0]));
+            if (document.querySelector('input:nth-child(6)').value) {
+                ctx.fillStyle = `${document.querySelector('input:nth-child(6)').value}`
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.fillStyle = `${document.querySelector('input:nth-child(5)').value}`
+            for (let index = 0; index < s.length; index++) {
+                const element = s[index];
+                console.log(element, x * (index + 1), x);
+                ctx.fillText(element, 10 + x * (index % 10), (index / 10 | 0) * 50 + 25);
+            }
+        }
+        drawText();
+
+        document.querySelector('input:nth-child(4)').addEventListener('input', evt => {
+            drawText();
+        })
+
+
+
+
+    </script>
+</body>
+
+</html>

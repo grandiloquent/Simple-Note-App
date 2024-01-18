@@ -541,6 +541,7 @@ function comment(textarea) {
     })
 }
 function commentLine(textarea) {
+    console.log("============")
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
     //     if (s.startsWith("/*") && s.endsWith("*/")) {
@@ -551,7 +552,12 @@ function commentLine(textarea) {
     // ${s}
     // */`;
     //     }
-    if (!s.trim()) {
+    console.log(s)
+    if (!s.trim() || (textarea.selectionStart === textarea.selectionEnd 
+        && textarea.value[textarea.selectionEnd] === '\n'
+        && textarea.value[textarea.selectionEnd-1] === '\n'
+        )) {
+        console.log('=======1');
         end = points[1];
         let count = 0;
         while (end < textarea.value.length) {

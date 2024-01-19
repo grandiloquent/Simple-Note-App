@@ -638,8 +638,9 @@ function deleteBlock(textarea) {
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
     //       //===
+    console.log("-----" + line + "---");
     if (line.startsWith("//===")) {
-        let end = textarea.value.indexOf("//===", points[0] + 5);
+        let end = textarea.value.indexOf("//===", points[1]);
         if (end !== -1) {
             let s = textarea.value.substring(points[0], end + 5);
             writeText(s);
@@ -1487,10 +1488,10 @@ ${s.replace(/(?<=[a-zA-Z0-9] )[a-zA-Z0-9_]+(?= =)/, name)}`;
     }
     textarea.setRangeText(str.replace(/(?<=iChannel)\d+/, m => {
         return parseInt(m) + 1;
-    }).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g,m=>{
-        return String.fromCharCode(m.codePointAt(0)+1)
-    }).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g,m=>{
-        return String.fromCharCode(m.codePointAt(0)+1)
+    }).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g, m => {
+        return String.fromCharCode(m.codePointAt(0) + 1)
+    }).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g, m => {
+        return String.fromCharCode(m.codePointAt(0) + 1)
     }), selectionEnd, selectionEnd);
 
 }
@@ -1542,13 +1543,13 @@ function copyBlock(textarea) {
     textarea.setRangeText(`
 
 ${s.replace(/(?<=iChannel)\d+/, m => {
-    return parseInt(m) + 1;
-}).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g,m=>{
-    return String.fromCharCode(m.codePointAt(0)+1)
-}).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g,m=>{
-    return String.fromCharCode(m.codePointAt(0)+1)
-})
-}
+        return parseInt(m) + 1;
+    }).replaceAll(/(?<=\.[a-z]+)[A-Z]\b/g, m => {
+        return String.fromCharCode(m.codePointAt(0) + 1)
+    }).replaceAll(/(?<=\('[a-z])[a-z](?='\))/g, m => {
+        return String.fromCharCode(m.codePointAt(0) + 1)
+    })
+        }
 `, selectionEnd, selectionEnd);
 
 }
@@ -2057,23 +2058,33 @@ function decrease2(textarea, isAdd) {
 function breakLine1(textarea) {
     const p = getWord(textarea);
     const selectedString = textarea.value.substring(p[0], p[1]);
-    let start = p[0];
-    let end = p[1];
-    while (start - 1 > -1) {
-        if (textarea.value[start] === ">"
-            && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
-            break;
+    let lp = getLine(textarea);
+    let line = textarea.value.substring(lp[0], lp[1]);
+    let ms = line.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
+    let m= line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+    if(!ms){
+        let start = p[0];
+        let end = p[1];
+        while (start - 1 > -1) {
+            if (textarea.value[start] === ">"
+                && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
+                break;
+            }
+            start--;
         }
-        start--;
+        end = textarea.value.indexOf("</script>", end);
+        const s = textarea.value.substring(start, end);
+        ms=s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
+        if(!m){
+            m=s.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+        }
     }
-    end = textarea.value.indexOf("</script>", end);
-    const s = textarea.value.substring(start, end);
-    const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
+    const name = ms && ms[0];
     end = textarea.selectionEnd;
     while (end < textarea.value.length && textarea.value[end] !== '\n') {
         end++;
     }
-    const m = s.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+ 
     let namev = (m && m[0]) || "float";
 
     if (namev === "int") {
@@ -2172,23 +2183,22 @@ return;
     }
     textarea.setRangeText(`
 //===
-    ${name}=vec4(${selectedString}, ${selectedString}, ${selectedString}, 1.0);
+    ${name}=vec4(${selectedString},0.0, 1.0);
 return;
-if(${selectedString}==0.0){
-// if(${selectedString}==0.5){
-// if(${selectedString}==1.0){
-// if(${selectedString}>0.0){
-// if(${selectedString}<1.0){
-// if(${selectedString}==-0.5){
-// if(${selectedString}==-1.0){
-// if(${selectedString}>0.0 && ${selectedString}<0.5){
-// if(${selectedString}>0.5 && ${selectedString}<1.){	
-// if(${selectedString}>=0.5 && ${selectedString}<=1.){	
-// if(${selectedString}<0. && ${selectedString}>=-1.){	
-
+    if(${selectedString}.x==0.0){
     ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else{
+   }else if(${selectedString}.x==1.0){
     ${name}=vec4(1.0,0.0,0.0,1.0);
+   }else if(${selectedString}.x==.5){
+    ${name}=vec4(0.0,1.0,0.0,1.0);
+   }else if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+    ${name}=vec4(.0,0.0,1.0,1.0);
+   }else if(${selectedString}.x>0.5 && ${selectedString}.x<1.){
+    ${name}=vec4(1.0,1.0,0.0,1.0);
+   }else if(${selectedString}.x>1.0){
+    ${name}=vec4(0.0,1.0,1.0,1.0);
+   }else if(${selectedString}.x<0.){
+    ${name}=vec4(1.0,0.0,1.0,1.0);
    }
    return;
 //===

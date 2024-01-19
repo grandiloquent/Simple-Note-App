@@ -1352,7 +1352,7 @@ function variables(textarea) {
     }
     let count = 0;
     while (selectionEnd < textarea.value.length) {
-        selectionEnd++;
+        
         //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
         if (textarea.value[selectionEnd] === '(') {
             count++;
@@ -1367,23 +1367,26 @@ function variables(textarea) {
             }
         } else if (textarea.value[selectionEnd] === ';') {
             break;
-        } else if ((
+        } else if (count === 0 && (
             textarea.value[selectionEnd] === ',' ||
             textarea.value[selectionEnd] === '?' ||
             textarea.value[selectionEnd] === ':'
-        ) && count === 0) {
+        )) {
+            //selectionEnd++;
             break;
         }
+        selectionEnd++;
     }
 
     let s = textarea.value.substring(selectionStart, selectionEnd);
     let n = s.match(/[a-z]/);
-    let name = n ? `${n}0` : `v0`;
+    console.log(n)
+    let name = n ? `${n[0]}0` : `v0`;
 
     let i = 0;
     while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
         i++
-        name = `${s[0]}${i}`;
+        name = `${n[0]}${i}`;
     }
     textarea.setRangeText(`${name}`, selectionStart, selectionEnd);
     let str = `
@@ -2061,8 +2064,8 @@ function breakLine1(textarea) {
     let lp = getLine(textarea);
     let line = textarea.value.substring(lp[0], lp[1]);
     let ms = line.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
-    let m= line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
-    if(!ms){
+    let m = line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+    if (!ms) {
         let start = p[0];
         let end = p[1];
         while (start - 1 > -1) {
@@ -2074,9 +2077,9 @@ function breakLine1(textarea) {
         }
         end = textarea.value.indexOf("</script>", end);
         const s = textarea.value.substring(start, end);
-        ms=s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
-        if(!m){
-            m=s.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+        ms = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
+        if (!m) {
+            m = s.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
         }
     }
     const name = ms && ms[0];
@@ -2084,7 +2087,7 @@ function breakLine1(textarea) {
     while (end < textarea.value.length && textarea.value[end] !== '\n') {
         end++;
     }
- 
+
     let namev = (m && m[0]) || "float";
 
     if (namev === "int") {
@@ -2185,19 +2188,19 @@ return;
 //===
     ${name}=vec4(${selectedString},${selectedString},${selectedString}, 1.0);
 return;
-    if(${selectedString}.x==0.0){
+    if(${selectedString}==0.0){
     ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else if(${selectedString}.x==1.0){
+   }else if(${selectedString}==1.0){
     ${name}=vec4(1.0,0.0,0.0,1.0);
-   }else if(${selectedString}.x==.5){
+   }else if(${selectedString}==.5){
     ${name}=vec4(0.0,1.0,0.0,1.0);
-   }else if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
+   }else if(${selectedString}>0.0 && ${selectedString}<0.5){
     ${name}=vec4(.0,0.0,1.0,1.0);
-   }else if(${selectedString}.x>0.5 && ${selectedString}.x<1.){
+   }else if(${selectedString}>0.5 && ${selectedString}<1.){
     ${name}=vec4(1.0,1.0,0.0,1.0);
-   }else if(${selectedString}.x>1.0){
+   }else if(${selectedString}>1.0){
     ${name}=vec4(0.0,1.0,1.0,1.0);
-   }else if(${selectedString}.x<0.){
+   }else if(${selectedString}<0.){
     ${name}=vec4(1.0,0.0,1.0,1.0);
    }
    return;

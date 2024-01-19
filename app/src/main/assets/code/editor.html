@@ -317,6 +317,20 @@ ${content}`;
                     }
                 ],
                 [
+                "text_snippet",
+                "代码",
+                async () => {
+
+                    await saveData();
+                    if (typeof NativeAndroid !== 'undefined') {
+                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                    } else {
+                        window.open('notes.html', '_blank');
+                    }
+                }
+            ],
+
+                [
                     "close",
                     "剪行",
                     () => {
@@ -345,13 +359,7 @@ ${content}`;
                         copyVariables(textarea)
                     }
                 ],
-                [
-                    "keyboard",
-                    "输入法",
-                    () => {
-                        changeInputMethod();
-                    }
-                ],
+                
                 [
                     "content_copy",
                     "复行",
@@ -466,6 +474,19 @@ ${content}`;
                         await preview();
                     }
                 ],
+                [
+                "text_snippet",
+                "代码",
+                async () => {
+
+                    await saveData();
+                    if (typeof NativeAndroid !== 'undefined') {
+                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                    } else {
+                        window.open('notes.html', '_blank');
+                    }
+                }
+            ],
 
 
 
@@ -481,6 +502,13 @@ ${content}`;
                     "粘字",
                     () => {
                         pasteWord(textarea)
+                    }
+                ],
+                [
+                    "keyboard",
+                    "输入法",
+                    () => {
+                        changeInputMethod();
                     }
                 ],
                 [
@@ -984,20 +1012,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 }
             ],
 
-            [
-                "text_snippet",
-                "代码",
-                async () => {
-
-                    await saveData();
-                    if (typeof NativeAndroid !== 'undefined') {
-                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
-                    } else {
-                        window.open('notes.html', '_blank');
-                    }
-                }
-            ],
-
+           
 
             [
                 "text_snippet",

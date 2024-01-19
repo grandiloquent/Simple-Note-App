@@ -2183,7 +2183,7 @@ return;
     }
     textarea.setRangeText(`
 //===
-    ${name}=vec4(${selectedString},0.0, 1.0);
+    ${name}=vec4(${selectedString},${selectedString},${selectedString}, 1.0);
 return;
     if(${selectedString}.x==0.0){
     ${name}=vec4(0.0,0.0,0.0,1.0);

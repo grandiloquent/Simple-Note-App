@@ -1352,7 +1352,7 @@ function variables(textarea) {
     }
     let count = 0;
     while (selectionEnd < textarea.value.length) {
-        
+
         //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
         if (textarea.value[selectionEnd] === '(') {
             count++;
@@ -2318,7 +2318,14 @@ function breakLine2(textarea) {
     return;
 }
 
-
+function searchWord() {
+    const p = getWord(textarea);
+    const selectedString = textarea.value.substring(p[0], p[1]);
+    const points = findBlock(textarea);
+    const blockString = textarea.value.substring(points[0], points[1]);
+    const r = new RegExp("\\b" + selectedString + "\\b", 'g');
+    console.log(blockString.match(r));
+}
 
 
 function duplicateLine(textarea) {
@@ -2585,6 +2592,36 @@ function formatLine(textarea, fn) {
         }
     }
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
+}
+
+function findBlock(textarea, fn) {
+    let selectionStart = textarea.selectionStart;
+    let count = 0;
+    while (selectionStart - 1 > -1) {
+        if (textarea.value[selectionStart] === '}') {
+            count++;
+        } else if (textarea.value[selectionStart] === "{") {
+            count--;
+            if (count === -1) {
+                break;
+            }
+        }
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    count = 0;
+    while (selectionEnd + 1 < textarea.value.length) {
+        if (textarea.value[selectionEnd] === '{') {
+            count++;
+        } else if (textarea.value[selectionEnd] === "}") {
+            count--;
+            if (count === -1) {
+                break;
+            }
+        }
+        selectionEnd++;
+    }
+    return [selectionStart, selectionEnd];
 }
 
 function formatExpression(textarea, fn) {

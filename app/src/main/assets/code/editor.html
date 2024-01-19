@@ -512,6 +512,22 @@ ${content}`;
                     }
                 ],
                 [
+                    "exposure_plus_2",
+                    "放大",
+                    () => {
+                        decrease2(textarea, true);
+
+                    }
+                ],
+                [
+                    "exposure_neg_2",
+                    "缩小",
+                    () => {
+                        decrease2(textarea);
+
+                    }
+                ],
+                [
                     "light_mode",
                     "模式",
                     () => {
@@ -630,22 +646,7 @@ ${content}`;
                     }
                 ],
 
-                [
-                    "exposure_plus_2",
-                    "放大",
-                    () => {
-                        decrease2(textarea, true);
-
-                    }
-                ],
-                [
-                    "exposure_neg_2",
-                    "缩小",
-                    () => {
-                        decrease2(textarea);
-
-                    }
-                ],
+                
             ].forEach(x => {
                 const div = document.createElement('div');
                 div.className = "bar-item-tab";
@@ -1009,6 +1010,13 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 "调试",
                 () => {
                     goToLine(textarea);
+                }
+            ],
+            [
+                "go_to_line",
+                "搜索",
+                () => {
+                    searchWord(textarea);
                 }
             ],
 

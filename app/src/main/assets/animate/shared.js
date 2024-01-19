@@ -2324,7 +2324,21 @@ function searchWord() {
     const points = findBlock(textarea);
     const blockString = textarea.value.substring(points[0], points[1]);
     const r = new RegExp("\\b" + selectedString + "\\b", 'g');
-    console.log(blockString.match(r));
+    const m = r.exec(blockString.substring(textarea.selectionStart + selectedString.length-points[0]));
+    if (m) {
+        console.log(m.index);
+        let index = m.index+ selectedString.length+textarea.selectionStart;
+        console.log(index,selectedString);
+        textarea.focus();
+        textarea.scrollTop = 0;
+        const fullText = textarea.value;
+        textarea.value = fullText.substring(0, index + selectedString.length);
+        textarea.scrollTop = textarea.scrollHeight;
+        textarea.value = fullText;
+
+        textarea.selectionStart = index;
+        textarea.selectionEnd = index +selectedString.length;
+    }
 }
 
 

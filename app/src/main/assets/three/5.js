@@ -52,7 +52,7 @@ b2.addEventListener("click", async evt => {
             method: 'POST',
             body: JSON.stringify({
                 id: parseInt(id),
-                title: "WebGL 有问题"
+                title: "有问题"
             }),
             cache: "no-store"
         });

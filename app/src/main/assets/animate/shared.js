@@ -1961,7 +1961,7 @@ function commentWord(textarea) {
     }
 
 }
-function functionsExpand(textarea) {
+async function functionsExpand(textarea) {
     let selectionStart = textarea.selectionStart;
     let selectionEnd = textarea.selectionEnd;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== "\n") {
@@ -1984,9 +1984,9 @@ function functionsExpand(textarea) {
             }
         }
     }
-    let p = getLine(textarea);
-    let s = textarea.value.substring(p[1], selectionEnd);
-    let inputsFunction = textarea.value.substring(p[0], p[1]).split(',');
+    
+    let s = textarea.value.substring(selectionStart, selectionEnd);
+    let inputsFunction =(await readText()).split(',');
     let argumentsFunction = substringBefore(substringAfter(s, "("), ")")
         .split(",").map(x => x.split(" ")[x.split(" ").length - 1]);
 
@@ -2025,9 +2025,9 @@ function functionsExpand(textarea) {
     }
     writeText(substringBeforeLast(substringAfter(s, "{"), "}"))
     s = `/*
-${textarea.value.substring(p[1], selectionEnd)}
+${textarea.value.substring(selectionStart, selectionEnd)}
 */`
-    textarea.setRangeText(s, p[0], selectionEnd);
+    textarea.setRangeText(s, selectionStart, selectionEnd);
 }
 
 function insertSnippet1() {

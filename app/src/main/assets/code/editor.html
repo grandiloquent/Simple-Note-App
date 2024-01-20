@@ -317,18 +317,18 @@ ${content}`;
                     }
                 ],
                 [
-                "text_snippet",
-                "代码",
-                async () => {
+                    "text_snippet",
+                    "代码",
+                    async () => {
 
-                    await saveData();
-                    if (typeof NativeAndroid !== 'undefined') {
-                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
-                    } else {
-                        window.open('notes.html', '_blank');
+                        await saveData();
+                        if (typeof NativeAndroid !== 'undefined') {
+                            NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                        } else {
+                            window.open('notes.html', '_blank');
+                        }
                     }
-                }
-            ],
+                ],
 
                 [
                     "close",
@@ -345,21 +345,8 @@ ${content}`;
                         deleteBlock(textarea)
                     }
                 ],
-                [
-                    "close",
-                    "删注",
-                    () => {
 
-                        deleteComments(textarea)
-                    }
-                ], [
-                    "content_copy",
-                    "复等",
-                    () => {
-                        copyVariables(textarea)
-                    }
-                ],
-                
+
                 [
                     "content_copy",
                     "复行",
@@ -427,7 +414,20 @@ ${content}`;
                         copyBlock(textarea)
                     }
                 ],
+                [
+                    "close",
+                    "删注",
+                    () => {
 
+                        deleteComments(textarea)
+                    }
+                ], [
+                    "content_copy",
+                    "复等",
+                    () => {
+                        copyVariables(textarea)
+                    }
+                ],
                 [
                     "function",
                     "展数",
@@ -475,18 +475,18 @@ ${content}`;
                     }
                 ],
                 [
-                "text_snippet",
-                "代码",
-                async () => {
+                    "text_snippet",
+                    "代码",
+                    async () => {
 
-                    await saveData();
-                    if (typeof NativeAndroid !== 'undefined') {
-                        NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
-                    } else {
-                        window.open('notes.html', '_blank');
+                        await saveData();
+                        if (typeof NativeAndroid !== 'undefined') {
+                            NativeAndroid.launchApp("psycho.euphoria.l", `/code/notes.html`);
+                        } else {
+                            window.open('notes.html', '_blank');
+                        }
                     }
-                }
-            ],
+                ],
 
 
 
@@ -646,7 +646,7 @@ ${content}`;
                     }
                 ],
 
-                
+
             ].forEach(x => {
                 const div = document.createElement('div');
                 div.className = "bar-item-tab";
@@ -1020,7 +1020,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                 }
             ],
 
-           
+
 
             [
                 "text_snippet",

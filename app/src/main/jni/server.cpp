@@ -478,10 +478,17 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         static const char query[]
                 = R"(select content from code WHERE id = ?1)";
         db::QueryResult fetch_row = db::query<query>(id);
-        std::string_view content;
+        std::string content;
         if (fetch_row(content)) {
 
             if (content.find("three.js") != std::string::npos) {
+                auto sv= SubstringBeforeLast(content,std::string{"document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+                sv+=R"(const div = document.createElement("div");
+    div.textContent = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
+    document.body.appendChild(div);
+)"+SubstringAfterLast(content,std::string{"document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+
+                content=sv;
                 std::string s{R"(<html lang='en'>
 <head>
 <meta charset="UTF-8">

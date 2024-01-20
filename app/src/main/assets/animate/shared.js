@@ -1989,7 +1989,6 @@ function functionsExpand(textarea) {
     let inputsFunction = textarea.value.substring(p[0], p[1]).split(',');
     let argumentsFunction = substringBefore(substringAfter(s, "("), ")")
         .split(",").map(x => x.split(" ")[x.split(" ").length - 1]);
-    console.log(argumentsFunction, inputsFunction, s);
 
     for (let i = 0; i < argumentsFunction.length; i++) {
         s = s.replaceAll(new RegExp("\\b" + argumentsFunction[i] + "\\b", 'g'),
@@ -1999,6 +1998,30 @@ function functionsExpand(textarea) {
         s = s.replaceAll(new RegExp("\\b" + "return" + "\\b", 'g'),
             inputsFunction[argumentsFunction.length] + " = "
         );
+    }
+    const buf = [];
+    const array = [];
+    s = s.replaceAll(/(?<=[a-zA-Z] )[a-zA-Z0-9_]+(?= =)/g, m => {
+        let v = [m];
+        let name = m;
+        let i = 0;
+        while (buf.indexOf(name) !== -1 || new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+            i++
+            name = `${/[a-zA-Z]+/.exec(name)}${i}`;
+        }
+        v.push(name);
+        array.push(v);
+        buf.push(name);
+        return name;
+    });
+
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        s = s.replaceAll(new RegExp("\\b" + element[0] + "\\b", 'g'), element[1]);
+    }
+    if (_pf) {
+        textarea.setRangeText(substringBeforeLast(substringAfter(s, "{"), "}"), _pf, _pf);
+        _pf = 0;
     }
     writeText(substringBeforeLast(substringAfter(s, "{"), "}"))
     s = `/*
@@ -2328,11 +2351,11 @@ function searchWord() {
     const points = findBlock(textarea);
     const blockString = textarea.value.substring(points[0], points[1]);
     const r = new RegExp("\\b" + selectedString + "\\b", 'g');
-    const m = r.exec(blockString.substring(textarea.selectionStart + selectedString.length-points[0]));
+    const m = r.exec(blockString.substring(textarea.selectionStart + selectedString.length - points[0]));
     if (m) {
         console.log(m.index);
-        let index = m.index+ selectedString.length+textarea.selectionStart;
-        console.log(index,selectedString);
+        let index = m.index + selectedString.length + textarea.selectionStart;
+        console.log(index, selectedString);
         textarea.focus();
         textarea.scrollTop = 0;
         const fullText = textarea.value;
@@ -2341,7 +2364,7 @@ function searchWord() {
         textarea.value = fullText;
 
         textarea.selectionStart = index;
-        textarea.selectionEnd = index +selectedString.length;
+        textarea.selectionEnd = index + selectedString.length;
     }
 }
 
@@ -2663,9 +2686,10 @@ function formatExpression(textarea, fn) {
 function deleteComments(textarea) {
     textarea.value = textarea.value.replaceAll(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
 }
-
+let _pf;
 function copyVariables(textarea) {
     let points = getLine(textarea);
+    _pf = points[1];
     let s = textarea.value.substring(points[0], points[1]);
     writeText(`${substringBeforeLast(substringAfter(s, "("), ")")},${substringAfter(substringBefore(s, '=').trim(), " ")}`);
 }

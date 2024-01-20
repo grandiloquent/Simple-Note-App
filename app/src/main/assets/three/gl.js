@@ -27,7 +27,9 @@ window.createProgram = function (gl, vertexShaderSource, fragmentShaderSource) {
     }
     log = gl.getShaderInfoLog(fshader);
     if (log) {
-        document.body.textContent = log;
+        const div = document.createElement("div");
+        div.textContent = log;
+        document.body.appendChild(div);
     }
     return program;
 };
@@ -35,7 +37,10 @@ window.createProgram = function (gl, vertexShaderSource, fragmentShaderSource) {
 window.onerror = function (errMsg, url, line, column, error) {
     var result = !column ? '' : 'column: ' + column;
     result += !error;
-    document.body.textContent = "\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result;
+
+    const div = document.createElement("div");
+    div.textContent = "\nError= " + errMsg + "\nurl= " + url + "\nline= " + line + result;
+    document.body.appendChild(div);
     var suppressErrorAlert = true;
     return suppressErrorAlert;
 };
@@ -48,19 +53,19 @@ var canvas = document.createElement('canvas');
 let canvasWidth_ = 512;
 let canvasHeight = 288;
 let isDate = false;
-const dataset = document.querySelector("script#fs").dataset;
-if (dataset.size) {
+const dataset = document.querySelector("script#fs") && document.querySelector("script#fs").dataset;
+if (dataset && dataset.size) {
     const array = dataset.size.split(' ');
     canvasWidth_ = parseInt(array[0], 10);
     canvasHeight = parseInt(array[1], 10);
 }
-if (dataset.isdate) {
+if (dataset && dataset.isdate) {
     isDate = true;
 }
-canvas.height =canvasHeight;
-canvas.width = canvasWidth_ ;
+canvas.height = canvasHeight;
+canvas.width = canvasWidth_;
 canvas.style.width = '100%';
-if(window.innerWidth > 512){
+if (window.innerWidth > 512) {
     canvas.style.width = '512px';
 }
 //canvas.style.height = canvasHeight + 'px';
@@ -122,8 +127,8 @@ canvas.addEventListener('touchmove', (e) => {
 let frame = 0;
 let then = 0;
 gl.useProgram(program);
-gl.uniform1i(gl.getUniformLocation(program, "iChannel0"),0);
-gl.uniform1i(gl.getUniformLocation(program, "iChannel1"),1);
+gl.uniform1i(gl.getUniformLocation(program, "iChannel0"), 0);
+gl.uniform1i(gl.getUniformLocation(program, "iChannel1"), 1);
 gl.bindVertexArray(vao);
 function render(time) {
     time *= 0.001;

@@ -484,6 +484,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             if (content.find("three.js") != std::string::npos) {
                 std::string s{R"(<html lang='en'>
 <head>
+<meta charset="UTF-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
@@ -511,6 +512,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 
                 std::string s{R"(<html lang='en'>
 <head>
+<meta charset="UTF-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
@@ -521,6 +523,85 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             location.href = '?id=' + parseInt(new URL(window.location.href).searchParams.get('id') - 1);
         }
     })
+const id = new URL(window.location).searchParams.get('id');
+const div = document.createElement("div");
+div.style.display = "flex";
+div.style.position = 'fixed';
+div.style.left = "0";
+div.style.right = "0";
+div.style.bottom = "0";
+div.style.height = "48px";
+div.style.textAlign = "center";
+div.style.alignItems= "center";
+const b1 = document.createElement("div");
+b1.innerHTML = "练习";
+b1.style.flexGrow = "1";
+div.appendChild(b1);
+const b2 = document.createElement("div");
+b2.innerHTML = "有问题"
+b2.style.flexGrow = "1";
+div.appendChild(b2);
+b1.addEventListener("click", async evt => {
+    let res;
+    try {
+
+        res = await fetch(`/code`, {
+            method: 'POST',
+            body: JSON.stringify({
+                id:  parseInt(id),
+                title: "WebGL 练习"
+            }),
+            cache: "no-store"
+        });
+        if (res.status !== 200) {
+
+        }
+    } catch (error) {
+    }
+    try {
+        const response = await fetch(`/code/random`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+        const results = await response.text();
+        window.location.href = `?id=${results}`
+    } catch (error) {
+        console.log(error);
+    }
+});
+b2.addEventListener("click", async evt => {
+    let res;
+    try {
+
+        res = await fetch(`/code`, {
+            method: 'POST',
+            body: JSON.stringify({
+                id: parseInt(id),
+                title: "WebGL 有问题"
+            }),
+            cache: "no-store"
+        });
+        if (res.status !== 200) {
+
+        }
+    } catch (error) {
+    }
+    try {
+        const response = await fetch(`/code/random`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+        const results = await response.text();
+        window.location.href = `?id=${results}`
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+document.body.appendChild(div);
+
+
+
 </script>
 <script id="vs" type="x-shader/x-vertex">#version 300 es
 in vec4 a_position;
@@ -620,6 +701,7 @@ in vec4 a_position;
             }
         }
     });
+
     server.Post("/codes", [](const httplib::Request &req, httplib::Response &res,
                              const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");

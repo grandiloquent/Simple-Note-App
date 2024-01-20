@@ -1370,6 +1370,10 @@ function variables(textarea) {
         } else if (count === 0 && (
             textarea.value[selectionEnd] === ',' ||
             textarea.value[selectionEnd] === '?' ||
+            textarea.value[selectionEnd] === '*' ||
+            textarea.value[selectionEnd] === '/' ||
+            textarea.value[selectionEnd] === '+' ||
+            textarea.value[selectionEnd] === '-' ||
             textarea.value[selectionEnd] === ':'
         )) {
             //selectionEnd++;

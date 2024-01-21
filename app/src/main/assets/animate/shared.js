@@ -2087,7 +2087,7 @@ function decrease2(textarea, isAdd) {
 }
 function breakLine1(textarea) {
     const p = getWord(textarea);
-    const selectedString = textarea.value.substring(p[0], p[1]);
+    let selectedString = textarea.value.substring(p[0], p[1]);
     let lp = getLine(textarea);
     let line = textarea.value.substring(lp[0], lp[1]);
     let ms = line.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/);
@@ -2142,10 +2142,10 @@ return;
     ${name}=vec4(1.0,1.0,0.0,1.0);
    }else if(${selectedString}>1.0){ // 青色
     ${name}=vec4(0.0,1.0,1.0,1.0);
+   }else if(${selectedString}<-1.){ // 紫色
+    ${name}=vec4(0.40, 0.23, 0.72,1.0);
    }else if(${selectedString}<0.){ // 粉色
     ${name}=vec4(1.0,0.0,1.0,1.0);
-   }else if(${selectedString}<-1.){ // 粉色
-    ${name}=vec4(0.40, 0.23, 0.72,1.0);
    }
    return;
 //===
@@ -2464,7 +2464,7 @@ function duplicateLine(textarea) {
             let line = textarea.value.substring(lp[0], lp[1]);
             let m = line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`)) || textarea.value.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
             let name = (m && m[0]) || "float";
-            let value = "0.0";
+            let value = "1.0";
             if (name === "int") {
                 value = "0";
             } else if (name === "vec2") {
@@ -2791,4 +2791,14 @@ ${textarea.value.substring(p[1], selectionEnd)}
 */`
     textarea.setRangeText(s, p[0], selectionEnd);
 
+}
+
+function formatParentheses(textarea) {
+    let points = getWordString(textarea);
+    if (points[0] === points[1]) {
+        textarea.setRangeText(`vec3 v = vec3(0.0,0.0,0.0);`, points[0], points[1]);
+    } else {
+        textarea.setRangeText(`)`, points[1], points[1]);
+        textarea.setRangeText(`smoonthstep(`, points[0], points[0]);
+    }
 }

@@ -432,6 +432,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/code/random", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
+        auto q.=req.get_param_value("q");
 
         static const char query[]
                 = R"(select id,title from code ORDER BY update_at DESC)";
@@ -439,6 +440,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::string_view id, title;
         std::regex c("[\u4e00-\u9fa5]+");
         while (fetch_row(id, title)) {
+            if (!q.empty() && title.find(q) != std::string::npos) {
+                res.set_content(id.data(), id.size(), "text/plain");
+                return;
+            }
             if (!std::regex_search(title.data(), c)) {
                 res.set_content(id.data(), id.size(), "text/plain");
                 return;
@@ -482,13 +487,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (fetch_row(content)) {
 
             if (content.find("three.js") != std::string::npos) {
-                auto sv= SubstringBeforeLast(content,std::string{"document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
-                sv+=R"(const div = document.createElement("div");
+                auto sv = SubstringBeforeLast(content, std::string{
+                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+                sv += R"(const div = document.createElement("div");
     div.textContent = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
     document.body.appendChild(div);
-)"+SubstringAfterLast(content,std::string{"document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+)" + SubstringAfterLast(content, std::string{
+                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
 
-                content=sv;
+                content = sv;
                 std::string s{R"(<html lang='en'>
 <head>
 <meta charset="UTF-8">

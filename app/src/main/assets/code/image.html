@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            row-gap: 8px;
+            padding: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <input value="500">
+        <input value="500">
+        <input type="file" accept="image/*">
+        <input>
+
+    </div>
+
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector("canvas");
+
+
+        const inputFile = document.querySelector('input:nth-child(3)');
+        inputFile.addEventListener('change', evt => {
+            var reader = new FileReader();
+            // Read in the image file as a data URL.
+            reader.readAsDataURL(inputFile.files[0]);
+            var img = new Image();
+            reader.onload = function (evt) {
+                if (evt.target.readyState == FileReader.DONE) {
+                    img.src = evt.target.result;
+                    img.onload = function () {
+                        canvas.width = parseInt(document.querySelector('input:nth-child(1)').value);
+                        canvas.height = parseInt(document.querySelector('input:nth-child(2)').value);
+                        const ctx = canvas.getContext("2d");
+                        let size = Math.min(img.naturalWidth, img.naturalHeight)
+                        console.log(size)
+                        ctx.drawImage(img, 0, 0, size, size, 0, 0, canvas.width, canvas.height)
+                    }
+                }
+            }
+        })
+
+
+
+
+    </script>
+</body>
+
+</html>

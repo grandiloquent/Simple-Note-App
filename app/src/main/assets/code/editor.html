@@ -569,30 +569,30 @@ ${content}`;
                     "保存",
                     async () => {
                         await saveData();
-                        if (!path) {
-                            if (id) {
-                                try {
-                                    const response = await fetch(`${baseUri}/code/random`);
-                                    if (response.status > 399 || response.status < 200) {
-                                        throw new Error(`${response.status}: ${response.statusText}`)
-                                    }
-                                    const results = await response.text();
-                                    window.location.href = `?id=${results}`
-                                } catch (error) {
-                                    console.log(error);
-                                }
-                            }
-                            else
-                                window.location.reload();
-                        }
+                        // if (!path) {
+                        //     if (id) {
+                        //         try {
+                        //             const response = await fetch(`${baseUri}/code/random`);
+                        //             if (response.status > 399 || response.status < 200) {
+                        //                 throw new Error(`${response.status}: ${response.statusText}`)
+                        //             }
+                        //             const results = await response.text();
+                        //             window.location.href = `?id=${results}`
+                        //         } catch (error) {
+                        //             console.log(error);
+                        //         }
+                        //     }
+                        //     else
+                        //         window.location.reload();
+                        // }
 
                     }
                 ],
                 [
-                    "favorite",
-                    "保存",
+                    "arrow_forward",
+                    "前进",
                     async () => {
-                        await saveDataWith("WebGL 练习");
+                        await saveData();
                         if (id) {
                             try {
                                 const response = await fetch(`${baseUri}/code/random`);
@@ -609,28 +609,6 @@ ${content}`;
                             window.location.reload();
                     }
                 ],
-                [
-                    "heart_minus",
-                    "保存",
-                    async () => {
-                        await saveDataWith("有问题");
-                        if (id) {
-                            try {
-                                const response = await fetch(`${baseUri}/code/random`);
-                                if (response.status > 399 || response.status < 200) {
-                                    throw new Error(`${response.status}: ${response.statusText}`)
-                                }
-                                const results = await response.text();
-                                window.location.href = `?id=${results}`
-                            } catch (error) {
-                                console.log(error);
-                            }
-                        }
-                        else
-                            window.location.reload();
-                    }
-                ],
-
                 [
                     "switch_right",
                     "交换",

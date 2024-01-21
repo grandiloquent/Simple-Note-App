@@ -432,18 +432,22 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/code/random", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        auto q.=req.get_param_value("q");
-
+        //auto q = req.get_param_value("q");
+        //auto o = req.get_param_value("o");
         static const char query[]
                 = R"(select id,title from code ORDER BY update_at DESC)";
-        db::QueryResult fetch_row = db::query<query>();
+        db::QueryResult fetch_row = db::query<query>(
+
+        );
+        // OFFSETo.empty() ? 0 : atoi(o.c_str())
         std::string_view id, title;
         std::regex c("[\u4e00-\u9fa5]+");
         while (fetch_row(id, title)) {
-            if (!q.empty() && title.find(q) != std::string::npos) {
-                res.set_content(id.data(), id.size(), "text/plain");
-                return;
-            }
+
+//            if (!q.empty() && (title.find(q) != std::string::npos)) {
+//                res.set_content(id.data(), id.size(), "text/plain");
+//                return;
+//            }
             if (!std::regex_search(title.data(), c)) {
                 res.set_content(id.data(), id.size(), "text/plain");
                 return;

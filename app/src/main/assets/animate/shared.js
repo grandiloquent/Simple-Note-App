@@ -1984,9 +1984,9 @@ async function functionsExpand(textarea) {
             }
         }
     }
-    
+
     let s = textarea.value.substring(selectionStart, selectionEnd);
-    let inputsFunction =(await readText()).split(',');
+    let inputsFunction = (await readText()).split(',');
     let argumentsFunction = substringBefore(substringAfter(s, "("), ")")
         .split(",").map(x => x.split(" ")[x.split(" ").length - 1]);
 
@@ -2116,119 +2116,36 @@ function breakLine1(textarea) {
     }
 
     let namev = (m && m[0]) || "float";
-
-    if (namev === "int") {
-        textarea.setRangeText(`
-        //===
-            ${name}=vec4(vec3(${selectedString}), 1.0);
-        return;
-        if(${selectedString}==0){
-        // if(${selectedString}==1){
-            ${name}=vec4(0.0,0.0,0.0,1.0);
-           }else{
-            ${name}=vec4(1.0,0.0,0.0,1.0);
-           }
-           return;
-        //===
-            ` , end, end);
-
-        return;
-    } else if (namev === "vec2") {
-        textarea.setRangeText(`
-//===
-    ${name}=vec4(${selectedString},0.0, 1.0);
-return;
-    if(${selectedString}.x==0.0){
-    ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else if(${selectedString}.x==1.0){
-    ${name}=vec4(1.0,0.0,0.0,1.0);
-   }else if(${selectedString}.x==.5){
-    ${name}=vec4(0.0,1.0,0.0,1.0);
-   }else if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
-    ${name}=vec4(.0,0.0,1.0,1.0);
-   }else if(${selectedString}.x>0.5 && ${selectedString}.x<1.){
-    ${name}=vec4(1.0,1.0,0.0,1.0);
-   }else if(${selectedString}.x>1.0){
-    ${name}=vec4(0.0,1.0,1.0,1.0);
-   }else if(${selectedString}.x<0.){
-    ${name}=vec4(1.0,0.0,1.0,1.0);
-   }
-   return;
-//===
-    ` , end, end);
-
-        return;
+    const sn = selectedString;
+    if (namev === "vec2") {
+        selectedString = 'y';
     } else if (namev === "vec3") {
-        textarea.setRangeText(`
-        //===
-            ${name}=vec4(${selectedString},1.0);
-        return;
-        if(${selectedString}.x==0.0){
-        // if(${selectedString}.x==0.5){
-        // if(${selectedString}.x==1.0){
-        // if(${selectedString}.x>0.0){
-        // if(${selectedString}.x<1.0){
-        // if(${selectedString}.x==-0.5){
-        // if(${selectedString}.x==-1.0){
-        // if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
-        // if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
-        // if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
-        // if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
-        
-            ${name}=vec4(0.0,0.0,0.0,1.0);
-           }else{
-            ${name}=vec4(1.0,0.0,0.0,1.0);
-           }
-           return;
-        //===
-            ` , end, end);
-
-        return;
+        selectedString = 'y';
     } else if (namev === "vec4") {
-        textarea.setRangeText(`
-        //===
-            ${name}=${selectedString};
-        return;
-        if(${selectedString}.x==0.0){
-        // if(${selectedString}.x==0.5){
-        // if(${selectedString}.x==1.0){
-        // if(${selectedString}.x>0.0){
-        // if(${selectedString}.x<1.0){
-        // if(${selectedString}.x==-0.5){
-        // if(${selectedString}.x==-1.0){
-        // if(${selectedString}.x>0.0 && ${selectedString}.x<0.5){
-        // if(${selectedString}.x>0.5 && ${selectedString}.x<1.){	
-        // if(${selectedString}.x>=0.5 && ${selectedString}.x<=1.){	
-        // if(${selectedString}.x<0. && ${selectedString}.x>=-1.){	
-        
-            ${name}=vec4(0.0,0.0,0.0,1.0);
-           }else{
-            ${name}=vec4(1.0,0.0,0.0,1.0);
-           }
-           return;
-        //===
-            ` , end, end);
-
-        return;
+        selectedString = 'y';
     }
     textarea.setRangeText(`
 //===
+${selectedString === 'y' ? `float y =${sn}.x;` : ''}
     ${name}=vec4(${selectedString},${selectedString},${selectedString}, 1.0);
+    // ${name}=texture(iChannel0,${sn}.xy).xyz;
 return;
-    if(${selectedString}==0.0){
+    if(${selectedString}==0.0){ // 黑色
     ${name}=vec4(0.0,0.0,0.0,1.0);
-   }else if(${selectedString}==1.0){
+   }else if(${selectedString}==1.0){ // 红色
     ${name}=vec4(1.0,0.0,0.0,1.0);
-   }else if(${selectedString}==.5){
+   }else if(${selectedString}==.5){ // 绿色
     ${name}=vec4(0.0,1.0,0.0,1.0);
-   }else if(${selectedString}>0.0 && ${selectedString}<0.5){
+   }else if(${selectedString}>0.0 && ${selectedString}<0.5){ // 蓝色
     ${name}=vec4(.0,0.0,1.0,1.0);
-   }else if(${selectedString}>0.5 && ${selectedString}<1.){
+   }else if(${selectedString}>0.5 && ${selectedString}<1.){ // 黄色
     ${name}=vec4(1.0,1.0,0.0,1.0);
-   }else if(${selectedString}>1.0){
+   }else if(${selectedString}>1.0){ // 青色
     ${name}=vec4(0.0,1.0,1.0,1.0);
-   }else if(${selectedString}<0.){
+   }else if(${selectedString}<0.){ // 粉色
     ${name}=vec4(1.0,0.0,1.0,1.0);
+   }else if(${selectedString}<-1.){ // 粉色
+    ${name}=vec4(0.40, 0.23, 0.72,1.0);
    }
    return;
 //===

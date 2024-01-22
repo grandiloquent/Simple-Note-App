@@ -432,8 +432,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     });
     server.Get("/code/random", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        //auto q = req.get_param_value("q");
-        //auto o = req.get_param_value("o");
+        auto q = req.get_param_value("q");
+        auto o = req.get_param_value("o");
         static const char query[]
                 = R"(select id,title from code ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>(
@@ -444,14 +444,18 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         std::regex c("[\u4e00-\u9fa5]+");
         while (fetch_row(id, title)) {
 
-//            if (!q.empty() && (title.find(q) != std::string::npos)) {
-//                res.set_content(id.data(), id.size(), "text/plain");
-//                return;
-//            }
-            if (!std::regex_search(title.data(), c)) {
-                res.set_content(id.data(), id.size(), "text/plain");
-                return;
+            if (q.empty()) {
+                if (!std::regex_search(title.data(), c)) {
+                    res.set_content(id.data(), id.size(), "text/plain");
+                    return;
+                }
+            } else {
+                if ((title == q)) {
+                    res.set_content(id.data(), id.size(), "text/plain");
+                    return;
+                }
             }
+
         }
         static const char query_r[]
                 = R"(select id,title from code ORDER BY random() LIMIT 1)";
@@ -494,7 +498,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                 auto sv = SubstringBeforeLast(content, std::string{
                         "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
                 sv += R"(const div = document.createElement("div");
-    div.textContent = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
+    div.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
     document.body.appendChild(div);
 )" + SubstringAfterLast(content, std::string{
                         "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
@@ -589,6 +593,15 @@ b2.addEventListener("click", async evt => {
 });
 
 document.body.appendChild(div);
+document.addEventListener('keydown', evt => {
+    if (evt.key === 'F3') {
+        evt.preventDefault();
+        b1.click();
+    } else if (evt.key === "F4") {
+        evt.preventDefault();
+        b2.click();
+    }
+})
 
 
 </script>
@@ -695,6 +708,15 @@ b2.addEventListener("click", async evt => {
 });
 
 document.body.appendChild(div);
+document.addEventListener('keydown', evt => {
+    if (evt.key === 'F3') {
+        evt.preventDefault();
+        b1.click();
+    } else if (evt.key === "F4") {
+        evt.preventDefault();
+        b2.click();
+    }
+})
 
 
 </script>

@@ -8,10 +8,31 @@ function createShader(gl, source, type) {
     gl.compileShader(shader);
     return shader;
 }
+function createFragmentShaderSource(fragmentShaderSource) {
+    const s = (document.getElementById('share') && document.getElementById('share').textContent) || '';
+    if (!s) {
+        return fragmentShaderSource;
+    } else {
+        const index = fragmentShaderSource.lastIndexOf('uniform');
+        if (index === -1) {
+            return s + fragmentShaderSource;
+        } else {
+            let start = index;
+            while (start  < fragmentShaderSource.length) {
+                start++;
+                if (fragmentShaderSource[start] === '\n') {
+                    start++;
+                    break;
+                }
+            }
+            return fragmentShaderSource.substring(0, start) + s + fragmentShaderSource.substring(start);
+        }
+    }
+}
 window.createProgram = function (gl, vertexShaderSource, fragmentShaderSource) {
     var program = gl.createProgram();
     var vshader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-    var fshader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+    var fshader = createShader(gl, createFragmentShaderSource(fragmentShaderSource), gl.FRAGMENT_SHADER);
     gl.attachShader(program, vshader);
     gl.deleteShader(vshader);
     gl.attachShader(program, fshader);

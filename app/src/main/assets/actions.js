@@ -276,7 +276,7 @@ function showContextMenu(evt) {
     const bottomSheet = document.createElement('custom-bottom-sheet');
     addContextMenuItem(bottomSheet, '复制路径', () => {
         bottomSheet.remove();
-        writeText(`/file?path=${path}`);
+        writeText(`data-image="/file?path=${path}"`);
     });
     addContextMenuItem(bottomSheet, '选择', () => {
         bottomSheet.remove();

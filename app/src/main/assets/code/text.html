@@ -22,9 +22,9 @@
 
 <body>
     <div class="wrapper">
-        <input value="500">
+        <input value="1024">
         <input value="30px 苹方">
-        <input value="50">
+        <input value="64">
         <input value="中国人">
         <input value="#000">
         <input>
@@ -50,10 +50,11 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
             ctx.fillStyle = `${document.querySelector('input:nth-child(5)').value}`
+            let size = ctx.measureText(s[0]);
             for (let index = 0; index < s.length; index++) {
                 const element = s[index];
-                console.log(element, x * (index + 1), x);
-                ctx.fillText(element, 10 + x * (index % 10), (index / 10 | 0) * 50 + 25);
+
+                ctx.fillText(element, (x - size.width) / 2 + x * (index % 16), (index / 16 | 0) * 64 + 32);
             }
         }
         drawText();

@@ -595,7 +595,7 @@ ${content}`;
                         await saveData();
                         if (id) {
                             try {
-                                const response = await fetch(`${baseUri}/code/random`);
+                                const response = await fetch(`${baseUri}/code/random?q=WebGL 练习`);
                                 if (response.status > 399 || response.status < 200) {
                                     throw new Error(`${response.status}: ${response.statusText}`)
                                 }

@@ -1337,7 +1337,9 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
-
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
 function variables(textarea) {
     /*
     let selectionStart = textarea.selectionStart;
@@ -1370,10 +1372,10 @@ function variables(textarea) {
         } else if (count === 0 && (
             textarea.value[selectionEnd] === ',' ||
             textarea.value[selectionEnd] === '?' ||
-            textarea.value[selectionEnd] === '*' ||
-            textarea.value[selectionEnd] === '/' ||
-            textarea.value[selectionEnd] === '+' ||
-            textarea.value[selectionEnd] === '-' ||
+            // textarea.value[selectionEnd] === '*' ||
+            // textarea.value[selectionEnd] === '/' ||
+            // textarea.value[selectionEnd] === '+' ||
+            // textarea.value[selectionEnd] === '-' ||
             textarea.value[selectionEnd] === ':'
         )) {
             //selectionEnd++;
@@ -1384,7 +1386,7 @@ function variables(textarea) {
 
     let s = textarea.value.substring(selectionStart, selectionEnd);
     let n = s.match(/[a-z]/);
-    console.log(n)
+
     let name = n ? `${n[0]}0` : `v0`;
 
     let i = 0;
@@ -1402,7 +1404,16 @@ float ${name} = ${s};
     while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart] !== '\n') {
         selectionStart++;
     }
-    textarea.setRangeText(str, selectionStart, selectionStart);
+    //textarea.setRangeText(str, selectionStart, selectionStart);
+    // .replaceAll(escapeRegExp(),'')
+    const points = findBlock(textarea);
+
+    
+    textarea.setRangeText(
+        str+"\n"+
+        textarea.value.substring(selectionStart, points[1])
+        .replaceAll(new RegExp("\\b" + escapeRegExp(s) + "(?=[\),; ])", 'g'), name)
+        , selectionStart  , points[1]);
 
 
 

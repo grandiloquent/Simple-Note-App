@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="items">
+
+    </div>
+    <div id="top">
+        <div>上工具栏</div>
+        <textarea></textarea>
+        <div>确认</div>
+    </div>
+    <div id="bottom">
+        <div>下工具栏</div>
+        <textarea></textarea>
+        <div>确认</div>
+    </div>
+    <div id="right">
+        <div>右工具栏</div>
+        <textarea></textarea>
+        <div>确认</div>
+    </div>
+    <script src="utils.js"></script>
+    <script>
+        document.querySelector('#items').textContent =
+            items.map(x => {
+                return `${x[0]} = ${x[2]},`
+            })
+        document.querySelector('#top textarea').value =
+            topIndexs;
+        document.querySelector('#top div:nth-child(3)').addEventListener('click', evt => {
+            const array = JSON.parse("[" + document.querySelector('#top textarea').value + "]");
+            if (array.length) {
+                localStorage.setItem("topIndexs", JSON.stringify(array));
+            }
+        })
+
+        document.querySelector('#bottom textarea').value =
+            bottomIndexs;
+        document.querySelector('#bottom div:nth-child(3)').addEventListener('click', evt => {
+            const array = JSON.parse("[" + document.querySelector('#bottom textarea').value + "]");
+            if (array.length) {
+                localStorage.setItem("bottomIndexs", JSON.stringify(array));
+            }
+        })
+        document.querySelector('#right textarea').value =
+            rightIndexs;
+        document.querySelector('#right div:nth-child(3)').addEventListener('click', evt => {
+            const array = JSON.parse("[" + document.querySelector('#right textarea').value + "]");
+            if (array.length) {
+                localStorage.setItem("rightIndexs", JSON.stringify(array));
+            }
+        })
+    </script>
+</body>
+
+</html>

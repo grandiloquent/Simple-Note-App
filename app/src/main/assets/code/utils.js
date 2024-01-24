@@ -419,3 +419,334 @@ insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
 const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
     [3, 6, 18, 27, 28]
 insertItem(rightIndexs, '.items-wrapper.selected');
+
+
+function duplicateLine(textarea) {
+    //     if (textarea.selectionStart !== textarea.selectionEnd) {
+    //         let start = textarea.selectionStart;
+    //         let end = textarea.selectionEnd;
+    //         const selectedString = textarea.value.substring(start, end);
+
+    //         while (start - 1 > -1) {
+    //             if (textarea.value[start] === ">"
+    //                 && start - "script".length > -1 && textarea.value.substring(start - "script".length, start) === "script") {
+    //                 break;
+    //             }
+    //             start--;
+    //         }
+    //         end = textarea.value.indexOf("</script>", end);
+    //         const s = textarea.value.substring(start, end);
+    //         const name = s.match(/(?<=out vec4 )[a-zA-Z0-9_]+(?=;)/)[0];
+    //         end = textarea.selectionEnd;
+    //         while (end < textarea.value.length && textarea.value[end] !== '\n') {
+    //             end++;
+    //         }
+    //         textarea.setRangeText(`
+    // if(${selectedString}==0.0){
+    //  ${name}=vec4(1.0,0.0,0.0,1.0);
+    // }else if(${selectedString}==1.0){
+    //     ${name}=vec4(0.0,1.0,0.0,1.0);
+    // }else if(${selectedString}>0.0 && ${selectedString}<0.5){
+    //     ${name}=vec4(1.0,1.0,0.0,1.0);
+    // }else if(${selectedString}==0.5){
+    //     ${name}=vec4(0.0,1.0,1.0,1.0);
+    // }else if(${selectedString}>0.5 && ${selectedString}<1.0){
+    //     ${name}=vec4(1.0,0.0,1.0,1.0);
+    // }else if(${selectedString}>1.0){
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    // }else if(${selectedString}<0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    // }else{
+    //     ${name}=vec4(0.0,0.0,1.0,1.0);
+    // }
+    // return;
+
+    // /*
+
+    // if(${selectedString}==0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}==1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>0.0 && ${selectedString}<0.5){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}==0.5){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>0.5 && ${selectedString}<1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}>1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}<1.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}<0.0){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    //    if(${selectedString}-0.5<0.0001){
+    //     ${name}=vec4(0.0,0.0,0.0,1.0);
+    //    }else{
+    //     ${name}=vec4(1.0,1.0,1.0,1.0);
+    //    }
+    //    return;
+
+    // */
+    //         ` , end, end);
+
+    //         return;
+    //     }
+    //     const points = getLine(textarea);
+    //     let s = textarea.value.substring(points[0], points[1]).trim();
+    //     if (s.startsWith("//")) {
+    //         textarea.selectionStart = points[1] + 1;
+    //         let p = getLine(textarea);
+    //         textarea.setRangeText("", p[0], p[1]);
+    //         textarea.setRangeText(substringAfter(s, "//"), points[0], points[1]);
+    //     } else {
+    //         let name = "";
+    //         let pn = getNumber(textarea);
+    //         console.log(pn, textarea.value.substring(pn[0], pn[1]).trim());
+    //         let number = parseFloat(textarea.value.substring(pn[0], pn[1]).trim());
+    //         if (!isNaN(number)) {
+    //             console.log(number)
+    //             if (number === 1.0) {
+    //                 name = "0.0";
+    //             } else if (number === 0.0) {
+    //                 name = "1.0";
+    //             } else {
+    //                 name = "0.0";
+    //             }
+
+    //             textarea.setRangeText(name, pn[0], pn[1]);
+    //             let selectionStart = textarea.selectionStart;
+    //             while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+    //                 selectionStart--;
+    //             }
+    //             textarea.setRangeText("\n// " + s, selectionStart, selectionStart);
+    //             return;
+    //         } else {
+    //             console.log("==============");
+    //             let start = textarea.selectionStart;
+    //             let end = textarea.selectionEnd;
+    //             while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start-1])) {
+    //                 start--;
+    //             }
+    //             while (end + 1 < textarea.value.length) {
+    //                 if (textarea.value[end + 1] !== ",") {
+    //                     console.log("==============",s.substring());
+    //                     let str = s.substring(0, start ) + "0.0" + s.substring(end);
+    //                     textarea.setRangeText("\n" + str, points[1], points[1]);
+    //                     break
+    //                 }
+    //                 end++;
+    //             }
+
+    //         }
+    //         let selectionEnd = textarea.selectionEnd;
+    //         while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== '\n') {
+    //             selectionEnd++;
+    //         }
+    //         textarea.setRangeText("// ", points[0], points[0]);
+    //     }
+
+    formatLine(textarea, (s, start, end) => {
+        if (s.trim().startsWith("//")) {
+            textarea.selectionStart = end + 1;
+            let p = getLine(textarea);
+            textarea.setRangeText("", p[0], p[1] + 1);
+            return substringAfter(s, "//");
+        }
+        if (textarea.value[textarea.selectionStart] === '='
+            || textarea.value[textarea.selectionStart - 1] === '=') {
+
+            return `// ${s}
+${s}`;
+        }
+        let p = getWord(textarea);
+        let index = s.indexOf("=", p[1] - start);
+        if (index !== -1) {
+            let lp = getLine(textarea);
+            let line = textarea.value.substring(lp[0], lp[1]);
+            let m = line.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`)) || textarea.value.match(new RegExp(`[a-zA-Z0-9]+(?= ${textarea.value.substring(p[0], p[1])})\\b`));
+            let name = (m && m[0]) || "float";
+            let value = "1.0";
+            if (name === "int") {
+                value = "0";
+            } else if (name === "vec2") {
+                value = "vec2(0.0, 0.0)";
+            } else if (name === "vec3") {
+                value = "vec3(0.0, 0.0, 0.0)";
+            } else if (name === "vec4") {
+                value = "vec4(0.0, 0.0, 0.0, 1.0)";
+            } else if (name === "bool") {
+                value = "false";
+            } else if (name === "mat2") {
+                value = "mat2(vec2(0.0,0.0),vec2(0.0,0.0))";
+            }
+            return `// ${s}
+${substringBefore(s, "=")} = ${value};`
+        } else {
+            let selectionStart = textarea.selectionStart;
+            while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {
+                selectionStart--;
+            }
+            let selectionEnd = textarea.selectionEnd;
+            let count = 0;
+            while (selectionEnd + 1 < textarea.value.length) {
+                selectionEnd++;
+                if (textarea.value[selectionEnd] === '(') {
+                    count++;
+                    while (selectionEnd + 1 < textarea.value.length) {
+                        if (textarea.value[selectionEnd] === ')') {
+                            count--;
+                            if (count === 0) {
+                                break;
+                            }
+                        }
+                        selectionEnd++;
+                    }
+                }
+                if (textarea.value[selectionEnd] === ',' || textarea.value[selectionEnd] === ';') {
+                    break;
+                }
+            }
+            // textarea.value.substring(selectionStart, selectionEnd)
+
+            return `// ${s}
+${textarea.value.substring(start, selectionStart)}1.0${textarea.value.substring(selectionEnd, end)};
+            `
+        }
+
+    });
+}
+function commentLine(textarea) {
+
+    let points = getLine(textarea);
+    let line = textarea.value.substring(points[0], points[1]).trim();
+    if (textarea.value[textarea.selectionStart] === '/'
+        || textarea.value[textarea.selectionStart + 1] === '*'
+    ) {
+        let end = textarea.selectionStart + 2;
+        while (end < textarea.value.length) {
+            if (textarea.value[end] === '*' && textarea.value[end + 1] === "/") {
+                end += 2;
+                break;
+            }
+            end++;
+        }
+        textarea.setRangeText(`${textarea.value.substring(textarea.selectionStart + 2, end - 2)}`, textarea.selectionStart, end);
+    } else if (textarea.value[textarea.selectionStart] === '+'
+        || textarea.value[textarea.selectionStart] === '-'
+        || textarea.value[textarea.selectionStart] === '*'
+        || textarea.value[textarea.selectionStart] === '/'
+        || textarea.value[textarea.selectionStart] === '%'
+    ) {
+        let end = textarea.selectionStart;
+        while (end < textarea.value.length) {
+            if (textarea.value[end] === ';')
+                break;
+            end++;
+        }
+        textarea.setRangeText(`/* ${textarea.value.substring(textarea.selectionStart, end)} */`, textarea.selectionStart, end);
+    } else if (line.indexOf("=") !== -1) {
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '(') {
+                count++;
+            } else if (textarea.value[end] === ')') {
+                count--;
+            } else if (count === 0 && textarea.value[end] === ';') {
+                end++;
+                break;
+            }
+        }
+        let s = textarea.value.substring(points[0], end).trim();
+        if (s.startsWith("//")) {
+            s = s.split('\n').map(x => {
+                if (x.startsWith("//"))
+                    return x.substring(2);
+                return x;
+            }).join('\n');
+        } else {
+            s = s.split('\n').map(x => "// " + x).join('\n');
+        }
+
+        textarea.setRangeText(s, points[0], end);
+    }
+    else if (line.indexOf("{") !== -1) {
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        let s = textarea.value.substring(points[0], end).trim();
+        if (s.startsWith("//")) {
+            s = s.split('\n').map(x => {
+                if (x.startsWith("//"))
+                    return x.substring(2);
+                return x;
+            }).join('\n');
+        } else {
+            s = s.split('\n').map(x => "// " + x).join('\n');
+        }
+
+        textarea.setRangeText(s, points[0], end);
+    } else {
+
+        if (line.startsWith("//")) {
+            line = line.substring(2);
+
+        } else {
+            line = "// " + line;
+        }
+
+        textarea.setRangeText(lin, points[0], points[1]);
+    }
+}

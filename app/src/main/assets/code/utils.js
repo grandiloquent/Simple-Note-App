@@ -378,12 +378,19 @@ const items = [
             insertSnippet1();
         }
     ],
+    [
+        39,
+        "text_snippet",
+        "变量",
+        () => {
+            insertVariables(textarea);
+        }
+    ],
 
 
 
 ]
 
-console.log(JSON.stringify(items.map(x => [x[0], x[2]])))
 
 function insertItem(indexs, selector, klass) {
     const bottomBar = document.querySelector(selector);
@@ -417,7 +424,7 @@ const bottomIndexs = JSON.parse(localStorage.getItem('bottomIndexs')) ||
     [35, 9, 10, 16, 8, 15, 13, 14]
 insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
 const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
-    [3, 6, 18, 27, 28]
+    [3, 6, 18, 27, 28, 39]
 insertItem(rightIndexs, '.items-wrapper.selected');
 
 
@@ -749,4 +756,143 @@ function commentLine(textarea) {
 
         textarea.setRangeText(lin, points[0], points[1]);
     }
+}
+function variables(textarea) {
+    /*
+    let selectionStart = textarea.selectionStart;
+                    let selectionEnd = textarea.selectionEnd;
+                    let s = `let v = 0;`;
+                    textarea.setRangeText(s, selectionStart, selectionEnd)
+    */
+    let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionStart - 1 > -1 && /[a-zA-Z0-9_]/.test(textarea.value[selectionStart - 1])) {
+        selectionStart--;
+    }
+    let count = 0;
+    while (selectionEnd < textarea.value.length) {
+
+        //  && (textarea.value[selectionEnd] !== ')' && textarea.value[selectionEnd] !== ';')
+        if (textarea.value[selectionEnd] === '(') {
+            count++;
+        } else if (textarea.value[selectionEnd] === ')') {
+            if (count === 0) {
+                break;
+            }
+            count--;
+            if (count === -1) {
+                selectionEnd++;
+                break;
+            }
+        } else if (textarea.value[selectionEnd] === ';') {
+            break;
+        } else if (count === 0 && (
+            textarea.value[selectionEnd] === ',' ||
+            textarea.value[selectionEnd] === '?' ||
+            // textarea.value[selectionEnd] === '*' ||
+            // textarea.value[selectionEnd] === '/' ||
+            // textarea.value[selectionEnd] === '+' ||
+            // textarea.value[selectionEnd] === '-' ||
+            textarea.value[selectionEnd] === ':'
+        )) {
+            //selectionEnd++;
+            break;
+        }
+        selectionEnd++;
+    }
+
+    let s = textarea.value.substring(selectionStart, selectionEnd);
+    let n = s.match(/[a-z]/);
+
+    let name = n ? `${n[0]}0` : `v0`;
+
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${n[0]}${i}`;
+    }
+    textarea.setRangeText(`${name}`, selectionStart, selectionEnd);
+    let str = `
+float ${name} = ${s};
+    `;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== ';') {
+        selectionStart--;
+    }
+    while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart] !== '\n') {
+        selectionStart++;
+    }
+    //textarea.setRangeText(str, selectionStart, selectionStart);
+    // .replaceAll(escapeRegExp(),'')
+    const points = findBlock(textarea);
+
+
+    textarea.setRangeText(
+        str + "\n" +
+        textarea.value.substring(selectionStart, points[1])
+            .replaceAll(new RegExp("\\b" + escapeRegExp(s) + "(?=[\),; ])", 'g'), name)
+        , selectionStart, points[1]);
+
+
+
+}
+function insertVariables(textarea) {
+    let points = getWord(textarea);
+    let word = textarea.value.substring(points[0], points[1]);
+    let start = points[0];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ';') {
+            start++;
+            break;
+        }
+        start--;
+    }
+    textarea.setRangeText(`
+/*
+${word} = vec2(0.0, 0.0);
+${word} = vec3(0.0, 0.0, 0.0);
+${word} = vec4(0.0, 0.0, 0.0,0.0);
+
+${word}.x += ();
+${word}.y += ();
+${word}.z += ();
+
+${word}.x -= ();
+${word}.y -= ();
+${word}.z -= ();
+
+${word}.x *= ();
+${word}.y *= ();
+${word}.z *= ();
+
+${word}.x /= ();
+${word}.y /= ();
+${word}.z /= ();
+
+abs cos length max min mix sin smoothstep step tan texture .xy .xyz
+
+.split(' ').sort().join(' ')
+
+if(){
+
+}else{
+
+}
+
+float dv = 0.0;
+if (dot(${word}, vec3(1, 0, 0)) > 0.) dv=1.;
+if (dot(${word}, vec3(1, 0, 0)) < 0.) dv=2.;
+if (dot(${word}, vec3(0, 0, 1)) > 0.) dv=3.;
+if (dot(${word}, vec3(0, 0, 1)) < 0.) dv=4.;
+if (dot(${word}, vec3(0, 1, 0)) > 0.) dv=5.;
+if (dot(${word}, vec3(0, 1, 0)) < 0.) dv=6.;
+
+if (dot(${word}, vec3(1, 0, 0)) > 0.) col = vec3(1., 0., 0.);
+if (dot(${word}, vec3(1, 0, 0)) < 0.) col = vec3(0., 1., 0.);
+if (dot(${word}, vec3(0, 0, 1)) > 0.) col = vec3(0., 0., 1.);
+if (dot(${word}, vec3(0, 0, 1)) < 0.) col = vec3(1., 1., 0.);
+if (dot(${word}, vec3(0, 1, 0)) > 0.) col = vec3(0., 1., 1.);
+if (dot(${word}, vec3(0, 1, 0)) < 0.) col = vec3(1., 0., 1.);
+
+*/
+    `, start, start);
 }

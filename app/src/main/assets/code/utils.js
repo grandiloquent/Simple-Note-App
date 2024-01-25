@@ -383,7 +383,7 @@ const items = [
         "text_snippet",
         "So",
         () => {
-            insertVariables(textarea,word=>`${word} = smoothstep(vec3(0.0, 0.0,0.0),vec3(1.0, 1.0,1.0),abs(${word}));`);
+            insertVariables(textarea, word => `${word} = smoothstep(vec3(0.0, 0.0,0.0),vec3(1.0, 1.0,1.0),abs(${word}));`);
         }
     ],
     [
@@ -391,21 +391,21 @@ const items = [
         "text_snippet",
         "*=",
         () => {
-            insertVariables(textarea,word=>`${word} *= 0.5;`);
+            insertVariables(textarea, word => `${word} *= 0.5;`);
         }
     ], [
         41,
         "text_snippet",
         "?:",
         () => {
-            insertVariables(textarea,word=>`${word} = ${word} > 0.0 ? ${word}:1.0;`);
+            insertVariables(textarea, word => `${word} = ${word} > 0.0 ? ${word}:1.0;`);
         }
     ], [
         42,
         "text_snippet",
         "if",
         () => {
-            insertVariables(textarea,word=>`if(${word} < 0.0){
+            insertVariables(textarea, word => `if(${word} < 0.0){
 
             }else{
         
@@ -415,9 +415,9 @@ const items = [
     [
         43,
         "text_snippet",
-        "1.-y",
+        "代码",
         () => {
-            insertVariables(textarea,word=>`${word}.y =1.0 - ${word}.y;`);
+            snippet(textarea);
         }
     ],
 
@@ -457,7 +457,7 @@ const bottomIndexs = JSON.parse(localStorage.getItem('bottomIndexs')) ||
     [35, 9, 10, 16, 8, 15, 13, 14]
 insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
 const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
-    [39, 40, 41, 42]
+    [39, 40, 41, 43]
 insertItem(rightIndexs, '.items-wrapper.selected');
 
 
@@ -687,7 +687,7 @@ ${substringBefore(s, "=")} = ${value};`
                 }
             }
             // textarea.value.substring(selectionStart, selectionEnd)
-           
+
             return `// ${s}
 ${textarea.value.substring(start, selectionStart)}1.0${textarea.value.substring(selectionEnd, end)};
             `
@@ -874,13 +874,23 @@ function insertVariables(textarea, fn) {
     let start = points[0];
     while (start - 1 > -1) {
         if ((textarea.value[start] === ';'
-        || textarea.value[start] === '}'
-        || textarea.value[start] === '{'
+            || textarea.value[start] === '}'
+            || textarea.value[start] === '{'
         ) && textarea.value[start + 1] === '\n') {
-            start+=2;
+            start += 2;
             break;
         }
         start--;
     }
-    textarea.setRangeText(fn(word)+"\n", start, start);
+    textarea.setRangeText(fn(word) + "\n", start, start);
+}
+
+async function snippet(textarea) {
+    const points = getWord(textarea);
+    let word = textarea.value.substring(points[0], points[1]);
+
+    const res = await fetch(`${baseUri}/snippet?k=${word}`)
+    if (res.status === 200) {
+        textarea.setRangeText(await res.text(), points[0], points[1]);
+    }
 }

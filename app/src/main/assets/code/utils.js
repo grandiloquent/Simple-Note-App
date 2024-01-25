@@ -381,9 +381,31 @@ const items = [
     [
         39,
         "text_snippet",
-        "变量",
+        "So",
         () => {
             insertVariables(textarea);
+        }
+    ],
+    [
+        40,
+        "text_snippet",
+        "*=",
+        () => {
+            insertVariables1(textarea);
+        }
+    ], [
+        41,
+        "text_snippet",
+        "?:",
+        () => {
+            insertVariables2(textarea);
+        }
+    ], [
+        42,
+        "text_snippet",
+        "if",
+        () => {
+            insertVariables3(textarea);
         }
     ],
 
@@ -836,7 +858,7 @@ float ${name} = ${s};
 
 }
 function insertVariables(textarea) {
-    let points = getWord(textarea);
+    let points = getWordString(textarea);
     let word = textarea.value.substring(points[0], points[1]);
     let start = points[0];
     while (start - 1 > -1) {
@@ -846,53 +868,49 @@ function insertVariables(textarea) {
         }
         start--;
     }
-    textarea.setRangeText(`
-/*
-${word} = vec2(0.0, 0.0);
-${word} = vec3(0.0, 0.0, 0.0);
-${word} = vec4(0.0, 0.0, 0.0,0.0);
-
-${word}.x += ();
-${word}.y += ();
-${word}.z += ();
-
-${word}.x -= ();
-${word}.y -= ();
-${word}.z -= ();
-
-${word}.x *= ();
-${word}.y *= ();
-${word}.z *= ();
-
-${word}.x /= ();
-${word}.y /= ();
-${word}.z /= ();
-
-abs cos length max min mix sin smoothstep step tan texture .xy .xyz
-
-.split(' ').sort().join(' ')
-
-if(){
-
-}else{
-
+    textarea.setRangeText(`${word} = smoothstep(vec3(0.0, 0.0,0.0),vec3(1.0, 1.0,1.0),abs(${word}));`, start, start);
+}
+function insertVariables2(textarea) {
+    let points = getWordString(textarea);
+    let word = textarea.value.substring(points[0], points[1]);
+    let start = points[0];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ';') {
+            start++;
+            break;
+        }
+        start--;
+    }
+    textarea.setRangeText(`${word} *= 0.5;`, start, start);
+}
+function insertVariables3(textarea) {
+    let points = getWordString(textarea);
+    let word = textarea.value.substring(points[0], points[1]);
+    let start = points[0];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ';') {
+            start++;
+            break;
+        }
+        start--;
+    }
+    textarea.setRangeText(`${word} > 0.0 ? 1.0:${word};`, start, start);
 }
 
-float dv = 0.0;
-if (dot(${word}, vec3(1, 0, 0)) > 0.) dv=1.;
-if (dot(${word}, vec3(1, 0, 0)) < 0.) dv=2.;
-if (dot(${word}, vec3(0, 0, 1)) > 0.) dv=3.;
-if (dot(${word}, vec3(0, 0, 1)) < 0.) dv=4.;
-if (dot(${word}, vec3(0, 1, 0)) > 0.) dv=5.;
-if (dot(${word}, vec3(0, 1, 0)) < 0.) dv=6.;
+function insertVariables4(textarea) {
+    let points = getWordString(textarea);
+    let word = textarea.value.substring(points[0], points[1]);
+    let start = points[0];
+    while (start - 1 > -1) {
+        if (textarea.value[start] === ';') {
+            start++;
+            break;
+        }
+        start--;
+    }
+    textarea.setRangeText(`if(${word} > 0.0){
 
-if (dot(${word}, vec3(1, 0, 0)) > 0.) col = vec3(1., 0., 0.);
-if (dot(${word}, vec3(1, 0, 0)) < 0.) col = vec3(0., 1., 0.);
-if (dot(${word}, vec3(0, 0, 1)) > 0.) col = vec3(0., 0., 1.);
-if (dot(${word}, vec3(0, 0, 1)) < 0.) col = vec3(1., 1., 0.);
-if (dot(${word}, vec3(0, 1, 0)) > 0.) col = vec3(0., 1., 1.);
-if (dot(${word}, vec3(0, 1, 0)) < 0.) col = vec3(1., 0., 1.);
+    }else{
 
-*/
-    `, start, start);
+    }`, start, start);
 }

@@ -2007,6 +2007,7 @@ ${selectedString === 'y' ? `float y =${sn}.x;` : ''}
     ${name}=vec4(${selectedString},${selectedString},${selectedString}, 1.0);
     // ${name}=texture(iChannel0,${sn}.xy).xyz;
 return;
+
     if(${selectedString}==0.0){ // 黑色
     ${name}=vec4(0.0,0.0,0.0,1.0);
    }else if(${selectedString}==1.0){ // 红色
@@ -2025,6 +2026,24 @@ return;
     ${name}=vec4(1.0,0.0,1.0,1.0);
    }
    return;
+
+   if(${selectedString}>1.0){ // 黑色
+    ${name}=vec4(0.0,0.0,0.0,1.0);
+   }else{
+    ${name}=vec4(1.0,1.0,1.0,1.0);
+   }
+   if(${selectedString}<.0){ // 黑色
+    ${name}=vec4(0.0,0.0,0.0,1.0);
+   }else{
+    ${name}=vec4(1.0,1.0,1.0,1.0);
+   }
+   if(${selectedString}==-1.){ // 黑色
+    ${name}=vec4(0.0,0.0,0.0,1.0);
+   }else{
+    ${name}=vec4(1.0,1.0,1.0,1.0);
+   }
+   return;
+   
 //===
     ` , end, end);
 

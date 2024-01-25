@@ -366,6 +366,20 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         }
         res.set_content(doc.dump(), "application/json");
     });
+    server.Get("/snippet", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto k = req.get_param_value("k");
+        static const char query[]
+                = R"(SELECT content FROM snippet where keyword = ?1)";
+        db::QueryResult fetch_row = db::query<query>(k);
+        std::string_view content;
+        if (fetch_row(content)) {
+            res.set_content(content.data(), content.size(), "application/json");
+        }
+
+    });
+
+
     server.Post("/snippet", [](const httplib::Request &req, httplib::Response &res,
                                const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
@@ -384,7 +398,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (doc.contains("content")) {
             content = doc["content"];
         }
-        int id=0;
+        int id = 0;
         if (doc.contains("id")) {
             id = doc["id"];
         }

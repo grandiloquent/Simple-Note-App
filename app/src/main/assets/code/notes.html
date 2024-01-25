@@ -245,11 +245,11 @@
                         //     body: s
                         // });
                         // writeText(s);
-                        if (element.hasAttribute('keyword')) {
 
-                            const dialog = document.createElement('custom-dialog');
-                            const div = document.createElement('textarea');
-                            div.style = `
+
+                        const dialog = document.createElement('custom-dialog');
+                        const div = document.createElement('textarea');
+                        div.style = `
     display: flex;
     flex-direction: column;
     row-gap: 4px;
@@ -258,22 +258,34 @@
     align-items: stretch;
     justify-content: center;
 `
-                            div.value = element.textContent;
-                            dialog.appendChild(div);
+                        div.value = element.textContent;
+                        dialog.appendChild(div);
 
-                            dialog.addEventListener('submit', async () => {
+                        dialog.addEventListener('submit', async () => {
+                            let s;
+                            if (element.hasAttribute('keyword')) {
+                                s = JSON.stringify({
+                                    id: parseInt(element.dataset.id),
+                                    keyword: div.value.trim()
+
+                                });
+                            } else if (element.hasAttribute('content')) {
+                                s = JSON.stringify({
+                                    id: parseInt(element.dataset.id),
+                                    content: div.value.trim()
+
+                                });
+                            }
+                            if (s) {
                                 const res = await fetch(`${baseUri}/snippet`, {
                                     method: 'POST',
-                                    body: JSON.stringify({
-                                        id: parseInt(element.dataset.id),
-                                        keyword: div.value.trim()
-
-                                    })
+                                    body: s
                                 });
-                            });
-                            document.body.appendChild(dialog);
+                            }
 
-                        }
+                        });
+                        document.body.appendChild(dialog);
+
                     })
                 })
 

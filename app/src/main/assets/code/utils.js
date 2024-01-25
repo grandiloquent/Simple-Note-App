@@ -687,7 +687,7 @@ ${substringBefore(s, "=")} = ${value};`
                 }
             }
             // textarea.value.substring(selectionStart, selectionEnd)
-
+           
             return `// ${s}
 ${textarea.value.substring(start, selectionStart)}1.0${textarea.value.substring(selectionEnd, end)};
             `
@@ -787,7 +787,7 @@ function commentLine(textarea) {
             line = "// " + line;
         }
 
-        textarea.setRangeText(lin, points[0], points[1]);
+        textarea.setRangeText(line, points[0], points[1]);
     }
 }
 function variables(textarea) {
@@ -873,7 +873,10 @@ function insertVariables(textarea, fn) {
     let word = textarea.value.substring(points[0], points[1]);
     let start = points[0];
     while (start - 1 > -1) {
-        if (textarea.value[start] === ';' && textarea.value[start + 1] === '\n') {
+        if ((textarea.value[start] === ';'
+        || textarea.value[start] === '}'
+        || textarea.value[start] === '{'
+        ) && textarea.value[start + 1] === '\n') {
             start+=2;
             break;
         }

@@ -172,7 +172,7 @@
 
         #notes-wrapper {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 48px 1fr;
             background-color: #dadce0;
             gap: 1px;
             line-height: 24px;
@@ -191,6 +191,7 @@
         }
     </style>
     <script src="../animate/shared.js"></script>
+    <script src="../animate/custom-dialog.js"></script>
 </head>
 
 <body>
@@ -232,18 +233,47 @@
             const notesWrapper = document.getElementById('notes-wrapper');
             const data = await loadData();
             notesWrapper.innerHTML = data.reverse().map(x => {
-                return `<div>${escapeHtml(x)}</div>`;
+                return `<div data-id="${x.id}" keyword>${x.keyword}</div><div data-id="${x.id}" content>${escapeHtml(x.content)}</div>`;
             }).join('');
             notesWrapper.querySelectorAll('div')
                 .forEach(x => {
                     x.addEventListener('click', async e => {
                         const element = e.currentTarget;
-                        const s = element.textContent;
-                        const res = await fetch(`${baseUri}/snippet/hit`, {
-                            method: 'POST',
-                            body: s
-                        });
-                        writeText(s);
+                        // const s = element.textContent;
+                        // const res = await fetch(`${baseUri}/snippet/hit`, {
+                        //     method: 'POST',
+                        //     body: s
+                        // });
+                        // writeText(s);
+                        if (element.hasAttribute('keyword')) {
+
+                            const dialog = document.createElement('custom-dialog');
+                            const div = document.createElement('textarea');
+                            div.style = `
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    font-size: 18px;
+    line-height: 24px;
+    align-items: stretch;
+    justify-content: center;
+`
+                            div.value = element.textContent;
+                            dialog.appendChild(div);
+
+                            dialog.addEventListener('submit', async () => {
+                                const res = await fetch(`${baseUri}/snippet`, {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                        id: parseInt(element.dataset.id),
+                                        keyword: div.value.trim()
+
+                                    })
+                                });
+                            });
+                            document.body.appendChild(dialog);
+
+                        }
                     })
                 })
 

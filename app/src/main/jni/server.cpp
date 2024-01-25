@@ -189,8 +189,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
 	PRIMARY KEY("id" AUTOINCREMENT)
  */
 //    static const char contentTableSql[]
-//            = R"(ALTER TABLE snippet ADD COLUMN views INTEGER)";
-    //   db::QueryResult fetch_row = db::query<contentTableSql>();
+//            = R"(ALTER TABLE snippet ADD COLUMN keyword TEXT)";
+//       db::QueryResult fetch_row = db::query<contentTableSql>();
 
 
     jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
@@ -352,12 +352,17 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     server.Get("/snippets", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]
-                = R"(SELECT content FROM snippet ORDER BY views)";
+                = R"(SELECT content,keyword,id FROM snippet ORDER BY views)";
         db::QueryResult fetch_row = db::query<query>();
-        std::string_view content;
+        std::string_view content, keyword, id;
         nlohmann::json doc = nlohmann::json::array();
-        while (fetch_row(content)) {
-            doc.push_back(content);
+        while (fetch_row(content, keyword, id)) {
+            nlohmann::json j = {
+                    {"content", content},
+                    {"keyword", keyword},
+                    {"id",      id}
+            };
+            doc.push_back(j);
         }
         res.set_content(doc.dump(), "application/json");
     });
@@ -370,12 +375,35 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             body.append(data, data_length);
             return true;
         });
-        static const char query[]
-                = R"(INSERT INTO snippet (content) VALUES(?1))";
-        db::QueryResult fetch_row = db::query<query>(body);
+        nlohmann::json doc = nlohmann::json::parse(body);
+        std::string keyword;
+        if (doc.contains("keyword")) {
+            keyword = doc["keyword"];
+        }
+        std::string content;
+        if (doc.contains("content")) {
+            content = doc["content"];
+        }
+        int id=0;
+        if (doc.contains("id")) {
+            id = doc["id"];
+        }
+        if (id == 0) {
+            static const char query[]
+                    = R"(INSERT INTO snippet (content,keyword) VALUES(?1,?2))";
+            db::QueryResult fetch_row = db::query<query>(content, keyword);
 
-        res.set_content(std::to_string(fetch_row.resultCode()),
-                        "text/plain; charset=UTF-8");
+            res.set_content(std::to_string(fetch_row.resultCode()),
+                            "text/plain; charset=UTF-8");
+        } else {
+            static const char query[]
+                    = R"(UPDATE snippet SET content=coalesce(NULLIF(?1,''),content),keyword=coalesce(NULLIF(?2,''),keyword) where id =?3)";
+            db::QueryResult fetch_row = db::query<query>(content, keyword, id);
+
+            res.set_content(std::to_string(fetch_row.resultCode()),
+                            "text/plain; charset=UTF-8");
+        }
+
     });
     server.Post("/snippet/delete", [](const httplib::Request &req, httplib::Response &res,
                                       const httplib::ContentReader &content_reader) {

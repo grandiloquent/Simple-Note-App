@@ -2005,8 +2005,7 @@ function breakLine1(textarea) {
 //===
 ${selectedString === 'y' ? `float y =${sn}.x;` : ''}
     ${name}=vec4(${selectedString},${selectedString},${selectedString}, 1.0);
-    // ${name}=texture(iChannel0,${sn}.xy).xyz;
-return;
+    // ${name}=texture(iChannel0,${sn}.xy); return;
 
     if(${selectedString}==0.0){ // 黑色
     ${name}=vec4(0.0,0.0,0.0,1.0);
@@ -2043,7 +2042,7 @@ return;
     ${name}=vec4(1.0,1.0,1.0,1.0);
    }
    return;
-   
+
 //===
     ` , end, end);
 

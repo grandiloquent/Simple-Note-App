@@ -383,7 +383,7 @@ const items = [
         "text_snippet",
         "So",
         () => {
-            insertVariables(textarea);
+            insertVariables(textarea,word=>`${word} = smoothstep(vec3(0.0, 0.0,0.0),vec3(1.0, 1.0,1.0),abs(${word}));`);
         }
     ],
     [
@@ -391,24 +391,35 @@ const items = [
         "text_snippet",
         "*=",
         () => {
-            insertVariables1(textarea);
+            insertVariables(textarea,word=>`${word} *= 0.5;`);
         }
     ], [
         41,
         "text_snippet",
         "?:",
         () => {
-            insertVariables2(textarea);
+            insertVariables(textarea,word=>`${word} = ${word} > 0.0 ? ${word}:1.0;`);
         }
     ], [
         42,
         "text_snippet",
         "if",
         () => {
-            insertVariables3(textarea);
+            insertVariables(textarea,word=>`if(${word} < 0.0){
+
+            }else{
+        
+            }`);
         }
     ],
-
+    [
+        43,
+        "text_snippet",
+        "1.-y",
+        () => {
+            insertVariables(textarea,word=>`${word}.y =1.0 - ${word}.y;`);
+        }
+    ],
 
 
 ]
@@ -446,7 +457,7 @@ const bottomIndexs = JSON.parse(localStorage.getItem('bottomIndexs')) ||
     [35, 9, 10, 16, 8, 15, 13, 14]
 insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
 const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
-    [3, 6, 18, 27, 28, 39]
+    [39, 40, 41, 42]
 insertItem(rightIndexs, '.items-wrapper.selected');
 
 
@@ -857,60 +868,16 @@ float ${name} = ${s};
 
 
 }
-function insertVariables(textarea) {
+function insertVariables(textarea, fn) {
     let points = getWordString(textarea);
     let word = textarea.value.substring(points[0], points[1]);
     let start = points[0];
     while (start - 1 > -1) {
-        if (textarea.value[start] === ';') {
-            start++;
+        if (textarea.value[start] === ';' && textarea.value[start + 1] === '\n') {
+            start+=2;
             break;
         }
         start--;
     }
-    textarea.setRangeText(`${word} = smoothstep(vec3(0.0, 0.0,0.0),vec3(1.0, 1.0,1.0),abs(${word}));`, start, start);
-}
-function insertVariables2(textarea) {
-    let points = getWordString(textarea);
-    let word = textarea.value.substring(points[0], points[1]);
-    let start = points[0];
-    while (start - 1 > -1) {
-        if (textarea.value[start] === ';') {
-            start++;
-            break;
-        }
-        start--;
-    }
-    textarea.setRangeText(`${word} *= 0.5;`, start, start);
-}
-function insertVariables3(textarea) {
-    let points = getWordString(textarea);
-    let word = textarea.value.substring(points[0], points[1]);
-    let start = points[0];
-    while (start - 1 > -1) {
-        if (textarea.value[start] === ';') {
-            start++;
-            break;
-        }
-        start--;
-    }
-    textarea.setRangeText(`${word} > 0.0 ? 1.0:${word};`, start, start);
-}
-
-function insertVariables4(textarea) {
-    let points = getWordString(textarea);
-    let word = textarea.value.substring(points[0], points[1]);
-    let start = points[0];
-    while (start - 1 > -1) {
-        if (textarea.value[start] === ';') {
-            start++;
-            break;
-        }
-        start--;
-    }
-    textarea.setRangeText(`if(${word} > 0.0){
-
-    }else{
-
-    }`, start, start);
+    textarea.setRangeText(fn(word)+"\n", start, start);
 }

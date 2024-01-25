@@ -495,15 +495,15 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         if (fetch_row(content)) {
 
             if (content.find("three.js") != std::string::npos) {
-                auto sv = SubstringBeforeLast(content, std::string{
-                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
-                sv += R"(const div = document.createElement("div");
-    div.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
-    document.body.appendChild(div);
-)" + SubstringAfterLast(content, std::string{
-                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
-
-                content = sv;
+//                auto sv = SubstringBeforeLast(content, std::string{
+//                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+//                sv += R"(const div = document.createElement("div");
+//    div.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
+//    document.body.appendChild(div);
+//)" + SubstringAfterLast(content, std::string{
+//                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
+//
+//                content = sv;
                 std::string s{R"(<html lang='en'>
 <head>
 <meta charset="UTF-8">

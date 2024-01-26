@@ -396,9 +396,9 @@ const items = [
     ], [
         41,
         "text_snippet",
-        "?:",
+        "重构",
         () => {
-            insertVariables(textarea, word => `${word} = ${word} > 0.0 ? ${word}:1.0;`);
+            refractorCode(textarea);
         }
     ], [
         42,
@@ -912,4 +912,59 @@ async function snippet(textarea) {
     if (res.status === 200) {
         textarea.setRangeText(await res.text(), points[0], points[1]);
     }
+}
+
+function refractorCode(textarea) {
+    let points = getLine(textarea);
+    let line = textarea.value.substring(points[0], points[1]).trim();
+    let p = `<script id="share" type="x-shader/x-fragment">`;
+    let index = textarea.value.indexOf(p);
+    let s;
+    if (line.indexOf("{") !== -1) {
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        s = textarea.value.substring(points[0], end);
+        if (index === -1) {
+            index = textarea.value.indexOf("</script>", end);
+            textarea.setRangeText(`
+    <script id="share" type="x-shader/x-fragment">
+    ${s}
+    </script>
+    `, index + 9, index + 9);
+        } else {
+            index = textarea.value.indexOf("</script>", index + p.length);
+            textarea.setRangeText(`
+    ${s}
+    `, index + 9, index + 9);
+        }
+        textarea.setRangeText("", points[0], end);
+    } else {
+        s = line;
+        if (index === -1) {
+            index = textarea.value.indexOf("</script>", end);
+            textarea.setRangeText(`
+    <script id="share" type="x-shader/x-fragment">
+    ${s}
+    </script>
+    `, index + 9, index + 9);
+        } else {
+            textarea.setRangeText(`
+    ${s}
+    `, index + p.length, index + p.length);
+        }
+        textarea.setRangeText("", points[0], end);
+    }
+
 }

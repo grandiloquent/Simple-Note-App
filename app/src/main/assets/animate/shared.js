@@ -1224,7 +1224,11 @@ function decreaseCode(textarea) {
     // s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
     // s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
     // s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
-    // s = removeSubstring(s, `<body>`, `</html>`);
+    s = removeSubstring(s, `uniform vec3 iChannelResolution[1];`, `uniform sampler2D iChannel0;`);
+    s = removeSubstring(s, `uniform sampler2D iChannel1;`, `// ==================================`);
+    s = removeSubstring(s, `// ==================================`, `// ==================================`);
+    s = s.replaceAll(`// ==================================`,'');
+
     s = removeSubstring(s, `<script id="vs" type="x-shader/x-vertex">`, `</script>`);
     let start = 0;
     let offset = 0;

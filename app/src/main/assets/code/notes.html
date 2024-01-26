@@ -296,9 +296,13 @@
                 .addEventListener('click', async e => {
                     const s = document.getElementById('textarea').value.trim();
                     if (!s) return
+                    let body = {
+                        keyword: substringBefore(s, "\n").trim(),
+                        content: substringAfter(s, "\n").trim()
+                    };
                     const res = await fetch(`${baseUri}/snippet`, {
                         method: 'POST',
-                        body: s
+                        body: JSON.stringify(body)
                     });
                 });
             document.getElementById('close')

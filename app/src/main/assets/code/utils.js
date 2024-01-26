@@ -947,7 +947,7 @@ function refractorCode(textarea) {
             index = textarea.value.indexOf("</script>", index + p.length);
             textarea.setRangeText(`
     ${s}
-    `, index + 9, index + 9);
+    `, index, index);
         }
         textarea.setRangeText("", points[0], end);
     } else {
@@ -964,7 +964,7 @@ function refractorCode(textarea) {
     ${s}
     `, index + p.length, index + p.length);
         }
-        textarea.setRangeText("", points[0], end);
+        textarea.setRangeText("", points[0], points[1]);
     }
 
 }

@@ -448,15 +448,36 @@ function insertItem(indexs, selector, klass) {
         bottomBar.appendChild(div);
     })
 }
-const topIndexs = JSON.parse(localStorage.getItem('topIndexs'))
-    || [1, 23, 4, 34, 30, 29, 36, 37]
-insertItem(topIndexs, '.bar-renderer.top', 'bar-item-tab');
-const bottomIndexs = JSON.parse(localStorage.getItem('bottomIndexs')) ||
-    [35, 9, 10, 16, 8, 15, 13, 14]
-insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
-const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
-    [39, 40, 42, 43]
-insertItem(rightIndexs, '.items-wrapper.selected');
+
+
+async function initializeToolbars() {
+    let topIndexs;
+    let bottomIndexs;
+    let rightIndexs;
+
+    try {
+        const response = await fetch(`${baseUri}/ts`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+
+        const results = JSON.parse(await response.text());
+        if (results) {
+            topIndexs = results[0];
+            bottomIndexs = results[1];
+            rightIndexs = results[2];
+        }
+    } catch (error) {
+        topIndexs = [1, 4, 3, 8, 35, 36, 34, 2]
+        bottomIndexs = [29, 9, 10, 15, 37]
+        rightIndexs = [30, 32, 18, 43, 42]
+    }
+    insertItem(topIndexs, '.bar-renderer.top', 'bar-item-tab');
+    insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
+    insertItem(rightIndexs, '.items-wrapper.selected');
+}
+initializeToolbars()
+
 
 
 function duplicateLine(textarea) {

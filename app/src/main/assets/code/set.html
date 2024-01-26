@@ -33,31 +33,70 @@
             items.map(x => {
                 return `${x[0]} = ${x[2]},`
             })
-        document.querySelector('#top textarea').value =
-            topIndexs;
+
         document.querySelector('#top div:nth-child(3)').addEventListener('click', evt => {
-            const array = JSON.parse("[" + document.querySelector('#top textarea').value + "]");
-            if (array.length) {
-                localStorage.setItem("topIndexs", JSON.stringify(array));
-            }
+            saveToolbars()
         })
 
-        document.querySelector('#bottom textarea').value =
-            bottomIndexs;
+
+
+        async function initializeToolbars() {
+            let topIndexs;
+            let bottomIndexs;
+            let rightIndexs;
+
+            try {
+                const response = await fetch(`${baseUri}/ts`);
+                if (response.status > 399 || response.status < 200) {
+                    throw new Error(`${response.status}: ${response.statusText}`)
+                }
+
+                const results = JSON.parse(await response.text());
+                if (results) {
+                    topIndexs = results[0];
+                    bottomIndexs = results[1];
+                    rightIndexs = results[2];
+                }
+            } catch (error) {
+                topIndexs = [1, 4, 3, 8, 35, 36, 34, 2]
+                bottomIndexs = [29, 9, 10, 15, 37]
+                rightIndexs = [30, 32, 18, 43, 42]
+            }
+            document.querySelector('#top textarea').value =
+                topIndexs;
+            document.querySelector('#bottom textarea').value =
+                bottomIndexs;
+            document.querySelector('#right textarea').value =
+                rightIndexs;
+        }
+        initializeToolbars();
         document.querySelector('#bottom div:nth-child(3)').addEventListener('click', evt => {
-            const array = JSON.parse("[" + document.querySelector('#bottom textarea').value + "]");
-            if (array.length) {
-                localStorage.setItem("bottomIndexs", JSON.stringify(array));
-            }
+            saveToolbars()
         })
-        document.querySelector('#right textarea').value =
-            rightIndexs;
+
         document.querySelector('#right div:nth-child(3)').addEventListener('click', evt => {
-            const array = JSON.parse("[" + document.querySelector('#right textarea').value + "]");
-            if (array.length) {
-                localStorage.setItem("rightIndexs", JSON.stringify(array));
-            }
+            saveToolbars()
         })
+        async function saveToolbars() {
+            let baseUri = window.location.host === '127.0.0.1:5500' ? SETTINGS.host : '';
+            const obj = [
+                JSON.parse("[" + document.querySelector('#top textarea').value + "]"),
+                JSON.parse("[" + document.querySelector('#bottom textarea').value + "]"),
+                JSON.parse("[" + document.querySelector('#right textarea').value + "]"),
+            ]
+            try {
+                const response = await fetch(`${baseUri}/ts`, {
+                    method: "POST",
+                    body: JSON.stringify(j)
+                });
+                if (response.status > 399 || response.status < 200) {
+                    throw new Error(`${response.status}: ${response.statusText}`)
+                }
+                const results = await response.text();
+            } catch (error) {
+                console.log(error);
+            }
+        }
     </script>
 </body>
 

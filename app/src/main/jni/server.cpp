@@ -1094,10 +1094,11 @@ in vec4 a_position;
                         "text/plain; charset=UTF-8");
 
     });
-    server.Get("/vn", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/ts", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         static const char query[]
-                = R"(select content from content WHERE id = 3)";
+                = R"(select content from content WHERE id = 5
+)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
 
@@ -1106,7 +1107,7 @@ in vec4 a_position;
             res.set_content(content.data(), content.size(), "text/plain");
         }
     });
-    server.Post("/vn", [](const httplib::Request &req, httplib::Response &res,
+    server.Post("/ts", [](const httplib::Request &req, httplib::Response &res,
                           const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
@@ -1117,7 +1118,7 @@ in vec4 a_position;
         });
 
         static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (3,?1,?2))";
+                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (5,?1,?2))";
         db::QueryResult fetch_row = db::query<query>(body,
                                                      GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),

@@ -1,1 +1,2 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
+App.zip filter=lfs diff=lfs merge=lfs -text

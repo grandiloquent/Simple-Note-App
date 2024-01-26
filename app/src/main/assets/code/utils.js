@@ -403,13 +403,11 @@ const items = [
     ], [
         42,
         "text_snippet",
-        "if",
+        "计算",
         () => {
-            insertVariables(textarea, word => `if(${word} < 0.0){
-
-            }else{
-        
-            }`);
+            let points = getLine(textarea);
+            let line = textarea.value.substring(points[0], points[1]);
+            textarea.setRangeText(eval(line), points[0], points[1])
         }
     ],
     [
@@ -457,7 +455,7 @@ const bottomIndexs = JSON.parse(localStorage.getItem('bottomIndexs')) ||
     [35, 9, 10, 16, 8, 15, 13, 14]
 insertItem(bottomIndexs, '.bar-renderer.bottom', 'bar-item-tab');
 const rightIndexs = JSON.parse(localStorage.getItem('rightIndexs')) ||
-    [39, 40, 41, 43]
+    [39, 40, 42, 43]
 insertItem(rightIndexs, '.items-wrapper.selected');
 
 

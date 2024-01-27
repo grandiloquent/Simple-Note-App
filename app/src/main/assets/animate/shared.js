@@ -190,7 +190,8 @@ function bind(elememnt) {
 }
 
 function camel(string) {
-    return string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
+    let s=string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
+    return s.slice(0,1).toLowerCase()+s.slice(1);
 }
 function findString() {
     let start = textarea.selectionStart
@@ -2229,7 +2230,14 @@ function formatExpressionLine(textarea, fn) {
                 break;
             }
         }
+        while (selectionEnd < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === '\n') {
+                break;
+            }
+        }
     }
+
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
 }
 

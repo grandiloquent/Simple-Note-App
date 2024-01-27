@@ -51,10 +51,9 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
             ctx.fillStyle = `${document.querySelector('input:nth-child(5)').value}`
-            let size = ctx.measureText(s[0]);
             for (let index = 0; index < s.length; index++) {
                 const element = s[index];
-
+                let size = ctx.measureText(element);
                 ctx.fillText(element, (x - size.width) / 2 + x * (index % 16), (index / 16 | 0) * 64 + 32);
             }
         }

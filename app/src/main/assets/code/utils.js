@@ -968,7 +968,7 @@ function refractorCode(textarea) {
 
 }
 
-function functions(textarea) {
+async function functions(textarea) {
 
     let points = getWord(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();

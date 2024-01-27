@@ -26,8 +26,9 @@
         <input value="30px 苹方">
         <input value="64">
         <input value="中国人">
-        <input value="#000">
+        <input value="#ff0000">
         <input>
+        <button>下载</button>
 
     </div>
 
@@ -62,9 +63,26 @@
         document.querySelector('input:nth-child(4)').addEventListener('input', evt => {
             drawText();
         })
+        document.querySelector('button').addEventListener('click', evt => {
+            saveImage(canvas,"100");
+        });
+        const saveImage = (canvas, filename) => {
 
+            var link = document.createElement("a");
+            var imgData = canvas.toDataURL({
+                format: 'png',
+                multiplier: 4
+            });
 
+           
+            var objurl = imgData;
 
+            link.download = `${filename}.png`;
+
+            link.href = objurl;
+
+            link.click();
+        };
 
     </script>
 </body>

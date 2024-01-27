@@ -995,8 +995,9 @@ async function functions(textarea) {
     s = `float ${name}(float , float ,){
 ${s}
    return ;
-}`
-    textarea.setRangeText('', points[0], points[1]);
+}
+`
+    textarea.setRangeText(`float v =${name}();`, points[0], points[1]);
     let selectionStart = textarea.selectionStart;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
         selectionStart--;

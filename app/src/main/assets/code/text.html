@@ -40,7 +40,7 @@
             canvas.width = parseInt(document.querySelector('input:nth-child(1)').value);
             const x = parseInt(document.querySelector('input:nth-child(3)').value);
             const s = document.querySelector('input:nth-child(4)').value;
-            canvas.height = ((s.length + 10) / 10 | 0) * x;
+            canvas.height = ((s.length + 16) / 16 | 0) * x;
             const ctx = canvas.getContext("2d");
             ctx.textBaseline = 'middle';
             // ctx.textAlign = "center";

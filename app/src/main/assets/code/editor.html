@@ -315,29 +315,6 @@ ${content}`;
 
 
 
-            document.getElementById('content_cut').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                cutLine(textarea)
-            })
-
-            document.getElementById('javascript').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-
-
-                let selectionStart = textarea.selectionStart;
-                let selectionEnd = textarea.selectionEnd;
-                let s = `if(x === undefined){
-}
-else if(x !== undefined){
-}
-else{
-}`;
-                textarea.setRangeText(s, selectionStart, selectionEnd)
-            })
-
-
 
 
             document.getElementById('function').addEventListener('click', evt => {
@@ -349,47 +326,10 @@ else{
 
 
 
-            document.getElementById('text_snippet').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-
-                showSnippetsDialog();
-            })
 
 
 
 
-            // document.getElementById('search').addEventListener('click', async evt => {
-            //     evt.stopPropagation();
-            //     evt.stopImmediatePropagation();
-            //     const points = getWordString(textarea);
-            //     let v = textarea.value.substring(points[0], points[1]).trim();
-            //     const s = `https://www.google.com/search?q=` + encodeURIComponent(v);
-            //     if (typeof NativeAndroid !== 'undefined') {
-            //         NativeAndroid.launchApp("psycho.euphoria.l", s);
-            //     } else {
-            //         window.open(s, '_blank');
-            //     }
-            // });
-            document.getElementById('close-line').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                //deleteLine(textarea)
-                removeEmptyLinesBlock(textarea)
-            });
-
-
-
-
-
-            document.getElementById('navigate_next').addEventListener('click', evt => {
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                if (id)
-                    window.location.href = `?id=${parseInt(id) + 1}`
-                else
-                    window.location.reload();
-            });
 
 
 

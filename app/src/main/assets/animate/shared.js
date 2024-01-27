@@ -276,7 +276,7 @@ function getWord(textarea) {
     while (start - 1 > -1 && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[start - 1])) {
         start--;
     }
-    while (end + 1 < textarea.value.length && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[end])) {
+    while (end < textarea.value.length && /[a-zA-Z0-9_\u3400-\u9FBF]/.test(textarea.value[end])) {
         end++;
     }
     return [start, end];
@@ -541,19 +541,7 @@ function comment(textarea) {
     })
 }
 
-function functions(textarea) {
-    const points = findExtendPosition(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    s = `
-    
-    async function doSomething (){
-        // const result = await ;
-${s}
-    }
-    
-    `
-    textarea.setRangeText(s, points[0], points[1]);
-}
+
 async function translate(baseUri, textarea) {
     const points = getWord(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
@@ -1224,10 +1212,9 @@ function decreaseCode(textarea) {
     // s = removeSubstring(s, `// Tell WebGL how to convert from clip space to pixels`, `gl.uniform3f(resolutionLocation, gl.canvas.width, gl.canvas.height, 1.0);`);
     // s = removeSubstring(s, `gl.uniform4f(mouseLocation, mouseX, mouseY, mouseX, mouseY);`, `gl.uniform1f(timeLocation, time);`);
     // s = removeSubstring(s, `window.onerror = function(errMsg, url, line, column, error) {`, `</script>`);
-    s = removeSubstring(s, `uniform vec3 iChannelResolution[1];`, `uniform sampler2D iChannel0;`);
-    s = removeSubstring(s, `uniform sampler2D iChannel1;`, `// ==================================`);
+    s = removeSubstring(s, `uniform vec3 iChannelResolution[1];`, `// ==================================`);
     s = removeSubstring(s, `// ==================================`, `// ==================================`);
-    s = s.replaceAll(`// ==================================`,'');
+    s = s.replaceAll(`// ==================================`, '');
 
     s = removeSubstring(s, `<script id="vs" type="x-shader/x-vertex">`, `</script>`);
     let start = 0;
@@ -1249,7 +1236,6 @@ function decreaseCode(textarea) {
         
 out vec4 ${m.match(/(?<=out vec4 )[^,]+/)};                                          
 void main(){
-vec4 iMouse=vec4(0.0);
 vec2 ${m.match(/(?<=in +vec2 )[^)]+/) || m.match(/(?<=vec2 )[^)]+/)} = gl_FragCoord.xy;
 `
     }).replace(/out vec4 outColor;[\r\n ]+void main\(\)[\r\n ]+\{[\r\n ]+mainImage\(outColor, \gl_FragCoord.xy\);[\r\n ]+\}[\r\n ]+/, '')
@@ -2218,6 +2204,30 @@ function formatLine(textarea, fn) {
         selectionEnd++;
         if (textarea.value[selectionEnd] === '\n') {
             break;
+        }
+    }
+    textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
+}
+
+function formatExpressionLine(textarea, fn) {
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n') {
+            break;
+        }
+    }
+    if (textarea.value.substring(selectionStart, selectionEnd).indexOf("=") !== -1) {
+        while (selectionEnd < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === ';') {
+                selectionEnd++;
+                break;
+            }
         }
     }
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);

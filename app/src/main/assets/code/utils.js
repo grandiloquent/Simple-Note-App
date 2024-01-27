@@ -339,7 +339,6 @@ const items = [
         () => {
             decreaseCode(textarea)
             formatCode();
-            insertSnippet1();
         }
     ],
     [
@@ -389,9 +388,9 @@ const items = [
     [
         40,
         "text_snippet",
-        "*=",
+        "函数",
         () => {
-            insertVariables(textarea, word => `${word} *= 0.5;`);
+            functions(textarea);
         }
     ], [
         41,
@@ -644,7 +643,7 @@ function duplicateLine(textarea) {
     //         textarea.setRangeText("// ", points[0], points[0]);
     //     }
 
-    formatLine(textarea, (s, start, end) => {
+    formatExpressionLine(textarea, (s, start, end) => {
         if (s.trim().startsWith("//")) {
             textarea.selectionStart = end + 1;
             let p = getLine(textarea);
@@ -967,4 +966,44 @@ function refractorCode(textarea) {
         textarea.setRangeText("", points[0], points[1]);
     }
 
+}
+
+function functions(textarea) {
+
+    let points = getWord(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let t = 'zh-CN';
+    if (/[\u3400-\u9FBF]/.test(s)) {
+        t = 'en'
+    }
+    let name = "f";
+    try {
+        const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+        const results = await response.json();
+        const trans = results.sentences.map(x => x.trans);
+        name = camel(trans.join(' '));
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    points = findExtendPosition(textarea);
+    s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
+    s = `float ${name}(float , float ,){
+${s}
+   return ;
+}`
+    textarea.setRangeText('', points[0], points[1]);
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
+        selectionStart--;
+    }
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+        selectionStart--;
+    }
+    
+    textarea.setRangeText(s, selectionStart,selectionStart);
 }

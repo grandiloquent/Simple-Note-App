@@ -232,7 +232,7 @@
         async function render() {
             const notesWrapper = document.getElementById('notes-wrapper');
             const data = await loadData();
-            notesWrapper.innerHTML = data.reverse().map(x => {
+            notesWrapper.innerHTML = data.sort((a,b)=>a.keyword.localeCompare(b.keyword)).map(x => {
                 return `<div data-id="${x.id}" keyword>${x.keyword}</div><div data-id="${x.id}" content>${escapeHtml(x.content)}</div>`;
             }).join('');
             notesWrapper.querySelectorAll('div')

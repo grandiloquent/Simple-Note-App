@@ -644,11 +644,25 @@ function duplicateLine(textarea) {
     //     }
 
     formatExpressionLine(textarea, (s, start, end) => {
+        
         if (s.trim().startsWith("//")) {
-            textarea.selectionStart = end + 1;
-            let p = getLine(textarea);
-            textarea.setRangeText("", p[0], p[1] + 1);
-            return substringAfter(s, "//");
+            // textarea.selectionStart = end + 1;
+            // let p = getLine(textarea);
+            // textarea.setRangeText("", p[0], p[1] + 1);
+            // return substringAfter(s, "//");
+
+            let endvv = end;
+
+
+            let p = getLineAt(textarea, endvv);
+            endvv = p[1];
+            
+        
+            s = s.split('\n').map(x => substringAfter(x, "//")).join('\n');
+
+            // textarea.setRangeText("", start, endvv);
+            textarea.setRangeText(`${s}`, start, endvv);
+            return s+"\n";
         }
         if (textarea.value[textarea.selectionStart] === '='
             || textarea.value[textarea.selectionStart - 1] === '=') {
@@ -677,7 +691,7 @@ ${s}`;
             } else if (name === "mat2") {
                 value = "mat2(vec2(0.0,0.0),vec2(0.0,0.0))";
             }
-            return `// ${s}
+            return `${s.split('\n').map(x => "// " + x).join('\n')}
 ${substringBefore(s, "=")} = ${value};`
         } else {
             let selectionStart = textarea.selectionStart;
@@ -706,7 +720,7 @@ ${substringBefore(s, "=")} = ${value};`
             }
             // textarea.value.substring(selectionStart, selectionEnd)
 
-            return `// ${s}
+            return `${s.split('\n').map(x => "// " + x).join('\n')}
 ${textarea.value.substring(start, selectionStart)}1.0${textarea.value.substring(selectionEnd, end)};
             `
         }
@@ -1005,6 +1019,6 @@ ${s}
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
         selectionStart--;
     }
-    
-    textarea.setRangeText(s, selectionStart,selectionStart);
+
+    textarea.setRangeText(s, selectionStart, selectionStart);
 }

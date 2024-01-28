@@ -190,8 +190,8 @@ function bind(elememnt) {
 }
 
 function camel(string) {
-    let s=string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
-    return s.slice(0,1).toLowerCase()+s.slice(1);
+    let s = string.replaceAll(/[ _-]([a-zA-Z])/g, m => m[1].toUpperCase());
+    return s.slice(0, 1).toLowerCase() + s.slice(1);
 }
 function findString() {
     let start = textarea.selectionStart
@@ -2223,10 +2223,11 @@ function formatExpressionLine(textarea, fn) {
         }
     }
     if (textarea.value.substring(selectionStart, selectionEnd).indexOf("=") !== -1) {
+        selectionEnd = textarea.selectionEnd;
         while (selectionEnd < textarea.value.length) {
             selectionEnd++;
             if (textarea.value[selectionEnd] === ';') {
-                selectionEnd++;
+               
                 break;
             }
         }
@@ -2236,7 +2237,7 @@ function formatExpressionLine(textarea, fn) {
                 break;
             }
         }
-    }
+    } 
 
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
 }

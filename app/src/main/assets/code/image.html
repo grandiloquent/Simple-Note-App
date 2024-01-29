@@ -26,7 +26,7 @@
         <input value="500">
         <input type="file" accept="image/*">
         <input>
-
+        <button>下载</button>
     </div>
 
     <canvas></canvas>
@@ -55,7 +55,26 @@
             }
         })
 
+        document.querySelector('button').addEventListener('click', evt => {
+            saveImage(canvas,"100");
+        });
+        const saveImage = (canvas, filename) => {
 
+            var link = document.createElement("a");
+            var imgData = canvas.toDataURL({
+                format: 'png',
+                multiplier: 4
+            });
+
+           
+            var objurl = imgData;
+
+            link.download = `${filename}.png`;
+
+            link.href = objurl;
+
+            link.click();
+        };
 
 
     </script>

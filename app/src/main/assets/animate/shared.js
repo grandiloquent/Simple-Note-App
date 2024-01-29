@@ -1288,61 +1288,7 @@ function variablesUnique(textarea) {
     textarea.value = textarea.value.replaceAll(new RegExp("\\b" + name + "\\b", 'g'), name);
 
 }
-function variablesReplace(textarea) {
-    /*
-    let selectionStart = textarea.selectionStart;
-                    let selectionEnd = textarea.selectionEnd;
-                    let s = `let v = 0;`;
-                    textarea.setRangeText(s, selectionStart, selectionEnd)
-    */
-    /*let selectionStart = textarea.selectionStart;
-    let selectionEnd = textarea.selectionEnd;
-    while (selectionStart - 1 > -1 && /[a-zA-Z0-9]/.test(textarea.value[selectionStart - 1])) {
-        selectionStart--;
-    }
-    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== ')') {
-        selectionEnd++;
-    }
-    let s = textarea.value.substring(selectionStart, selectionEnd + 1);
-    let name = `${s[0]}0`;
 
-
-    let i = 0;
-    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
-        i++
-        name = `${s[0]}${i}`;
-    }
-    textarea.setRangeText(`${name}`, selectionStart, selectionEnd + 1);
-    let str = `
-float ${name} = ${s};
-    `;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
-        selectionStart--;
-    }
-    textarea.setRangeText(str, selectionStart, selectionStart);
-    */
-
-    const points = findExtendPosition(textarea);
-    let s = textarea.value.substring(points[0], points[1]).trim();
-    const first = substringBefore(s, "\n").trim();
-    const second = substringAfter(s, "\n");
-
-    let name = `v0`;
-
-
-    let i = 0;
-    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
-        i++
-        name = `v${i}`;
-    }
-    s = second.replaceAll(first, name)
-
-    textarea.setRangeText(`
-float ${name} = ${first};
-${s}
-`, points[0], points[1]);
-
-}
 function copyLine(textarea) {
     const points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
@@ -2227,7 +2173,10 @@ function formatExpressionLine(textarea, fn) {
         while (selectionEnd < textarea.value.length) {
             selectionEnd++;
             if (textarea.value[selectionEnd] === ';'
-                || textarea.value[selectionEnd] === '{') {
+                || textarea.value[selectionEnd] === '{'
+                || textarea.value[selectionEnd] === '}'
+                
+                ) {
 
                 break;
             }

@@ -417,6 +417,15 @@ const items = [
             snippet(textarea);
         }
     ],
+    [
+        44,
+        "text_snippet",
+        "变量",
+        () => {
+            variablesReplace(textarea);
+        }
+    ],
+
 
 
 ]
@@ -468,7 +477,7 @@ async function initializeToolbars() {
         }
     } catch (error) {
         topIndexs = [1, 4, 3, 8, 35, 36, 34, 2]
-        bottomIndexs = [29, 9, 10, 15, 37]
+        bottomIndexs = [40, 9, 10, 15, 37]
         rightIndexs = [30, 32, 18, 43, 42]
     }
     insertItem(topIndexs, '.bar-renderer.top', 'bar-item-tab');
@@ -644,7 +653,7 @@ function duplicateLine(textarea) {
     //     }
 
     formatExpressionLine(textarea, (s, start, end) => {
-        
+
         if (s.trim().startsWith("//")) {
             // textarea.selectionStart = end + 1;
             // let p = getLine(textarea);
@@ -656,13 +665,13 @@ function duplicateLine(textarea) {
 
             let p = getLineAt(textarea, endvv);
             endvv = p[1];
-            
-        
+
+
             s = s.split('\n').map(x => substringAfter(x, "//")).join('\n');
 
             // textarea.setRangeText("", start, endvv);
             textarea.setRangeText(`${s}`, start, endvv);
-            return s+"\n";
+            return s + "\n";
         }
         if (textarea.value[textarea.selectionStart] === '='
             || textarea.value[textarea.selectionStart - 1] === '=') {
@@ -1006,12 +1015,15 @@ async function functions(textarea) {
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
-    s = `vec2 ${name}(vec2 uv, float f){
+    let v = substringAfter(substringBefore(substringAfterLast(s, "\n"),'=').trim(),' ').match(/[a-zA-Z0-9_]+/)[0];
+    let vv=getBlockString(textarea).match(new RegExp("[a-zA-Z0-9_]+\\s*(?="+v+")"))[0];
+
+    s = `${vv} ${name}(vec2 uv, float f){
 ${s}
-   return ;
+   return ${v};
 }
 `
-    textarea.setRangeText(`float v =${name}();`, points[0], points[1]);
+    textarea.setRangeText(`${vv} ${v} =${name}(uv,f);`, points[0], points[1]);
     let selectionStart = textarea.selectionStart;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
         selectionStart--;
@@ -1021,4 +1033,134 @@ ${s}
     }
 
     textarea.setRangeText(s, selectionStart, selectionStart);
+}
+function variablesReplace(textarea) {
+    /*
+    let selectionStart = textarea.selectionStart;
+                    let selectionEnd = textarea.selectionEnd;
+                    let s = `let v = 0;`;
+                    textarea.setRangeText(s, selectionStart, selectionEnd)
+    */
+    /*let selectionStart = textarea.selectionStart;
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionStart - 1 > -1 && /[a-zA-Z0-9]/.test(textarea.value[selectionStart - 1])) {
+        selectionStart--;
+    }
+    while (selectionEnd < textarea.value.length && textarea.value[selectionEnd] !== ')') {
+        selectionEnd++;
+    }
+    let s = textarea.value.substring(selectionStart, selectionEnd + 1);
+    let name = `${s[0]}0`;
+
+
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `${s[0]}${i}`;
+    }
+    textarea.setRangeText(`${name}`, selectionStart, selectionEnd + 1);
+    let str = `
+float ${name} = ${s};
+    `;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== '\n') {
+        selectionStart--;
+    }
+    textarea.setRangeText(str, selectionStart, selectionStart);
+   
+
+    const points = findExtendPosition(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    const first = substringBefore(s, "\n").trim();
+    const second = substringAfter(s, "\n");
+
+    let name = `v0`;
+
+
+    let i = 0;
+    while (new RegExp("\\b" + name + "\\b", 'g').test(textarea.value)) {
+        i++
+        name = `v${i}`;
+    }
+    s = second.replaceAll(first, name)
+
+    textarea.setRangeText(`
+float ${name} = ${first};
+${s}
+`, points[0], points[1]);
+ */
+    let selectionStart = textarea.selectionStart;
+    let count = 0;
+    while (selectionStart - 1 > -1) {
+        if (textarea.value[selectionStart] === '{') {
+            if (count == 0)
+                break;
+            else count--;
+        } else if (textarea.value[selectionStart] === '}') {
+            count++;
+        }
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        if (textarea.value[selectionEnd] === '}') {
+            if (count == 0)
+                break;
+            else count--;
+        } else if (textarea.value[selectionEnd] === '{') {
+            count++;
+        }
+        selectionEnd++;
+    }
+    let s = textarea.value.substring(selectionStart, selectionEnd);
+
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1) {
+        if (/\s/.test(textarea.value[start])) {
+            start++;
+            break;
+        }
+        start--;
+    }
+    count = 0;
+    while (end < textarea.value.length) {
+        if (/\s/.test(textarea.value[end])) {
+            if (count > 0)
+                break;
+            count++;
+        }
+        end++;
+    }
+    let word = textarea.value.substring(start, end);
+    let regex = new RegExp("\\b" + escapeRegExp(word[0]) + "\\b", 'g');
+    s = s.replaceAll(regex, word[1]);
+    textarea.setRangeText(s, selectionStart, selectionEnd);
+}
+
+function getBlockString() {
+    let selectionStart = textarea.selectionStart;
+    let count = 0;
+    while (selectionStart - 1 > -1) {
+        if (textarea.value[selectionStart] === '{') {
+            if (count == 0)
+                break;
+            else count--;
+        } else if (textarea.value[selectionStart] === '}') {
+            count++;
+        }
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        if (textarea.value[selectionEnd] === '}') {
+            if (count == 0)
+                break;
+            else count--;
+        } else if (textarea.value[selectionEnd] === '{') {
+            count++;
+        }
+        selectionEnd++;
+    }
+    return textarea.value.substring(selectionStart, selectionEnd);
+
 }

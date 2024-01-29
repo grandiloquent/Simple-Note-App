@@ -1006,7 +1006,7 @@ async function functions(textarea) {
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
-    s = `float ${name}(float , float ,){
+    s = `vec2 ${name}(vec2 uv, float f){
 ${s}
    return ;
 }

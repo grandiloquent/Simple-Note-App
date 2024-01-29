@@ -2226,8 +2226,9 @@ function formatExpressionLine(textarea, fn) {
         selectionEnd = textarea.selectionEnd;
         while (selectionEnd < textarea.value.length) {
             selectionEnd++;
-            if (textarea.value[selectionEnd] === ';') {
-               
+            if (textarea.value[selectionEnd] === ';'
+                || textarea.value[selectionEnd] === '{') {
+
                 break;
             }
         }
@@ -2237,7 +2238,7 @@ function formatExpressionLine(textarea, fn) {
                 break;
             }
         }
-    } 
+    }
 
     textarea.setRangeText(fn(textarea.value.substring(selectionStart, selectionEnd), selectionStart, selectionEnd), selectionStart, selectionEnd);
 }
@@ -2488,7 +2489,7 @@ function formatParentheses(textarea) {
     if (points[0] === points[1]) {
         textarea.setRangeText(`vec3 v = vec3(0.0,0.0,0.0);`, points[0], points[1]);
     } else {
-        textarea.setRangeText(`)`, points[1], points[1]);
-        textarea.setRangeText(`smoonthstep(`, points[0], points[0]);
+        textarea.setRangeText(`(,)`, points[1], points[1]);
+        //textarea.setRangeText(`smoonthstep(`, points[0], points[0]);
     }
 }

@@ -1486,7 +1486,7 @@ function parentheses(textarea) {
     let line = substringAfter(textarea.value.substring(p[0], p[1]), '=').trim();
     line = substringBeforeLast(line, ';');
     s = s.replaceAll(new RegExp("\\b" + nameString + "\\b", 'g'),
-        `(${line})`);
+        `${line}`);
 
     //     let name = `${s[0]}0`;
 

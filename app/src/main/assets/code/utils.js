@@ -896,7 +896,11 @@ function variables(textarea) {
     let str = `
 float ${name} = ${s};
     `;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart] !== ';') {
+    while (selectionStart - 1 > -1 && (
+        textarea.value[selectionStart] !== ';'||
+        textarea.value[selectionStart] !== '}'||
+        textarea.value[selectionStart] !== '{'
+    )) {
         selectionStart--;
     }
     while (selectionStart + 1 < textarea.value.length && textarea.value[selectionStart] !== '\n') {
@@ -1023,7 +1027,7 @@ async function functions(textarea) {
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
     let vm = substringAfter(substringBefore(substringAfterLast(s, "\n"), '=').trim(), ' ').match(/[a-zA-Z0-9_]+/);
-    let v = (vm && vm[0]) || '';
+    let v = (vm && vm[0]) || 'col';
     let ss = getBlockString(textarea);
     let vv = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"))[0];
     const vvv = findArguments(s, ss);

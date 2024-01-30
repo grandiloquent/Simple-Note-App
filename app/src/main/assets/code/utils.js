@@ -425,7 +425,14 @@ const items = [
             variablesReplace(textarea);
         }
     ],
-
+    [
+        45,
+        "text_snippet",
+        "翻译",
+        () => {
+            translate(textarea);
+        }
+    ],
 
 
 ]
@@ -1015,15 +1022,16 @@ async function functions(textarea) {
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
-    let v = substringAfter(substringBefore(substringAfterLast(s, "\n"),'=').trim(),' ').match(/[a-zA-Z0-9_]+/)[0];
-    let vv=getBlockString(textarea).match(new RegExp("[a-zA-Z0-9_]+\\s*(?="+v+")"))[0];
-
-    s = `${vv} ${name}(vec2 uv, float f){
+    let v = substringAfter(substringBefore(substringAfterLast(s, "\n"), '=').trim(), ' ').match(/[a-zA-Z0-9_]+/)[0];
+    let ss = getBlockString(textarea);
+    let vv = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"))[0];
+    const vvv = findArguments(s, ss);
+    s = `${vv} ${name}(${vvv[0]}){
 ${s}
    return ${v};
 }
 `
-    textarea.setRangeText(`${vv} ${v} =${name}(uv,f);`, points[0], points[1]);
+    textarea.setRangeText(`${vv} ${v} =${name}(${vvv[1]});`, points[0], points[1]);
     let selectionStart = textarea.selectionStart;
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
         selectionStart--;
@@ -1163,4 +1171,72 @@ function getBlockString() {
     }
     return textarea.value.substring(selectionStart, selectionEnd);
 
+}
+
+
+async function translate(textarea) {
+
+    let points = getWord(textarea);
+    let s = textarea.value.substring(points[0], points[1]).trim();
+    let t = 'zh-CN';
+    if (/[\u3400-\u9FBF]/.test(s)) {
+        t = 'en'
+    }
+    try {
+        const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+        const results = await response.json();
+        const trans = results.sentences.map(x => x.trans);
+        let name = camel(trans.join(' '));
+        textarea.setRangeText(name, points[0], points[1]);
+    } catch (error) {
+        console.log(error);
+    }
+
+
+}
+
+function findArguments(s, ss) {
+    let start = 0;
+    let array = [];
+    while (start < s.length) {
+        if (s[start] === '(') {
+            let j = start;
+            let count = 0;
+            while (j < s.length) {
+                if (s[j] === '(') {
+                    count++;
+                } else if (s[j] === ')') {
+                    count--;
+                    if (count == 0) {
+                        array.push(...[...s.substring(start, j).matchAll(/[a-z][a-zA-Z0-9_]+/g)].map(x => x[0]))
+                        start = j + 1;
+                        break;
+                    }
+                }
+                j++;
+            }
+        }
+        start++;
+    }
+    array = [...new Set(array)];
+    const buffer1 = [];
+    const buffer2 = [];
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (!new RegExp("[a-zA-Z0-9]+ " + element).test(s)) {
+
+            const m = ss.match(new RegExp("([a-zA-Z0-9]+) (" + element + ")"));
+            if (m) {
+                buffer1.push(m[1] + " " + m[2]);
+                buffer2.push(m[2]);
+            }
+        }
+    }
+    return [
+        buffer1.join(','),
+        buffer1.join(',')
+    ]
 }

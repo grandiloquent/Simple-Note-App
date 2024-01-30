@@ -27,42 +27,7 @@
 
 <body data-mode="1">
     <div class="wrapper" style="padding: 49px 0 49px 0;">
-        <textarea id="textarea" style="font-size: 14px">void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-
-            x           
-            vec2 center = 0.5 * iResolution.xy;
-            vec2 uv = (fragCoord - center) / iResolution.y * 8.0;
-            vec2 mouse = (iMouse.xy - center) / iResolution.y * 8.0;
-            float unit = 16.0 / iResolution.y;
-            vec3 color = vec3(1.0);
-        
-            // Default before user interaction
-            if (ivec2(iMouse.xy) == ivec2(0)) mouse = vec2(2.0 * cos(iTime), sin(0.5 * iTime)) * 2.0;
-        
-            // Constants: mass (m), springiness (k), resistance/friction (u)
-            float m = 1.0;
-            float k = 100.0;
-            float u = 0.8;
-        
-            // Initial position (x0) and initial velocity (v0)
-            float x0 = 3.0;
-            float v0 = 0.0;
-        
-            // Position vs. time graph
-            float y = springODE(iTime - uv.x, 0.0, x0, v0, m, u, k) - 2.0;
-            float dx = (springODE(iTime - uv.x + 0.001, 0.0, x0, v0, m, u, k) - 2.0 - y) / 0.001;
-            if (uv.x > 0.0 && uv.x < iTime) drawSDF(abs(uv.y - y) / sqrt(1.0 + dx * dx), vec3(1.0, 0.0, 0.0));
-        
-            // Spring and weight
-            float x = springODE(iTime, 0.0, x0, v0, m, u, k) - 2.0;
-            if (uv.y < 8.0 && uv.y > x) drawSDF(udTriangleWave(vec2(uv.y - 4.0, uv.x), 12.0 / (4.0 - x), 0.7), vec3(0.0));
-            drawSDF(sdDisk(uv, vec2(0.0, x), 0.5), vec3(0.0, 0.0, 1.0));
-        
-            // Vignette
-            color *= 1.0 - 2.0 * pow(length(fragCoord / iResolution.xy - 0.5), 4.0);
-        
-            fragColor = vec4(color, 1.0);
-        }</textarea>
+        <textarea id="textarea" style="font-size: 14px"></textarea>
     </div>
     <div class="bar-renderer top" style="top: 0;">
     </div>

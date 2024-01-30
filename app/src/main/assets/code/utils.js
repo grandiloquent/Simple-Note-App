@@ -1022,7 +1022,8 @@ async function functions(textarea) {
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
-    let v = substringAfter(substringBefore(substringAfterLast(s, "\n"), '=').trim(), ' ').match(/[a-zA-Z0-9_]+/)[0];
+    let vm = substringAfter(substringBefore(substringAfterLast(s, "\n"), '=').trim(), ' ').match(/[a-zA-Z0-9_]+/);
+    let v = (vm && vm[0]) || '';
     let ss = getBlockString(textarea);
     let vv = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"))[0];
     const vvv = findArguments(s, ss);
@@ -1222,13 +1223,14 @@ function findArguments(s, ss) {
         start++;
     }
     array = [...new Set(array)];
+    console.log(array);
     const buffer1 = [];
     const buffer2 = [];
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        if (!new RegExp("[a-zA-Z0-9]+ " + element).test(s)) {
+        if (!new RegExp("[a-zA-Z0-9]+ " + element+" ").test(s)) {
 
-            const m = ss.match(new RegExp("([a-zA-Z0-9]+) (" + element + ")"));
+            const m = ss.match(new RegExp("([a-zA-Z0-9]+) (" + element + ") "));
             if (m) {
                 buffer1.push(m[1] + " " + m[2]);
                 buffer2.push(m[2]);
@@ -1237,6 +1239,6 @@ function findArguments(s, ss) {
     }
     return [
         buffer1.join(','),
-        buffer1.join(',')
+        buffer2.join(',')
     ]
 }

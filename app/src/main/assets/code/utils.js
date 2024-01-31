@@ -1012,18 +1012,18 @@ async function functions(textarea) {
         t = 'en'
     }
     let name = "f";
-    // try {
-    //     const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
-    //     if (response.status > 399 || response.status < 200) {
-    //         throw new Error(`${response.status}: ${response.statusText}`)
-    //     }
-    //     const results = await response.json();
-    //     const trans = results.sentences.map(x => x.trans);
-    //     name = camel(trans.join(' '));
+    try {
+        const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
+        if (response.status > 399 || response.status < 200) {
+            throw new Error(`${response.status}: ${response.statusText}`)
+        }
+        const results = await response.json();
+        const trans = results.sentences.map(x => x.trans);
+        name = camel(trans.join(' '));
 
-    // } catch (error) {
-    //     console.log(error);
-    // }
+    } catch (error) {
+        console.log(error);
+    }
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
@@ -1251,7 +1251,7 @@ function findArguments(s, ss) {
     // }
     array = [...s.matchAll(/[a-zA-Z][a-zA-Z0-9.]*/g)].map(x => {
         if (x[0].indexOf('.') !== -1) {
-            return substringBefore(x[0],".");
+            return substringBefore(x[0], ".");
         } else {
             return x[0];
         }
@@ -1264,8 +1264,6 @@ function findArguments(s, ss) {
         if (["vec3", "for", "int", "float"].indexOf(element) !== -1) {
             continue;
         }
-        if(element==='ks')
-        console.log("=----",element,new RegExp("[a-zA-Z0-9]+\\s*[a-zA-Z0-9]+\\s*" + element + "\\s*[=,)](?!=)").test(s))
         if (!new RegExp("[a-zA-Z0-9]+ *[a-zA-Z0-9]+ *" + element + "\\s*[=,)](?!=)").test(s)) {
             const m = ss.match(new RegExp("([a-zA-Z0-9]+)\\s*(" + element + ")\\s*[=,)](?!=)"));
             if (m) {

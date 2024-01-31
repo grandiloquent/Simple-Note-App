@@ -772,18 +772,21 @@ function commentLine(textarea) {
             end++;
         }
         textarea.setRangeText(`/* ${textarea.value.substring(textarea.selectionStart, end)} */`, textarea.selectionStart, end);
-    } else if (line.indexOf("=") !== -1) {
+    }
+    else if (line.indexOf("{") !== -1) {
+
         let end = points[0];
         let count = 0;
         while (end < textarea.value.length) {
             end++;
-            if (textarea.value[end] === '(') {
+            if (textarea.value[end] === '{') {
                 count++;
-            } else if (textarea.value[end] === ')') {
+            } else if (textarea.value[end] === '}') {
                 count--;
-            } else if (count === 0 && textarea.value[end] === ';') {
-                end++;
-                break;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
             }
         }
         let s = textarea.value.substring(points[0], end).trim();
@@ -798,20 +801,18 @@ function commentLine(textarea) {
         }
 
         textarea.setRangeText(s, points[0], end);
-    }
-    else if (line.indexOf("{") !== -1) {
+    } else if (line.indexOf("=") !== -1) {
         let end = points[0];
         let count = 0;
         while (end < textarea.value.length) {
             end++;
-            if (textarea.value[end] === '{') {
+            if (textarea.value[end] === '(') {
                 count++;
-            } else if (textarea.value[end] === '}') {
+            } else if (textarea.value[end] === ')') {
                 count--;
-                if (count === 0) {
-                    end++;
-                    break;
-                }
+            } else if (count === 0 && textarea.value[end] === ';') {
+                end++;
+                break;
             }
         }
         let s = textarea.value.substring(points[0], end).trim();
@@ -897,8 +898,8 @@ function variables(textarea) {
 float ${name} = ${s};
     `;
     while (selectionStart - 1 > -1 && (
-        textarea.value[selectionStart] !== ';'||
-        textarea.value[selectionStart] !== '}'||
+        textarea.value[selectionStart] !== ';' &&
+        textarea.value[selectionStart] !== '}' &&
         textarea.value[selectionStart] !== '{'
     )) {
         selectionStart--;
@@ -953,52 +954,52 @@ function refractorCode(textarea) {
     let p = `<script id="share" type="x-shader/x-fragment">`;
     let index = textarea.value.indexOf(p);
     let s;
-    if (line.indexOf("{") !== -1) {
-        let end = points[0];
-        let count = 0;
-        while (end < textarea.value.length) {
-            end++;
-            if (textarea.value[end] === '{') {
-                count++;
-            } else if (textarea.value[end] === '}') {
-                count--;
-                if (count === 0) {
-                    end++;
-                    break;
-                }
+    //if (line.indexOf("{") !== -1) {
+    let end = points[0];
+    let count = 0;
+    while (end < textarea.value.length) {
+        end++;
+        if (textarea.value[end] === '{') {
+            count++;
+        } else if (textarea.value[end] === '}') {
+            count--;
+            if (count === 0) {
+                end++;
+                break;
             }
         }
-        s = textarea.value.substring(points[0], end);
-        if (index === -1) {
-            index = textarea.value.indexOf("</script>", end);
-            textarea.setRangeText(`
+    }
+    s = textarea.value.substring(points[0], end);
+    if (index === -1) {
+        index = textarea.value.indexOf("</script>", end);
+        textarea.setRangeText(`
     <script id="share" type="x-shader/x-fragment">
     ${s}
     </script>
     `, index + 9, index + 9);
-        } else {
-            index = textarea.value.indexOf("</script>", index + p.length);
-            textarea.setRangeText(`
+    } else {
+        index = textarea.value.indexOf("</script>", index + p.length);
+        textarea.setRangeText(`
     ${s}
     `, index, index);
-        }
-        textarea.setRangeText("", points[0], end);
-    } else {
-        s = line;
-        if (index === -1) {
-            index = textarea.value.indexOf("</script>", end);
-            textarea.setRangeText(`
-    <script id="share" type="x-shader/x-fragment">
-    ${s}
-    </script>
-    `, index + 9, index + 9);
-        } else {
-            textarea.setRangeText(`
-    ${s}
-    `, index + p.length, index + p.length);
-        }
-        textarea.setRangeText("", points[0], points[1]);
     }
+    textarea.setRangeText("", points[0], end);
+    // } else {
+    //     s = line;
+    //     if (index === -1) {
+    //         index = textarea.value.indexOf("</script>", end);
+    //         textarea.setRangeText(`
+    // <script id="share" type="x-shader/x-fragment">
+    // ${s}
+    // </script>
+    // `, index + 9, index + 9);
+    //     } else {
+    //         textarea.setRangeText(`
+    // ${s}
+    // `, index + p.length, index + p.length);
+    //     }
+    //     textarea.setRangeText("", points[0], points[1]);
+    // }
 
 }
 
@@ -1011,24 +1012,26 @@ async function functions(textarea) {
         t = 'en'
     }
     let name = "f";
-    try {
-        const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
-        if (response.status > 399 || response.status < 200) {
-            throw new Error(`${response.status}: ${response.statusText}`)
-        }
-        const results = await response.json();
-        const trans = results.sentences.map(x => x.trans);
-        name = camel(trans.join(' '));
+    // try {
+    //     const response = await fetch(`${baseUri}/trans?to=${t}&q=${encodeURIComponent(s)}`);
+    //     if (response.status > 399 || response.status < 200) {
+    //         throw new Error(`${response.status}: ${response.statusText}`)
+    //     }
+    //     const results = await response.json();
+    //     const trans = results.sentences.map(x => x.trans);
+    //     name = camel(trans.join(' '));
 
-    } catch (error) {
-        console.log(error);
-    }
+    // } catch (error) {
+    //     console.log(error);
+    // }
 
     points = findExtendPosition(textarea);
     s = substringAfter(textarea.value.substring(points[0], points[1]).trim(), "\n");
     let vm = substringAfter(substringBefore(substringAfterLast(s, "\n"), '=').trim(), ' ').match(/[a-zA-Z0-9_]+/);
     let v = (vm && vm[0]) || 'col';
-    let ss = getBlockString(textarea);
+    let ssPoints = getBlockString(textarea);
+    let ss = textarea.value.substring(ssPoints[0], ssPoints[1]);
+
     let vv = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"))[0];
     const vvv = findArguments(s, ss);
     s = `${vv} ${name}(${vvv[0]}){
@@ -1037,10 +1040,10 @@ ${s}
 }
 `
     textarea.setRangeText(`${vv} ${v} =${name}(${vvv[1]});`, points[0], points[1]);
-    let selectionStart = textarea.selectionStart;
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
-        selectionStart--;
-    }
+    let selectionStart = ssPoints[0];
+    // while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
+    //     selectionStart--;
+    // }
     while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
         selectionStart--;
     }
@@ -1150,16 +1153,36 @@ ${s}
     textarea.setRangeText(s, selectionStart, selectionEnd);
 }
 
+function getLineBackforward(textarea, start) {
+    let end = start;
+    while (start - 1 > -1) {
+        if (textarea.value[start] === '\n') break;
+        start--;
+    }
+    return [start, end];
+}
+
 function getBlockString() {
     let selectionStart = textarea.selectionStart;
     let count = 0;
+    // while (selectionStart - 1 > -1) {
+    //     if (textarea.value[selectionStart] === '{') {
+    //         if (count == 0)
+    //             break;
+    //         else count--;
+    //     } else if (textarea.value[selectionStart] === '}') {
+    //         count++;
+    //     }
+    //     selectionStart--;
+    // }
     while (selectionStart - 1 > -1) {
         if (textarea.value[selectionStart] === '{') {
-            if (count == 0)
+            let points = getLineBackforward(textarea, selectionStart);
+            let s = textarea.value.substring(points[0], points[1]);
+            if (/\n\s*[a-zA-Z0-9]+ +[a-zA-Z0-9_]+ *\(/.test(s)) {
+                selectionStart = points[0];
                 break;
-            else count--;
-        } else if (textarea.value[selectionStart] === '}') {
-            count++;
+            }
         }
         selectionStart--;
     }
@@ -1174,7 +1197,7 @@ function getBlockString() {
         }
         selectionEnd++;
     }
-    return textarea.value.substring(selectionStart, selectionEnd);
+    return [selectionStart, selectionEnd];
 
 }
 
@@ -1206,35 +1229,45 @@ async function translate(textarea) {
 function findArguments(s, ss) {
     let start = 0;
     let array = [];
-    while (start < s.length) {
-        if (s[start] === '(') {
-            let j = start;
-            let count = 0;
-            while (j < s.length) {
-                if (s[j] === '(') {
-                    count++;
-                } else if (s[j] === ')') {
-                    count--;
-                    if (count == 0) {
-                        array.push(...[...s.substring(start, j).matchAll(/[a-z][a-zA-Z0-9_]+/g)].map(x => x[0]))
-                        start = j + 1;
-                        break;
-                    }
-                }
-                j++;
-            }
+    // while (start < s.length) {
+    //     if (s[start] === '(') {
+    //         let j = start;
+    //         let count = 0;
+    //         while (j < s.length) {
+    //             if (s[j] === '(') {
+    //                 count++;
+    //             } else if (s[j] === ')') {
+    //                 count--;
+    //                 if (count == 0) {
+    //                     array.push(...[...s.substring(start, j).matchAll(/[a-z][a-zA-Z0-9_]+/g)].map(x => x[0]))
+    //                     start = j + 1;
+    //                     break;
+    //                 }
+    //             }
+    //             j++;
+    //         }
+    //     }
+    //     start++;
+    // }
+    array = [...s.matchAll(/[a-zA-Z][a-zA-Z0-9.]*/g)].map(x => {
+        if (x[0].indexOf('.') !== -1) {
+            return substringBefore(x[0],".");
+        } else {
+            return x[0];
         }
-        start++;
-    }
+    });
     array = [...new Set(array)];
-    console.log(array);
     const buffer1 = [];
     const buffer2 = [];
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        if (!new RegExp("[a-zA-Z0-9]+ " + element+" ").test(s)) {
-
-            const m = ss.match(new RegExp("([a-zA-Z0-9]+) (" + element + ") "));
+        if (["vec3", "for", "int", "float"].indexOf(element) !== -1) {
+            continue;
+        }
+        if(element==='ks')
+        console.log("=----",element,new RegExp("[a-zA-Z0-9]+\\s*[a-zA-Z0-9]+\\s*" + element + "\\s*[=,)](?!=)").test(s))
+        if (!new RegExp("[a-zA-Z0-9]+ *[a-zA-Z0-9]+ *" + element + "\\s*[=,)](?!=)").test(s)) {
+            const m = ss.match(new RegExp("([a-zA-Z0-9]+)\\s*(" + element + ")\\s*[=,)](?!=)"));
             if (m) {
                 buffer1.push(m[1] + " " + m[2]);
                 buffer2.push(m[2]);

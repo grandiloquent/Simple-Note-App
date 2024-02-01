@@ -949,6 +949,43 @@ async function snippet(textarea) {
 }
 
 function refractorCode(textarea) {
+    let p1 = `<script id="share" type="x-shader/x-fragment">`;
+    let p2 = `<script id="fs" type="x-shader/x-fragment">`;
+    let p3 = `</script>`;
+    let p4 = "void main() {"
+
+    let index = textarea.value.indexOf(p1);
+    if (index === -1) {
+        let start = textarea.value.indexOf(p2);
+        start += p2.length;
+        let end = textarea.value.indexOf(p3, start);
+        let s = textarea.value.substring(start, end);
+        let s1 = s.indexOf(p4);
+        if (s1 === -1) return;
+        let s2 = s1;
+        let count = 0;
+        while (s2 < s.length) {
+            if (s[s2] === '{') {
+                count++;
+            } else if (s[s2] === '}') {
+                count--;
+                if (count === 0) {
+                    s2++;
+                    break;
+                }
+            }
+            s2++;
+        }
+        let v1 = s.substring(0, s1) + s.substring(s2).trim();
+        let v2 = s.substring(s1, s2);
+        textarea.setRangeText("\n" + v2 + "\n", start, end);
+        textarea.value += `${p1}${v1}
+        ${p3}`
+    } else {
+
+    }
+
+    /*
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
     let p = `<script id="share" type="x-shader/x-fragment">`;
@@ -1000,7 +1037,7 @@ function refractorCode(textarea) {
     //     }
     //     textarea.setRangeText("", points[0], points[1]);
     // }
-
+*/
 }
 
 async function functions(textarea) {

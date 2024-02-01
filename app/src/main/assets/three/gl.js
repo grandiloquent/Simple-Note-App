@@ -13,20 +13,21 @@ function createFragmentShaderSource(fragmentShaderSource) {
     if (!s) {
         return fragmentShaderSource;
     } else {
-        const index = fragmentShaderSource.lastIndexOf('uniform');
-        if (index === -1) {
-            return s + fragmentShaderSource;
-        } else {
-            let start = index;
-            while (start  < fragmentShaderSource.length) {
-                start++;
-                if (fragmentShaderSource[start] === '\n') {
-                    start++;
-                    break;
-                }
-            }
-            return fragmentShaderSource.substring(0, start) + s + fragmentShaderSource.substring(start);
-        }
+        return s + fragmentShaderSource;
+        // const index = fragmentShaderSource.lastIndexOf('uniform');
+        // if (index === -1) {
+        //     return s + fragmentShaderSource;
+        // } else {
+        //     let start = index;
+        //     while (start  < fragmentShaderSource.length) {
+        //         start++;
+        //         if (fragmentShaderSource[start] === '\n') {
+        //             start++;
+        //             break;
+        //         }
+        //     }
+        //     return fragmentShaderSource.substring(0, start) + s + fragmentShaderSource.substring(start);
+        // }
     }
 }
 window.createProgram = function (gl, vertexShaderSource, fragmentShaderSource) {
@@ -86,6 +87,7 @@ if (dataset && dataset.isdate) {
 canvas.height = canvasHeight;
 canvas.width = canvasWidth_;
 canvas.style.width = '100%';
+// canvas.style.height = canvasHeight+'px';
 if (window.innerWidth > 512) {
     canvas.style.width = '512px';
 }

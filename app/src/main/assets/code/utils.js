@@ -978,9 +978,10 @@ function refractorCode(textarea) {
         }
         let v1 = s.substring(0, s1) + s.substring(s2).trim();
         let v2 = s.substring(s1, s2);
+        textarea.setRangeText(`${p1}${v1}
+        ${p3}`,end+p3.length,end+p3.length);
         textarea.setRangeText("\n" + v2 + "\n", start, end);
-        textarea.value += `${p1}${v1}
-        ${p3}`
+
     } else {
 
     }

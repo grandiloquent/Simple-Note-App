@@ -983,7 +983,27 @@ function refractorCode(textarea) {
         textarea.setRangeText("\n" + v2 + "\n", start, end);
 
     } else {
-
+        let points = getLine(textarea);
+        let end = points[0];
+        let count = 0;
+        while (end < textarea.value.length) {
+            end++;
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        let s = textarea.value.substring(points[0], end);
+        index = textarea.value.indexOf("</script>", index + p1.length);
+        textarea.setRangeText(`
+    ${s}
+    `, index, index);
+    textarea.setRangeText("", points[0], end);
     }
 
     /*
@@ -1082,9 +1102,9 @@ ${s}
     // while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '{') {
     //     selectionStart--;
     // }
-    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
-        selectionStart--;
-    }
+    // while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+    //     selectionStart--;
+    // }
 
     textarea.setRangeText(s, selectionStart, selectionStart);
 }
@@ -1302,8 +1322,8 @@ function findArguments(s, ss) {
         if (["vec3", "for", "int", "float"].indexOf(element) !== -1) {
             continue;
         }
-        if (!new RegExp("[a-zA-Z0-9]+ *[a-zA-Z0-9]+ *" + element + "\\s*[=,)](?!=)").test(s)) {
-            const m = ss.match(new RegExp("([a-zA-Z0-9]+)\\s*(" + element + ")\\s*[=,)](?!=)"));
+        if (!new RegExp("[a-zA-Z0-9]+ +" + element + "\\s*[=,)](?!=)").test(s)) {
+            const m = ss.match(new RegExp("([a-zA-Z0-9]+)\\s+(" + element + ")\\s*[=,)](?!=)"));
             if (m) {
                 buffer1.push(m[1] + " " + m[2]);
                 buffer2.push(m[2]);

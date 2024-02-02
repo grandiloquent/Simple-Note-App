@@ -747,6 +747,7 @@ function commentLine(textarea) {
 
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
+    
     if (textarea.value[textarea.selectionStart] === '\n'
         &&textarea.selectionStart===textarea.selectionEnd) {
         let points = findExtendPosition(textarea);
@@ -782,7 +783,7 @@ function commentLine(textarea) {
         textarea.setRangeText(`/* ${textarea.value.substring(textarea.selectionStart, end)} */`, textarea.selectionStart, end);
     }
     else if (line.indexOf("{") !== -1) {
-
+ 
         let end = points[0];
         let count = 0;
         while (end < textarea.value.length) {
@@ -798,8 +799,10 @@ function commentLine(textarea) {
             }
         }
         let s = textarea.value.substring(points[0], end).trim();
+       
         if (s.startsWith("//")) {
             s = s.split('\n').map(x => {
+                 x=x.trim();
                 if (x.startsWith("//"))
                     return x.substring(2);
                 return x;

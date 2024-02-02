@@ -568,10 +568,17 @@ function deleteBlock(textarea) {
     // let s = textarea.value.substring(points[0], points[1]).trim();
     // writeText(s);
     // textarea.setRangeText("", points[0], points[1]);
+    if (textarea.value[textarea.selectionStart] === '\n'
+        || textarea.selectionStart === textarea.selectionEnd) {
+        let points = findExtendPosition(textarea);
+        let s = textarea.value.substring(points[0], points[1]).trim();
+        writeText(s);
+        textarea.setRangeText(``, points[0], points[1]);
+        return;
+    }
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
-    //       //===
-    console.log("-----" + line + "---");
+
     if (line.startsWith("//===")) {
         let end = textarea.value.indexOf("//===", points[1]);
         if (end !== -1) {
@@ -2175,8 +2182,8 @@ function formatExpressionLine(textarea, fn) {
             if (textarea.value[selectionEnd] === ';'
                 || textarea.value[selectionEnd] === '{'
                 || textarea.value[selectionEnd] === '}'
-                
-                ) {
+
+            ) {
 
                 break;
             }

@@ -747,7 +747,15 @@ function commentLine(textarea) {
 
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
-    if (textarea.value[textarea.selectionStart] === '/'
+    if (textarea.value[textarea.selectionStart] === '\n'
+        ||textarea.selectionStart===textarea.selectionEnd) {
+        let points = findExtendPosition(textarea);
+        let s=textarea.value.substring(points[0], points[1]).trim();
+        if(s.startsWith("/*"))
+        textarea.setRangeText(`${s.substring(2,s.length-2)}`, points[0], points[1]);
+        else
+        textarea.setRangeText(`/*${s}*/`, points[0],points[1]);
+    } else if (textarea.value[textarea.selectionStart] === '/'
         || textarea.value[textarea.selectionStart + 1] === '*'
     ) {
         let end = textarea.selectionStart + 2;
@@ -979,7 +987,7 @@ function refractorCode(textarea) {
         let v1 = s.substring(0, s1) + s.substring(s2).trim();
         let v2 = s.substring(s1, s2);
         textarea.setRangeText(`${p1}${v1}
-        ${p3}`,end+p3.length,end+p3.length);
+        ${p3}`, end + p3.length, end + p3.length);
         textarea.setRangeText("\n" + v2 + "\n", start, end);
 
     } else {
@@ -1003,7 +1011,7 @@ function refractorCode(textarea) {
         textarea.setRangeText(`
     ${s}
     `, index, index);
-    textarea.setRangeText("", points[0], end);
+        textarea.setRangeText("", points[0], end);
     }
 
     /*

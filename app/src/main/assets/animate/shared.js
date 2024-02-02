@@ -569,7 +569,7 @@ function deleteBlock(textarea) {
     // writeText(s);
     // textarea.setRangeText("", points[0], points[1]);
     if (textarea.value[textarea.selectionStart] === '\n'
-        || textarea.selectionStart === textarea.selectionEnd) {
+        && textarea.selectionStart === textarea.selectionEnd) {
         let points = findExtendPosition(textarea);
         let s = textarea.value.substring(points[0], points[1]).trim();
         writeText(s);

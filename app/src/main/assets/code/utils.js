@@ -748,7 +748,7 @@ function commentLine(textarea) {
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
     if (textarea.value[textarea.selectionStart] === '\n'
-        ||textarea.selectionStart===textarea.selectionEnd) {
+        &&textarea.selectionStart===textarea.selectionEnd) {
         let points = findExtendPosition(textarea);
         let s=textarea.value.substring(points[0], points[1]).trim();
         if(s.startsWith("/*"))

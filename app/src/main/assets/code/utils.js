@@ -1011,7 +1011,7 @@ function refractorCode(textarea) {
 
     } else {
         index = textarea.value.lastIndexOf(p1, textarea.selectionStart);
-        if (index !== -1) {
+        if (index === -1) {
             let points = getLine(textarea);
             let end = points[0];
             let count = 0;

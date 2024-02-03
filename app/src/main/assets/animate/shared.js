@@ -1309,7 +1309,7 @@ function copyLine(textarea) {
     let s = textarea.value.substring(points[0], points[1]).trim();
     if (/\bif\s*\([^\)]+\)\s*{/.test(s)) {
         let count = 0;
-        let end=points[1]
+        let end=textarea.selectionStart;
         while (end < textarea.value.length) {
             if (textarea.value[end] === '{') {
                 count++;

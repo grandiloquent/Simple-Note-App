@@ -1010,27 +1010,55 @@ function refractorCode(textarea) {
         textarea.setRangeText("\n" + v2 + "\n", start, end);
 
     } else {
-        let points = getLine(textarea);
-        let end = points[0];
-        let count = 0;
-        while (end < textarea.value.length) {
-            end++;
-            if (textarea.value[end] === '{') {
-                count++;
-            } else if (textarea.value[end] === '}') {
-                count--;
-                if (count === 0) {
-                    end++;
-                    break;
+        index = textarea.value.lastIndexOf(p1, textarea.selectionStart);
+        if (index !== -1) {
+            let points = getLine(textarea);
+            let end = points[0];
+            let count = 0;
+            while (end < textarea.value.length) {
+                end++;
+                if (textarea.value[end] === '{') {
+                    count++;
+                } else if (textarea.value[end] === '}') {
+                    count--;
+                    if (count === 0) {
+                        end++;
+                        break;
+                    }
                 }
             }
-        }
-        let s = textarea.value.substring(points[0], end);
-        index = textarea.value.indexOf("</script>", index + p1.length);
-        textarea.setRangeText(`
+            let s = textarea.value.substring(points[0], end);
+            index = textarea.value.indexOf("</script>", index + p1.length);
+            textarea.setRangeText(`
+        ${s}
+        `, index, index);
+            textarea.setRangeText("", points[0], end);
+        } else {
+            let points = getLine(textarea);
+            let end = points[0];
+            let count = 0;
+            while (end < textarea.value.length) {
+                end++;
+                if (textarea.value[end] === '{') {
+                    count++;
+                } else if (textarea.value[end] === '}') {
+                    count--;
+                    if (count === 0) {
+                        end++;
+                        break;
+                    }
+                }
+            }
+            let s = textarea.value.substring(points[0], end);
+            textarea.setRangeText(substringBefore(s, "{").trim() + ";", points[0], end);
+
+
+            index = textarea.value.indexOf(p2);
+            textarea.setRangeText(`
     ${s}
-    `, index, index);
-        textarea.setRangeText("", points[0], end);
+    `, index+p2.length, index+p2.length);
+        }
+
     }
 
     /*

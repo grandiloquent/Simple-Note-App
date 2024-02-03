@@ -564,20 +564,21 @@ async function translate(baseUri, textarea) {
     }
 }
 function deleteBlock(textarea) {
+    let points = getLine(textarea);
+    let line = textarea.value.substring(points[0], points[1]).trim();
     // const points = findExtendPosition(textarea);
     // let s = textarea.value.substring(points[0], points[1]).trim();
     // writeText(s);
     // textarea.setRangeText("", points[0], points[1]);
     if (textarea.value[textarea.selectionStart] === '\n'
         && textarea.selectionStart === textarea.selectionEnd) {
-        let points = findExtendPosition(textarea);
-        let s = textarea.value.substring(points[0], points[1]).trim();
+        let linePoints = points;
+        points = findExtendPosition(textarea);
+        let s = textarea.value.substring(linePoints[0], points[1]).trim();
         writeText(s);
-        textarea.setRangeText(``, points[0], points[1]);
+        textarea.setRangeText(``, linePoints[0], points[1]);
         return;
     }
-    let points = getLine(textarea);
-    let line = textarea.value.substring(points[0], points[1]).trim();
 
     if (line.startsWith("//===")) {
         let end = textarea.value.indexOf("//===", points[1]);
@@ -616,6 +617,13 @@ function deleteBlock(textarea) {
         textarea.setRangeText("", points[0], end + 9);
     }
     else if (line.indexOf("{") !== -1) {
+        if (/\bif\s*\([^\)]+\)\s*{/.test(line)) {
+            let points = getIfBlock(textarea);
+            let s = textarea.value.substring(points[0], points[1]);
+            writeText(s);
+            textarea.setRangeText("", points[0], points[1]);
+            return;
+        }
         let end = points[0];
         let count = 0;
         while (end < textarea.value.length) {
@@ -1297,8 +1305,39 @@ function variablesUnique(textarea) {
 }
 
 function copyLine(textarea) {
-    const points = getLine(textarea);
+    let points = getLine(textarea);
     let s = textarea.value.substring(points[0], points[1]).trim();
+    if (/\bif\s*\([^\)]+\)\s*{/.test(s)) {
+        let count = 0;
+        let end=points[1]
+        while (end < textarea.value.length) {
+            if (textarea.value[end] === '{') {
+                count++;
+            } else if (textarea.value[end] === '}') {
+                count--;
+                if (count === 0) {
+                    end++;
+                    break;
+                }
+            }
+            end++;
+        }
+        while (points[0] <end) {
+            if (textarea.value[points[0]] == 'i') {
+                break;
+            }
+            points[0]++;
+        }
+        points[1] = end;
+        console.log(points[0],points[1])
+        textarea.setRangeText(`else ${textarea.value.substring(
+            points[0], points[1]
+        ).replace(/[\d.]+/, m => {
+            let v = (parseFloat(m) + 1) + '';
+            return v.length === 1 ? v + ".0" : v;
+        })}`, end, end);
+        return;
+    }
     let name = /[a-zA-Z0-9_]+(?= =)/.exec(s);
 
 

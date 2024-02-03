@@ -747,15 +747,16 @@ function commentLine(textarea) {
 
     let points = getLine(textarea);
     let line = textarea.value.substring(points[0], points[1]).trim();
-    
+
     if (textarea.value[textarea.selectionStart] === '\n'
-        &&textarea.selectionStart===textarea.selectionEnd) {
-        let points = findExtendPosition(textarea);
-        let s=textarea.value.substring(points[0], points[1]).trim();
-        if(s.startsWith("/*"))
-        textarea.setRangeText(`${s.substring(2,s.length-2)}`, points[0], points[1]);
+        && textarea.selectionStart === textarea.selectionEnd) {
+        let linePoints = points;
+        points = findExtendPosition(textarea);
+        let s = textarea.value.substring(linePoints[0], points[1]).trim();
+        if (s.startsWith("/*"))
+            textarea.setRangeText(`${s.substring(2, s.length - 2)}`, linePoints[0], points[1]);
         else
-        textarea.setRangeText(`/*${s}*/`, points[0],points[1]);
+            textarea.setRangeText(`/*${s}*/`, linePoints[0], points[1]);
     } else if (textarea.value[textarea.selectionStart] === '/'
         || textarea.value[textarea.selectionStart + 1] === '*'
     ) {
@@ -783,7 +784,22 @@ function commentLine(textarea) {
         textarea.setRangeText(`/* ${textarea.value.substring(textarea.selectionStart, end)} */`, textarea.selectionStart, end);
     }
     else if (line.indexOf("{") !== -1) {
- 
+        if (/\bif\s*\([^\)]+\)\s*{/.test(line)) {
+            let points = getIfBlock(textarea);
+            let s = textarea.value.substring(points[0], points[1]);
+            if (s.startsWith("//")) {
+                s = s.split('\n').map(x => {
+                    x = x.trim();
+                    if (x.startsWith("//"))
+                        return x.substring(2);
+                    return x;
+                }).join('\n');
+            } else {
+                s = s.split('\n').map(x => "// " + x).join('\n');
+            }
+            textarea.setRangeText(s, points[0], points[1]);
+            return;
+        }
         let end = points[0];
         let count = 0;
         while (end < textarea.value.length) {
@@ -799,10 +815,10 @@ function commentLine(textarea) {
             }
         }
         let s = textarea.value.substring(points[0], end).trim();
-       
+
         if (s.startsWith("//")) {
             s = s.split('\n').map(x => {
-                 x=x.trim();
+                x = x.trim();
                 if (x.startsWith("//"))
                     return x.substring(2);
                 return x;
@@ -1345,4 +1361,32 @@ function findArguments(s, ss) {
         buffer1.join(','),
         buffer2.join(',')
     ]
+}
+function getIfBlock(textarea) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1) {
+        if (textarea.value[start - 1] === '\n')
+            break;
+        start--;
+    }
+    let count = 0;
+    while (end < textarea.value.length) {
+        if (textarea.value[end] === '{') {
+            count++;
+        } else if (textarea.value[end] === '}') {
+            count--;
+            if (count === 0) {
+                let points = getLineAt(textarea, end);
+                let line = textarea.value.substring(points[0], points[1]);
+                if (!/\bif\s*\([^\)]+\)\s*{/.test(line)) {
+                    end++;
+                    break;
+                }
+            }
+        }
+        end++;
+    }
+
+    return [start, end];
 }

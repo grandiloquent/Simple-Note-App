@@ -1029,7 +1029,7 @@ function refractorCode(textarea) {
                 }
             }
             let s = textarea.value.substring(points[0], end);
-            index = textarea.value.indexOf("</script>", index + p1.length);
+            index = textarea.value.indexOf("</script>",textarea.value.length- index);
             textarea.setRangeText(`
         ${s}
         `, index, index);

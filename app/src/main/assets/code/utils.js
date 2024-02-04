@@ -980,6 +980,7 @@ function refractorCode(textarea) {
     let p2 = `<script id="fs" type="x-shader/x-fragment">`;
     let p3 = `</script>`;
     let p4 = "void main() {"
+    let p5 = `<script id="fs" `;
 
     let index = textarea.value.indexOf(p1);
     if (index === -1) {
@@ -1053,10 +1054,12 @@ function refractorCode(textarea) {
             textarea.setRangeText(substringBefore(s, "{").trim() + ";", points[0], end);
 
 
-            index = textarea.value.indexOf(p2);
+            index = textarea.value.indexOf(p5);
+            index = textarea.value.indexOf(">", index + p5.length);
+
             textarea.setRangeText(`
     ${s}
-    `, index+p2.length, index+p2.length);
+    `, index + 1, index + 1);
         }
 
     }

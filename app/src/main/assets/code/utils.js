@@ -1011,8 +1011,8 @@ function refractorCode(textarea) {
         textarea.setRangeText("\n" + v2 + "\n", start, end);
 
     } else {
-        index = textarea.value.lastIndexOf(p1, textarea.selectionStart);
-        if (index === -1) {
+        index = textarea.value.indexOf(p1, textarea.selectionStart);
+        if (index !== -1) {
             let points = getLine(textarea);
             let end = points[0];
             let count = 0;
@@ -1029,7 +1029,7 @@ function refractorCode(textarea) {
                 }
             }
             let s = textarea.value.substring(points[0], end);
-            index = textarea.value.indexOf("</script>",textarea.value.length- index);
+            index = textarea.value.indexOf("</script>", index + p1.length);
             textarea.setRangeText(`
         ${s}
         `, index, index);

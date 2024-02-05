@@ -1148,7 +1148,8 @@ async function functions(textarea) {
     let ssPoints = getBlockString(textarea);
     let ss = textarea.value.substring(ssPoints[0], ssPoints[1]);
 
-    let vv = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"))[0];
+    let vvm = ss.match(new RegExp("[a-zA-Z0-9_]+\\s*(?=" + v + ")"));
+    let vv = (vvm && vvm[0]) || 'vec3';
     const vvv = findArguments(s, ss);
     s = `${vv} ${name}(${vvv[0]}){
 ${s}

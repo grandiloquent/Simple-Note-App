@@ -3,6 +3,7 @@ package psycho.euphoria.app;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ClipboardManager.OnPrimaryClipChangedListener;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -162,42 +163,6 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
         return stringBuilder.toString();
     }
 
-    public static String translateWord(String q, Database database) throws Exception {
-        String result = database.query(q);
-        if (result != null) {
-            return result;
-        }
-        String catchData = "https://dictionaryapi.com/api/v3/references/learners/json/" +
-                Uri.encode(q) + "?key=cfb57e42-44bb-449d-aa59-1a61d2ca31f0";
-        URL url = new URL(catchData);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        InputStream is = connection.getInputStream();
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
-        String line = in.readLine();
-        StringBuffer json = new StringBuffer();
-        while (line != null) {
-            json.append(line);
-            line = in.readLine();
-        }
-        if (json.indexOf("\"shortdef\"") == -1) {
-            return null;
-        }
-        JSONArray jsonArray = new JSONArray(String.valueOf(json));
-        JSONObject jsonObject = jsonArray.getJSONObject(0);
-        if (jsonObject == null) {
-            return null;
-        }
-        JSONArray shortdefarray = jsonObject.getJSONArray("shortdef");
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < shortdefarray.length(); i++) {
-            stringBuilder.append(shortdefarray.getString(i)).append('\n');
-        }
-        if (stringBuilder.toString().length() > 0) {
-            database.insert(q, stringBuilder.toString());
-        }
-        return stringBuilder.toString();
-    }
-
     public static String translateChineseWord(String q, Database database) throws Exception {
         String result = database.query(q);
         if (result != null) {
@@ -240,11 +205,50 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
         return stringBuilder.toString();
     }
 
+    public static String translateWord(String q, Database database) throws Exception {
+        String result = database.query(q);
+        if (result != null) {
+            return result;
+        }
+        String catchData = "https://dictionaryapi.com/api/v3/references/learners/json/" +
+                Uri.encode(q) + "?key=cfb57e42-44bb-449d-aa59-1a61d2ca31f0";
+        URL url = new URL(catchData);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        InputStream is = connection.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        String line = in.readLine();
+        StringBuffer json = new StringBuffer();
+        while (line != null) {
+            json.append(line);
+            line = in.readLine();
+        }
+        if (json.indexOf("\"shortdef\"") == -1) {
+            return null;
+        }
+        JSONArray jsonArray = new JSONArray(String.valueOf(json));
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+        if (jsonObject == null) {
+            return null;
+        }
+        JSONArray shortdefarray = jsonObject.getJSONArray("shortdef");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < shortdefarray.length(); i++) {
+            stringBuilder.append(shortdefarray.getString(i)).append('\n');
+        }
+        if (stringBuilder.toString().length() > 0) {
+            database.insert(q, stringBuilder.toString());
+        }
+        return stringBuilder.toString();
+    }
+
+    OnPrimaryClipChangedListener mOnPrimaryClipChangedListener;
+    ClipboardManager clipboardManager ;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        clipboardManager.addPrimaryClipChangedListener(() -> {
+        clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        mOnPrimaryClipChangedListener = () -> {
             ClipData clipData = clipboardManager.getPrimaryClip();
             if (clipData == null) return;
             if (clipData.getItemCount() > 0) {
@@ -289,7 +293,8 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                     }).start();
                 }
             }
-        });
+        };
+        clipboardManager.addPrimaryClipChangedListener(mOnPrimaryClipChangedListener);
         mDatabase = new Database(this,
                 new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "p.db").getAbsolutePath());
 
@@ -347,6 +352,12 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
 
     @Override
     public void onRelease(int primaryCode) {
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        clipboardManager.removePrimaryClipChangedListener(mOnPrimaryClipChangedListener);
     }
 
     @Override

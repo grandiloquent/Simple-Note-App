@@ -135,7 +135,6 @@ std::string Hy(const std::string &q) {
 
 
     auto host = Substring(q, "://", "/");
-    LOGE("%s\n%s", q.c_str(), host.c_str());
     auto query = SubstringAfterLast(q, host);
     httplib::SSLClient cli(SubstringBeforeLast(host, ":"),
                            std::atoi(SubstringAfterLast(host, ":").c_str()));
@@ -150,3 +149,26 @@ std::string Hy(const std::string &q) {
         return {};
     }
 }
+
+
+std::string Weather(const std::string &province, const std::string &city) {
+    httplib::SSLClient  cli("wis.qq.com", 443);
+    cli.enable_server_certificate_verification(false);
+
+    std::stringstream ss;
+    ss << "/weather/common?source=pc&weather_type=observe%7Cforecast_1h%7Cforecast_24h%7Calarm&province=";
+    ss << EncodeUrl(province);
+    ss << "&city=";
+    ss <<EncodeUrl( city);
+    if (auto res = cli.Get(
+            ss.str(),
+            {{"User-Agent",
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}})) {
+
+        return res->body;
+    } else {
+        return {};
+    }
+}
+

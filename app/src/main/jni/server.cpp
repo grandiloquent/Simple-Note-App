@@ -1694,6 +1694,17 @@ in vec4 a_position;
                 )
             fs::create_directory(path);
     });
+    server.Get("/weather", [](
+            const httplib::Request &req, httplib::Response
+    &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto province = req.get_param_value("province");
+        auto city = req.get_param_value("city");
+
+        res.set_content(Weather(province,city),"application/json");
+
+    });
+
     server.Post("/upload", [&](
             const auto &req,
             auto &res
@@ -1789,6 +1800,90 @@ in vec4 a_position;
 
                            ));
                });
+    server.Get("/recycle",
+               [](
+                       const httplib::Request &req, httplib::Response
+               &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto path = req.get_param_value("path");
+                   std::filesystem::path p(httplib::detail::decode_url(path, true));
+                   auto parent = p.parent_path();
+                   for (
+                       const fs::directory_entry &dir_entry
+                           :
+                           fs::recursive_directory_iterator(parent)
+                           ) {
+                       if (dir_entry.
+
+                               is_regular_file() &&
+
+                           (dir_entry.
+
+                                           path()
+
+                                    .
+
+                                            extension()
+
+                            == ".mp4" ||
+                            dir_entry.
+
+                                            path()
+
+                                    .
+
+                                            extension()
+
+                            == ".mov" ||
+                            dir_entry.
+
+                                            path()
+
+                                    .
+
+                                            extension()
+
+                            == ".MOV" ||
+                            dir_entry.
+
+                                            path()
+
+                                    .
+
+                                            extension()
+
+                            ==
+                            ".MP4")) {
+                           std::filesystem::path s = dir_entry.path();
+                           fs::rename(dir_entry
+                                              .
+
+                                                      path(), s
+
+                                              .replace_extension("v"));
+                       }
+
+                   }
+                   parent = parent.append("recycle");
+                   if (!
+                           fs::exists(parent)
+                           ) {
+                       fs::create_directory(parent);
+                   }
+                   fs::rename(p, parent
+                           .
+                                   append(p
+                                                  .
+
+                                                          filename()
+
+                                                  .
+
+                                                          string()
+
+                           ));
+               });
+
     server.
             listen(host, port
     );

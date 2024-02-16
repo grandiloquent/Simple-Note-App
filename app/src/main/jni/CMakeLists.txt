@@ -29,8 +29,8 @@ target_link_libraries(httplib
 
 add_library(sqlite3 SHARED sqlite3.c)
 add_subdirectory(nlohmann_json)
-add_subdirectory(mbedtls)
-target_include_directories(nativelib PRIVATE mbedtls/include)
+#add_subdirectory(mbedtls)
+#target_include_directories(nativelib PRIVATE mbedtls/include)
 add_library(shared SHARED shared.cpp)
 target_link_libraries(shared android log)
 add_library(extractor SHARED extractor.cpp)
@@ -44,7 +44,7 @@ target_include_directories(server PRIVATE zipper/zipper)
 
 target_link_libraries(nativelib
         android
-        mbedtls
+#        mbedtls
         server
         camera2ndk
         mediandk)

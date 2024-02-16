@@ -5,8 +5,8 @@
 #include <android/asset_manager_jni.h>
 
 #include <nlohmann/json.hpp>
-#include <mbedtls/ssl.h>
-#include <mbedtls/ctr_drbg.h>
+//#include <mbedtls/ssl.h>
+//#include <mbedtls/ctr_drbg.h>
 #include "server.h"
 #include <thread>
 #include "cameraEngine.h"
@@ -42,13 +42,13 @@ JNIEXPORT jboolean
 JNICALL
 Java_psycho_euphoria_app_MainActivity_request(JNIEnv *env, jclass obj) {
 
-    mbedtls_ssl_context ssl;
-    mbedtls_ssl_config conf;
-    mbedtls_ctr_drbg_context ctx;
-
-    mbedtls_ssl_init(&ssl);
-    mbedtls_ssl_config_init(&conf);
-    mbedtls_ctr_drbg_init(&ctx);
+//    mbedtls_ssl_context ssl;
+//    mbedtls_ssl_config conf;
+//    mbedtls_ctr_drbg_context ctx;
+//
+//    mbedtls_ssl_init(&ssl);
+//    mbedtls_ssl_config_init(&conf);
+//    mbedtls_ctr_drbg_init(&ctx);
     return true;
 }
 

@@ -494,7 +494,41 @@ async function initializeToolbars() {
 initializeToolbars()
 
 
+function getExpressionLine(textarea) {
+    let selectionStart = textarea.selectionStart;
+    while (selectionStart - 1 > -1 && textarea.value[selectionStart - 1] !== '\n') {
+        selectionStart--;
+    }
+    let selectionEnd = textarea.selectionEnd;
+    while (selectionEnd < textarea.value.length) {
+        selectionEnd++;
+        if (textarea.value[selectionEnd] === '\n') {
+            break;
+        }
+    }
+    if (textarea.value.substring(selectionStart, selectionEnd).indexOf("=") !== -1) {
+        selectionEnd = textarea.selectionEnd;
+        while (selectionEnd < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === ';'
+                || textarea.value[selectionEnd] === '{'
+                || textarea.value[selectionEnd] === '}'
 
+            ) {
+
+                break;
+            }
+        }
+        while (selectionEnd < textarea.value.length) {
+            selectionEnd++;
+            if (textarea.value[selectionEnd] === '\n') {
+                break;
+            }
+        }
+    }
+
+    return [selectionStart, selectionEnd];
+}
 function duplicateLine(textarea) {
     //     if (textarea.selectionStart !== textarea.selectionEnd) {
     //         let start = textarea.selectionStart;
@@ -659,27 +693,18 @@ function duplicateLine(textarea) {
     //         textarea.setRangeText("// ", points[0], points[0]);
     //     }
 
+    let [expressionStart, expressionEnd] = getExpressionLine(textarea);
+    let str = textarea.value.substring(expressionStart, expressionEnd).trim();
+    if (str.startsWith("//")) {
+        let endvv = expressionEnd;
+        let p = getLineAt(textarea, endvv);
+        endvv = p[1];
+        str = str.split('\n').map(x => substringAfter(x, "//")).join('\n');
+        textarea.setRangeText(`${str}`, expressionStart, endvv);
+        return;
+    }
     formatExpressionLine(textarea, (s, start, end) => {
 
-        if (s.trim().startsWith("//")) {
-            // textarea.selectionStart = end + 1;
-            // let p = getLine(textarea);
-            // textarea.setRangeText("", p[0], p[1] + 1);
-            // return substringAfter(s, "//");
-
-            let endvv = end;
-
-
-            let p = getLineAt(textarea, endvv);
-            endvv = p[1];
-
-
-            s = s.split('\n').map(x => substringAfter(x, "//")).join('\n');
-
-            // textarea.setRangeText("", start, endvv);
-            textarea.setRangeText(`${s}`, start, endvv);
-            return s + "\n";
-        }
         if (textarea.value[textarea.selectionStart] === '='
             || textarea.value[textarea.selectionStart - 1] === '=') {
 

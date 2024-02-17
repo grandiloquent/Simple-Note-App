@@ -19,7 +19,20 @@
             return res.json();
         }
         async function render() {
-            const data = await load("湖南省","长沙市");
+            const data = await load("湖南省", "长沙市");
+
+            const forecast_1h = document.createElement("div");
+            forecast_1h.style = "display:grid;grid-template-columns: 1fr 1fr 1fr;";
+
+            Object.keys(data.data.forecast_1h).forEach(v => {
+                const x = data.data.forecast_1h[v];
+                forecast_1h.insertAdjacentHTML("beforeend", `
+                <div>${formatUpateTime(x.update_time)}</div>
+                <div>${x.weather_short}</div>
+                <div>${x.degree}</div>
+                `);
+            })
+            document.body.appendChild(forecast_1h);
 
             const forecast_24h = document.createElement("div");
             forecast_24h.style = "display:grid;grid-template-columns: 1fr 1fr 1fr;";
@@ -30,12 +43,9 @@
                 <div>${formatTime(x.time)}</div>
                 <div>${x.day_weather_short}</div>
                 <div>${x.min_degree}/${x.max_degree}</div>
-               
-                
                 `);
             })
             document.body.appendChild(forecast_24h);
-            console.log(data);
         }
         function formatTime(time) {
             const match = /([0-9]{4})-([0-9]{2})-([0-9]{2})/.exec(time);
@@ -60,6 +70,9 @@
             await render();
         }
 
+        function formatUpateTime(update_time) {
+            return update_time.substring(8, 10);
+        }
         initialize();
     </script>
 </body>

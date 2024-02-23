@@ -230,7 +230,13 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                            return;
                        }
                    }
-
+                   if (p.ends_with(".html")) {
+                       auto file = FindFile(req);
+                       res.status = 302;
+                       res.set_header("location",
+                                      SubstringBeforeLast(req.path,"/")+ "/file?path=" + EncodeUrl(file.string()));
+                       return;
+                   }
                    auto str = std::string{}; //m[p];
 
                    if (str.empty()) {
@@ -1701,7 +1707,7 @@ in vec4 a_position;
         auto province = req.get_param_value("province");
         auto city = req.get_param_value("city");
 
-        res.set_content(Weather(province,city),"application/json");
+        res.set_content(Weather(province, city), "application/json");
 
     });
 

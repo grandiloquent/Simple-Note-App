@@ -11,6 +11,7 @@ std::filesystem::path FindFile(const httplib::Request &req) {
         auto referer = req.get_header_value("Referer");
         std::filesystem::path d(
                 SubstringAfterLast(httplib::detail::decode_url(referer, true), "="));
+
         auto p = d.parent_path();
         p = p.append(req.path.substr(1));
         if (exists(p)) {

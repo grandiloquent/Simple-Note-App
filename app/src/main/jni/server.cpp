@@ -230,13 +230,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                            return;
                        }
                    }
-                   if (p.ends_with(".html")) {
-                       auto file = FindFile(req);
-                       res.status = 302;
-                       res.set_header("location",
-                                      SubstringBeforeLast(req.path,"/")+ "/file?path=" + EncodeUrl(file.string()));
-                       return;
-                   }
+
                    auto str = std::string{}; //m[p];
 
                    if (str.empty()) {
@@ -256,6 +250,14 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                                       &data, &len);
                        str = std::string(reinterpret_cast<const char *>(data), len);
                        //m[p] = str;
+                   }
+                   if (str.length() == 0 && p.ends_with(".html")) {
+                       auto file = FindFile(req);
+                       res.status = 302;
+                       res.set_header("location",
+                                      SubstringBeforeLast(req.path, "/") + "/file?path=" +
+                                      EncodeUrl(file.string()));
+                       return;
                    }
                    auto content_type = httplib::detail::find_content_type(p, t);
                    res.set_content(str, content_type);

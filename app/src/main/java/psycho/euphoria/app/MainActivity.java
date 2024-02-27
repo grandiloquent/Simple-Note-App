@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import psycho.euphoria.app.CustomWebChromeClient;
 import psycho.euphoria.app.CustomWebViewClient;
 import psycho.euphoria.app.ServerService;
@@ -150,7 +152,6 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.CAMERA);
         }
-
         if (permissions.size() > 0) {
             requestPermissions(permissions.toArray(new String[0]), 0);
         }
@@ -230,13 +231,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
-
 //        Intent intent=new Intent(this,ImageViewerActivity.class);
 //        intent.setData(Uri.fromFile(
 //                new File("/storage/emulated/0/Pictures/WeiXin").listFiles()[0]
 //        ));
 //        startActivity(intent);
-
     }
 
     @Override
@@ -297,7 +296,6 @@ public class MainActivity extends Activity {
                 break;
             case 5:
                 triggerScan();
-
                 break;
             case 6:
                 mWebView.loadUrl(mUrl);
@@ -313,10 +311,10 @@ public class MainActivity extends Activity {
             case 7:
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).
                         setPrimaryClip(ClipData.newPlainText(null, mWebView.getUrl()));
-
                 break;
             case 10:
-                Utils.launchInputMethodPicker(this);
+                //Utils.launchInputMethodPicker(this);
+                FetchNodes();
                 break;
             case 13:
                 Utils.killProcesses(mUrl);
@@ -324,5 +322,21 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void FetchNodes() {
+        new Thread(() -> {
+            try {
+                HttpsURLConnection u = (HttpsURLConnection) new URL("https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md").openConnection();
+                String contents = Shared.readString(u);
+                Shared.setText(this, contents);
+                Shared.runOnUiThread(() -> {
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                });
+            } catch (Exception error) {
+                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        }).start();
     }
 }

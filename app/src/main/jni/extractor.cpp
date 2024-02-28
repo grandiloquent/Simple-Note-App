@@ -106,7 +106,7 @@ static std::string buildPayload(const std::string &s, int salt) {
     return ss.str();
 }
 
-std::string Dic(const std::string &q) {
+std::string Dic(bool isChinese,const std::string &q) {
     auto s = httplib::detail::encode_url(q);
     int salt = time(NULL);
     auto payload = buildPayload(s, salt);
@@ -116,7 +116,7 @@ std::string Dic(const std::string &q) {
     std::stringstream ss;
 
     ss << "/api?q=" << s << "&salt=" << salt << "&sign=" << sign
-       << "&from=EN&appKey=4da34b556074bc9f&to=zh-CHS";
+       << "&appKey=4da34b556074bc9f"<<(isChinese?"&from=zh-CHS&to=zh-CHS":"&from=EN&to=zh-CHS");
 
     LOGE("%s", ss.str().c_str());
     if (auto res = cli.Get(

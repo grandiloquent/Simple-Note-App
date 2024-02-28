@@ -54,9 +54,9 @@ Java_psycho_euphoria_app_MainActivity_request(JNIEnv *env, jclass obj) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jstring q) {
+Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz,jboolean isChinese, jstring q) {
     const std::string w = jsonparse::jni::Convert<std::string>::from(env, q);
-    auto str = Dic(w);
+    auto str = Dic(isChinese,w);
     nlohmann::json js = nlohmann::json::parse(str);
     if (js.contains("errorCode") && js["errorCode"] == "0") {
         if (js.contains("basic")) {

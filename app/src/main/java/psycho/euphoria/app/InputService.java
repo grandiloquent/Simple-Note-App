@@ -163,12 +163,12 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
         return stringBuilder.toString();
     }
 
-    public static String translateChineseWord(String q, Database database) throws Exception {
+    public static String translateChineseWord(boolean isChinese, String q, Database database) throws Exception {
         String result = database.query(q);
         if (result != null) {
             return result;
         }
-        result = ServerService.dic(q);
+        result = ServerService.dic(isChinese, q);
         if (result != null && result.length() > 0) {
             database.insert(q, result);
         }
@@ -242,7 +242,7 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
     }
 
     OnPrimaryClipChangedListener mOnPrimaryClipChangedListener;
-    ClipboardManager clipboardManager ;
+    ClipboardManager clipboardManager;
 
     @Override
     public void onCreate() {
@@ -259,39 +259,39 @@ public class InputService extends InputMethodService implements KeyboardView.OnK
                 mCurrentString = charSequence.toString();
                 if (mCurrentString.startsWith("http://") || mCurrentString.startsWith("https://"))
                     return;
-                if (!mChinese.matcher(charSequence.toString()).find()) {
-                    new Thread(() -> {
-                        String response = "";
-                        try {
-                            response = mChinese.matcher(mCurrentString).find() ? translate("zh", mCurrentString) : translateChineseWord(mCurrentString, mDatabase);
-                            if (response == null) {
-                                response = translateWord(mCurrentString, mDatabase);
-                            }
-                            if (response == null) {
-                                response = translateCollegiate(mCurrentString, mDatabase);
-                            }
+//                if (!mChinese.matcher(charSequence.toString()).find()) {
+                new Thread(() -> {
+                    String response = "";
+                    try {
+                        response = translateChineseWord(mChinese.matcher(mCurrentString).find(), mCurrentString, mDatabase);
+                        if (response == null) {
+                            response = translateWord(mCurrentString, mDatabase);
+                        }
+                        if (response == null) {
+                            response = translateCollegiate(mCurrentString, mDatabase);
+                        }
 
-                        } catch (Exception e) {
-                        }
-                        String finalResponse = response;
-                        Shared.postOnMainThread(() -> {
-                            Shared.createFloatView(this, finalResponse);
-                        });
-                    }).start();
-                } else {
-                    new Thread(() -> {
-                        String response = "";
-                        try {
-                            response = translate("en", mCurrentString);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        String finalResponse = response;
-                        Shared.postOnMainThread(() -> {
-                            Shared.createFloatView(this, finalResponse);
-                        });
-                    }).start();
-                }
+                    } catch (Exception e) {
+                    }
+                    String finalResponse = response;
+                    Shared.postOnMainThread(() -> {
+                        Shared.createFloatView(this, finalResponse);
+                    });
+                }).start();
+//                } else {
+//                    new Thread(() -> {
+//                        String response = "";
+//                        try {
+//                            response = translate("en", mCurrentString);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        String finalResponse = response;
+//                        Shared.postOnMainThread(() -> {
+//                            Shared.createFloatView(this, finalResponse);
+//                        });
+//                    }).start();
+//                }
             }
         };
         clipboardManager.addPrimaryClipChangedListener(mOnPrimaryClipChangedListener);

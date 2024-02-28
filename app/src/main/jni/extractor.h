@@ -8,7 +8,7 @@
 std::string Tiktok(const std::string &q);
 std::string Trans(const std::string &q, const std::string &to);
 std::string Title(const std::string &q);
-std::string Dic(const std::string &q);
+std::string Dic(bool isChinese, const std::string &q);
 std::string Hy(const std::string &q);
 std::string Weather(const std::string &province, const std::string &city);
 #endif

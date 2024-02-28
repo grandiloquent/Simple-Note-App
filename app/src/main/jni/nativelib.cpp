@@ -57,6 +57,7 @@ JNIEXPORT jstring JNICALL
 Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz,jboolean isChinese, jstring q) {
     const std::string w = jsonparse::jni::Convert<std::string>::from(env, q);
     auto str = Dic(isChinese,w);
+    LOGE("%s",str.c_str());
     nlohmann::json js = nlohmann::json::parse(str);
     if (js.contains("errorCode") && js["errorCode"] == "0") {
         if (js.contains("basic")) {

@@ -12,10 +12,10 @@
 #include "cameraEngine.h"
 #include "CameraWrapper.h"
 
-cameraEngine* cameraEngine1;
-CameraWrapper* wrapper;
+cameraEngine *cameraEngine1;
+CameraWrapper *wrapper;
 
-void imageReader::imagePreview(jint *image, jint width, jint height){
+void imageReader::imagePreview(jint *image, jint width, jint height) {
     wrapper->drawImage(image, width, height);
 }
 
@@ -54,12 +54,35 @@ Java_psycho_euphoria_app_MainActivity_request(JNIEnv *env, jclass obj) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz,jboolean isChinese, jstring q) {
+Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jboolean isChinese,
+                                           jstring q) {
     const std::string w = jsonparse::jni::Convert<std::string>::from(env, q);
-    auto str = Dic(isChinese,w);
-    LOGE("%s",str.c_str());
+    auto str = Dic(isChinese, w);
     nlohmann::json js = nlohmann::json::parse(str);
-    if (js.contains("errorCode") && js["errorCode"] == "0") {
+
+    if (js.contains("newhh")) {
+        js = js["newhh"];
+        std::stringstream ss;
+        ss << js["dataList"][0]["pinyin"].get<std::string>() << "\n";
+        for (auto &explain: js["dataList"][0]["sense"]) {
+            ss << explain["def"][0].get<std::string>() << "\n";
+        }
+        jstring result;
+        result = env->NewStringUTF(ss.str().c_str());
+        return result;
+    } else    if (js.contains("ec")) {
+        js = js["ec"];
+        std::stringstream ss;
+        ss << js["word"][0]["usphone"].get<std::string>() << "\n";
+        for (auto &explain: js["word"][0]["trs"]) {
+            ss << explain["tr"][0]["l"]["i"][0].get<std::string>() << "\n";
+        }
+        jstring result;
+        result = env->NewStringUTF(ss.str().c_str());
+        return result;
+    }
+    /*
+     if (js.contains("errorCode") && js["errorCode"] == "0") {
         if (js.contains("basic")) {
             std::stringstream ss;
             for (auto &explain: js["basic"]["explains"]) {
@@ -71,12 +94,12 @@ Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz,jboolean is
 
         }
     }
+     */
 
     return nullptr;
 }
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_openCamera(JNIEnv* env, jclass clazz)
-{
+Java_psycho_euphoria_app_ServerService_openCamera(JNIEnv *env, jclass clazz) {
     //wrapper = new CameraWrapper(env, pInstance);
     uint32_t w = 480;
     uint32_t h = 640;
@@ -85,8 +108,7 @@ Java_psycho_euphoria_app_ServerService_openCamera(JNIEnv* env, jclass clazz)
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_cameraPreview(JNIEnv* env, jobject thiz)
-{
+Java_psycho_euphoria_app_ServerService_cameraPreview(JNIEnv *env, jobject thiz) {
     cameraEngine1->startPreview(true);
 
     std::thread prewiewHandler(&CameraWrapper::imageGeting, wrapper, cameraEngine1);
@@ -94,16 +116,14 @@ Java_psycho_euphoria_app_ServerService_cameraPreview(JNIEnv* env, jobject thiz)
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_takePhoto(JNIEnv* env, jclass clazz){
+Java_psycho_euphoria_app_ServerService_takePhoto(JNIEnv *env, jclass clazz) {
     std::thread photoHandler(&cameraEngine::onTakeImage, cameraEngine1);
     photoHandler.detach();
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_psycho_euphoria_app_ServerService_deleteCamera(JNIEnv* env, jclass clazz)
-{
-    if(cameraEngine1)
-    {
+Java_psycho_euphoria_app_ServerService_deleteCamera(JNIEnv *env, jclass clazz) {
+    if (cameraEngine1) {
         cameraEngine1->deleteCamera();
         cameraEngine1 = nullptr;
     }

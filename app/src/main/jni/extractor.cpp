@@ -101,14 +101,53 @@ static std::string hash(const char *buf) {
 static std::string buildPayload(const std::string &s, int salt) {
 
     std::stringstream ss;
+//    ss << "4da34b556074bc9f"
+//       << s << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
     ss << "4da34b556074bc9f"
-       << s << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
+       << s << salt << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
     return ss.str();
 }
 
-std::string Dic(bool isChinese,const std::string &q) {
-    auto s = q;//httplib::detail::encode_url(q);
-    LOGE("=========>%s",s.c_str());
+std::string sha256(const std::string str) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+    std::stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int) hash[i];
+    }
+    return ss.str();
+}
+// https://github.com/creatcode/api/blob/master/YoudaoDic.md
+
+std::string Dic(bool isChinese, const std::string &q) {
+
+
+    httplib::Client cli("dict.youdao.com", 80);
+    std::stringstream ss;
+
+    if (isChinese) {
+        ss
+                << "/jsonapi?xmlVersion=5.1&client=&dicts=%7B%22count%22%3A99%2C%22dicts%22%3A%5B%5B%22newhh%22%5D%5D%7D&keyfrom=&model=&mid=&imei=&vendor=&screen=&ssid=&network=5g&abtest=&jsonversion=2&q="
+                << q;
+    } else {
+        ss
+                << "/jsonapi?xmlVersion=5.1&client=&dicts=%7B%22count%22%3A99%2C%22dicts%22%3A%5B%5B%22ec%22%5D%5D%7D&keyfrom=&model=&mid=&imei=&vendor=&screen=&ssid=&network=5g&abtest=&jsonversion=2&q="
+                << q;
+    }
+
+    if (auto res = cli.Get(ss.str(),
+                           {{"User-Agent",
+                             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                             "(KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}})) {
+        return res->body;
+    } else {
+        return {};
+    }
+    /*
+     auto s = q;//httplib::detail::encode_url(q);
     int salt = time(NULL);
     auto payload = buildPayload(s, salt);
     auto sign = hash(payload.c_str());
@@ -130,6 +169,7 @@ std::string Dic(bool isChinese,const std::string &q) {
     } else {
         return {};
     }
+     */
 }
 
 std::string Hy(const std::string &q) {
@@ -153,14 +193,15 @@ std::string Hy(const std::string &q) {
 
 
 std::string Weather(const std::string &province, const std::string &city) {
-    httplib::SSLClient  cli("wis.qq.com", 443);
+    httplib::SSLClient cli("wis.qq.com", 443);
     cli.enable_server_certificate_verification(false);
 
     std::stringstream ss;
-    ss << "/weather/common?source=pc&weather_type=observe%7Cforecast_1h%7Cforecast_24h%7Calarm&province=";
+    ss
+            << "/weather/common?source=pc&weather_type=observe%7Cforecast_1h%7Cforecast_24h%7Calarm&province=";
     ss << EncodeUrl(province);
     ss << "&city=";
-    ss <<EncodeUrl( city);
+    ss << EncodeUrl(city);
     if (auto res = cli.Get(
             ss.str(),
             {{"User-Agent",

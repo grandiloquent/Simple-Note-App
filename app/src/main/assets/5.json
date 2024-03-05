@@ -1,121 +1,945 @@
 {
-    "input": "good",
-    "meta": {
-        "input": "good",
-        "guessLanguage": "eng",
-        "isHasSimpleDict": "1",
-        "le": "en",
-        "lang": "eng",
-        "dicts": [
-            "meta",
-            "simple",
-            "ec"
-        ]
-    },
-    "le": "en",
-    "simple": {
-        "query": "good",
-        "word": [
+    "web_trans": {
+        "web-translation": [
             {
-                "usphone": "ɡʊd",
-                "ukphone": "ɡʊd",
-                "ukspeech": "good&type=1",
-                "return-phrase": "good",
-                "usspeech": "good&type=2"
+                "@same": "true",
+                "key": "隋代",
+                "trans": [
+                    {
+                        "summary": {
+                            "line": [
+                                "<b>隋代</b>"
+                            ]
+                        },
+                        "value": "Sui dynasty",
+                        "support": 1,
+                        "url": ""
+                    }
+                ]
+            },
+            {
+                "key": "隋代书法",
+                "trans": [
+                    {
+                        "value": "calligraphy of Sui dynasty"
+                    }
+                ]
+            },
+            {
+                "key": "隋代史学",
+                "trans": [
+                    {
+                        "value": "historiography of sui dynasty"
+                    }
+                ]
+            },
+            {
+                "key": "隋代美学",
+                "trans": [
+                    {
+                        "value": "the sui dynasty aesthetics"
+                    }
+                ]
+            },
+            {
+                "key": "隋唐五代诗学研究",
+                "trans": [
+                    {
+                        "value": "Study of Five-Dynasties Portry"
+                    }
+                ]
+            },
+            {
+                "key": "魏晋南北朝隋唐五代",
+                "trans": [
+                    {
+                        "value": "Researches in Chinese Economic History"
+                    }
+                ]
             }
         ]
     },
-    "lang": "eng",
-    "ec": {
-        "exam_type": [
-            "初中",
-            "高中",
-            "CET4",
-            "CET6",
-            "考研"
+    "special": {
+        "summary": {
+            "sources": {
+                "source": {
+                    "site": "NoteExpress",
+                    "url": "https://dict.youdao.com"
+                }
+            },
+            "text": "以上统计来源于2,447,534篇论文数据，部分数据来源于"
+        },
+        "co-add": "https://dict.youdao.com",
+        "total": "2,447,543",
+        "entries": [
+            {
+                "entry": {
+                    "major": "历史学",
+                    "trs": [
+                        {
+                            "tr": {
+                                "nat": "the sui dynasty",
+                                "chnSent": "<b>隋代</b>宫人的膺选标准主要表现在容貌美丽、品性柔顺、出身良家、德才兼备等几个方面。",
+                                "cite": "28",
+                                "docTitle": "隋代宫人的膺选标准与社会期许——以隋代宫人墓志铭为基本素材 ",
+                                "engSent": "<b>The</b> selecting standards of ladies-in-waiting in <b>the </b><b>Sui </b><b>Dynasty</b> embodied such qualities as pretty complexion,tender character,birth into a good family,being intelligent and well-bred and whatever.",
+                                "url": "youdao"
+                            }
+                        }
+                    ],
+                    "num": 1
+                }
+            }
+        ]
+    },
+    "blng_sents_part": {
+        "sentence-count": 6,
+        "sentence-pair": [
+            {
+                "sentence": "手工抄写是隋代出版的唯一手段。",
+                "sentence-translation-speech": "Hand+transcribing+is+the+only+means+of+publishing+in+Sui+Dynasty.&le=eng",
+                "sentence-eng": "手工抄写是<b>隋代</b>出版的唯一手段。",
+                "sentence-translation": "Hand transcribing is the only means of publishing in Sui Dynasty.",
+                "speech-size": "17kb",
+                "aligned-words": {
+                    "src": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "3",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "3",
+                                "@e": "5",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "5",
+                                "@e": "6",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "6",
+                                "@e": "8",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "8",
+                                "@e": "10",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ]
+                                },
+                                "@id": "4"
+                            },
+                            {
+                                "@s": "10",
+                                "@e": "11",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ]
+                                },
+                                "@id": "5"
+                            },
+                            {
+                                "@s": "11",
+                                "@e": "13",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "6"
+                            },
+                            {
+                                "@s": "13",
+                                "@e": "15",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "7"
+                            }
+                        ]
+                    },
+                    "tran": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "5",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "6",
+                                "@e": "18",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "19",
+                                "@e": "21",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "22",
+                                "@e": "30",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "31",
+                                "@e": "36",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "4"
+                            },
+                            {
+                                "@s": "37",
+                                "@e": "39",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ]
+                                },
+                                "@id": "5"
+                            },
+                            {
+                                "@s": "40",
+                                "@e": "50",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ]
+                                },
+                                "@id": "6"
+                            },
+                            {
+                                "@s": "51",
+                                "@e": "65",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ]
+                                },
+                                "@id": "7"
+                            }
+                        ]
+                    }
+                },
+                "url": "youdao"
+            },
+            {
+                "sentence": "隋代是历史上统治短暂的统一王朝之一。",
+                "sentence-translation-speech": "Sui+Dai+is+one+of+regnant+and+brief+unified+reigns+on+the+history.&le=eng",
+                "sentence-eng": "<b>隋代</b>是历史上统治短暂的统一王朝之一。",
+                "sentence-translation": "Sui Dai is one of regnant and brief unified reigns on the history.",
+                "speech-size": "17kb",
+                "aligned-words": {
+                    "src": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "3",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "3",
+                                "@e": "4",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "4",
+                                "@e": "7",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "7",
+                                "@e": "9",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "9",
+                                "@e": "11",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "4"
+                            },
+                            {
+                                "@s": "11",
+                                "@e": "12",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "5"
+                            },
+                            {
+                                "@s": "12",
+                                "@e": "14",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ]
+                                },
+                                "@id": "6"
+                            },
+                            {
+                                "@s": "14",
+                                "@e": "16",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ]
+                                },
+                                "@id": "7"
+                            }
+                        ]
+                    },
+                    "tran": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "8",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "9",
+                                "@e": "11",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "12",
+                                "@e": "18",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "19",
+                                "@e": "26",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "27",
+                                "@e": "36",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "4"
+                            },
+                            {
+                                "@s": "37",
+                                "@e": "44",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ]
+                                },
+                                "@id": "5"
+                            },
+                            {
+                                "@s": "45",
+                                "@e": "51",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "6"
+                                        }
+                                    ]
+                                },
+                                "@id": "6"
+                            },
+                            {
+                                "@s": "59",
+                                "@e": "66",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "7"
+                                        }
+                                    ]
+                                },
+                                "@id": "7"
+                            }
+                        ]
+                    }
+                },
+                "url": "youdao"
+            },
+            {
+                "sentence": "隋代修建的龙居古刹是这座名山的代表作。",
+                "sentence-translation-speech": "Longju+Temple%2C+established+during+the+Sui+Dynasty+%28581-618%29%2C+is+a+representative+of+the+historic+relics+on+the+mountain.&le=eng",
+                "sentence-eng": "<b>隋代</b>修建的龙居古刹是这座名山的代表作。",
+                "sentence-translation": "Longju Temple, established during the Sui Dynasty (581-618), is a representative of the historic relics on the mountain.",
+                "speech-size": "32kb",
+                "aligned-words": {
+                    "src": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "3",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "5",
+                                "@e": "6",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "10",
+                                "@e": "11",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "11",
+                                "@e": "15",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "16",
+                                "@e": "19",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "5"
+                            }
+                        ]
+                    },
+                    "tran": {
+                        "chars": [
+                            {
+                                "@s": "1",
+                                "@e": "7",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "0"
+                                        }
+                                    ]
+                                },
+                                "@id": "0"
+                            },
+                            {
+                                "@s": "62",
+                                "@e": "64",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ]
+                                },
+                                "@id": "1"
+                            },
+                            {
+                                "@s": "67",
+                                "@e": "81",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "5"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "2"
+                                        }
+                                    ]
+                                },
+                                "@id": "2"
+                            },
+                            {
+                                "@s": "82",
+                                "@e": "84",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "1"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ]
+                                },
+                                "@id": "3"
+                            },
+                            {
+                                "@s": "89",
+                                "@e": "97",
+                                "aligns": {
+                                    "sc": [
+                                        {
+                                            "@id": "3"
+                                        }
+                                    ],
+                                    "tc": [
+                                        {
+                                            "@id": "4"
+                                        }
+                                    ]
+                                },
+                                "@id": "4"
+                            }
+                        ]
+                    }
+                },
+                "url": "youdao"
+            }
         ],
+        "more": "blng_sents",
+        "trs-classify": [
+            {
+                "proportion": "100%",
+                "tr": "全部"
+            },
+            {
+                "proportion": "100.0%",
+                "tr": "sui dynasty"
+            }
+        ]
+    },
+    "input": "隋代",
+    "ce": {
         "source": {
             "name": "有道词典",
             "url": "https://dict.youdao.com"
         },
         "word": [
             {
-                "usphone": "ɡʊd",
-                "ukphone": "ɡʊd",
-                "ukspeech": "good&type=1",
                 "trs": [
                     {
                         "tr": [
                             {
                                 "l": {
                                     "i": [
-                                        "adj. 优良的；能干的，擅长的；令人愉快的，满意的；合适的，方便的；有益的；乖的；虔诚的；健康的；善良的；正直的；相当大的，相当多的；至少；彻底的；明智的，合理的；划算的，收益可观的；赢得赞许的，令人尊敬的；（用于表示回应）好的；表示惊讶、生气或者加强语气；（用于打招呼）好；有趣的；有效的；能提供……的；（踢、射、投）命中；亲密的；<非正式>够了"
-                                    ]
+                                        "",
+                                        {
+                                            "#text": "Sui",
+                                            "@action": "link",
+                                            "@href": "app:ds:Sui"
+                                        },
+                                        " ",
+                                        {
+                                            "#text": "Dynasty",
+                                            "@action": "link",
+                                            "@href": "app:ds:Dynasty"
+                                        }
+                                    ],
+                                    "#tran": "隋朝：中国历史上的一个朝代，时间为公元581年至618年，由杨坚建立，共有三位皇帝，统一了南北朝，结束了长达近300年的分裂局面。"
                                 }
                             }
                         ]
-                    },
-                    {
-                        "tr": [
-                            {
-                                "l": {
-                                    "i": [
-                                        "n. 善，正义；好事；商品，所有物；<英>（运载的）货物（goods）；优势，利益；<非正式>真货，正品（the goods）；好人，有道德的人（the good）"
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "tr": [
-                            {
-                                "l": {
-                                    "i": [
-                                        "adv. <非正式>好地；<美>彻底地，完全地"
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "tr": [
-                            {
-                                "l": {
-                                    "i": [
-                                        "【名】 （Good）（英）古德，（瑞典）戈德（人名）"
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "wfs": [
-                    {
-                        "wf": {
-                            "name": "复数",
-                            "value": "goods"
-                        }
-                    },
-                    {
-                        "wf": {
-                            "name": "比较级",
-                            "value": "better"
-                        }
-                    },
-                    {
-                        "wf": {
-                            "name": "最高级",
-                            "value": "best"
-                        }
                     }
                 ],
                 "return-phrase": {
                     "l": {
-                        "i": "good"
+                        "i": "隋代"
                     }
-                },
-                "usspeech": "good&type=2"
+                }
             }
         ]
-    }
+    },
+    "meta": {
+        "input": "隋代",
+        "guessLanguage": "zh",
+        "isHasSimpleDict": "1",
+        "le": "en",
+        "lang": "eng",
+        "dicts": [
+            "web_trans",
+            "special",
+            "blng_sents_part",
+            "ce",
+            "meta",
+            "simple"
+        ]
+    },
+    "le": "en",
+    "simple": {
+        "query": "隋代",
+        "word": [
+            {
+                "return-phrase": "隋代"
+            }
+        ]
+    },
+    "lang": "eng"
 }

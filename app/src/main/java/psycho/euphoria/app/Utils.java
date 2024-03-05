@@ -44,6 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class Utils {
     public static Rectangle calculateCommonPageSize(List<String> imagesUri) {
         float maxWidth = 0;
@@ -306,5 +308,21 @@ public class Utils {
                 ServerService.deleteCamera();
             }
         }.start();
+    }
+
+    public static void FetchNodes(Context context) {
+        new Thread(() -> {
+            try {
+                HttpsURLConnection u = (HttpsURLConnection) new URL("https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md").openConnection();
+                String contents = Shared.readString(u);
+                Shared.setText(context, contents);
+                Shared.runOnUiThread(() -> {
+                    Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+                });
+            } catch (Exception error) {
+                Toast.makeText(context, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        }).start();
     }
 }

@@ -36,6 +36,7 @@ import android.widget.RemoteViews;
 
 import static psycho.euphoria.app.Shared.getDeviceIP;
 import static psycho.euphoria.app.Shared.getUsablePort;
+import static psycho.euphoria.app.Utils.FetchNodes;
 
 public class ServerService extends Service {
     public static final String ACTION_DISMISS = "psycho.euphoria.app.ServerService.ACTION_DISMISS";
@@ -47,6 +48,8 @@ public class ServerService extends Service {
     public static final String ACTION_BRO = "psycho.euphoria.app.ServerService.ACTION_BRO";
 
     public static final String ACTION_OP = "psycho.euphoria.app.ServerService.ACTION_OP";
+    public static final String ACTION_READER = "psycho.euphoria.app.ServerService.ACTION_READER";
+    public static final String ACTION_SERVERS = "psycho.euphoria.app.ServerService.ACTION_SERVERS";
 
     static {
 /*
@@ -76,7 +79,10 @@ public class ServerService extends Service {
                 .setAction(ACTION_BRO), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.op, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_OP), PendingIntent.FLAG_IMMUTABLE));
-
+        notificationLayout.setOnClickPendingIntent(R.id.reader, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_READER), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.servers, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_SERVERS), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setCustomContentView(notificationLayout)
@@ -168,7 +174,10 @@ public class ServerService extends Service {
                         "com.tencent.mm",
                         "com.android.chrome",
                         "org.mozilla.firefox",
-                        "com.zhiliaoapp.musically"
+                        "com.zhiliaoapp.musically",
+                        "com.eg.android.AlipayGphone",
+                        "cn.yonghui.hyd",
+                        "com.jingdong.app.mall"
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 Utils.takePhoto();
@@ -182,16 +191,21 @@ public class ServerService extends Service {
 //                launchIntent.setData(Uri.parse("http://" +
 //                        Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
-            // com.android.chrome
-            }else if (intent.getAction().equals(ACTION_OP)) {
+                // com.android.chrome
+            } else if (intent.getAction().equals(ACTION_OP)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
 //                launchIntent.setData(Uri.parse("http://" +
 //                        Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
                 // com.android.chrome
+            } else if (intent.getAction().equals(ACTION_READER)) {
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("org.readera");
+                startActivity(launchIntent);
+            } else if (intent.getAction().equals(ACTION_SERVERS)) {
+                FetchNodes(this);
             }
-
 
         }
         return super.onStartCommand(intent, flags, startId);

@@ -63,17 +63,20 @@ Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jboolean i
     if (js.contains("newhh")) {
         js = js["newhh"];
         std::stringstream ss;
-        ss << js["dataList"][0]["pinyin"].get<std::string>() << "\n";
+
+        if (js["dataList"][0].contains("pinyin"))
+            ss << js["dataList"][0]["pinyin"].get<std::string>() << "\n";
         for (auto &explain: js["dataList"][0]["sense"]) {
             ss << explain["def"][0].get<std::string>() << "\n";
         }
         jstring result;
         result = env->NewStringUTF(ss.str().c_str());
         return result;
-    } else    if (js.contains("ec")) {
+    } else if (js.contains("ec")) {
         js = js["ec"];
         std::stringstream ss;
-        ss << js["word"][0]["usphone"].get<std::string>() << "\n";
+        if (js["word"][0].contains("usphone"))
+            ss << js["word"][0]["usphone"].get<std::string>() << "\n";
         for (auto &explain: js["word"][0]["trs"]) {
             ss << explain["tr"][0]["l"]["i"][0].get<std::string>() << "\n";
         }

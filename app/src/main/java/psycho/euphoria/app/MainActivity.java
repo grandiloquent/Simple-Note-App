@@ -49,6 +49,7 @@ import psycho.euphoria.app.WebAppInterface;
 
 import static psycho.euphoria.app.ServerService.ACTION_DISMISS;
 import static psycho.euphoria.app.ServerService.START_SERVER_ACTION;
+import static psycho.euphoria.app.Utils.FetchNodes;
 
 
 public class MainActivity extends Activity {
@@ -314,7 +315,7 @@ public class MainActivity extends Activity {
                 break;
             case 10:
                 //Utils.launchInputMethodPicker(this);
-                FetchNodes();
+                FetchNodes(this);
                 break;
             case 13:
                 Utils.killProcesses(mUrl);
@@ -324,19 +325,5 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void FetchNodes() {
-        new Thread(() -> {
-            try {
-                HttpsURLConnection u = (HttpsURLConnection) new URL("https://raw.githubusercontent.com/mksshare/mksshare.github.io/main/README.md").openConnection();
-                String contents = Shared.readString(u);
-                Shared.setText(this, contents);
-                Shared.runOnUiThread(() -> {
-                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-                });
-            } catch (Exception error) {
-                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
-            }
 
-        }).start();
-    }
 }

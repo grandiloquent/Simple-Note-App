@@ -51,6 +51,9 @@ public class ServerService extends Service {
     public static final String ACTION_READER = "psycho.euphoria.app.ServerService.ACTION_READER";
     public static final String ACTION_SERVERS = "psycho.euphoria.app.ServerService.ACTION_SERVERS";
 
+
+    public static final String ACTION_INPUT = "psycho.euphoria.app.ServerService.ACTION_INPUT";
+
     static {
 /*
 加载编译Rust代码后得到共享库。它完整的名称为librust.so
@@ -83,6 +86,8 @@ public class ServerService extends Service {
                 .setAction(ACTION_READER), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.servers, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_SERVERS), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.input, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_INPUT), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setCustomContentView(notificationLayout)
@@ -205,6 +210,8 @@ public class ServerService extends Service {
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SERVERS)) {
                 FetchNodes(this);
+            } else if (intent.getAction().equals(ACTION_INPUT)) {
+                Utils.launchInputMethodPicker(this);
             }
 
         }

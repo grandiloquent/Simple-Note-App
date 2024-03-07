@@ -11,6 +11,7 @@ std::string Title(const std::string &q);
 std::string Dic(bool isChinese, const std::string &q);
 std::string Hy(const std::string &q);
 std::string Weather(const std::string &province, const std::string &city);
+std::string Ec( const std::string &q);
 #endif
 /*
 add_library(extractor SHARED extractor.cpp)

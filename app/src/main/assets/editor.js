@@ -469,15 +469,31 @@ document.querySelector('#save-note').addEventListener('click', evt => {
 document.querySelector('#format-head').addEventListener('click', evt => {
     formatHead(textarea)
 });
-document.querySelector('#format-code').addEventListener('click', evt => {
+document.querySelector('#format-code').addEventListener('click', async evt => {
     //formatCode(textarea);
-    const positions = findExtendPosition(textarea);
-    let s = textarea.value.substring(positions[0], positions[1]);
-    s = s.split('\n').map(x => x.trim()).join(' ')
-    .replaceAll(/\s+-\s+/g,"");
-    textarea.setRangeText(s, positions[0], positions[1]);
+    // const positions = findExtendPosition(textarea);
+    // let s = textarea.value.substring(positions[0], positions[1]);
+    // s = s.split('\n').map(x => x.trim()).join(' ')
+    //     .replaceAll(/\s+-\s+/g, "");
+    // textarea.setRangeText(s, positions[0], positions[1]);
+
+    const s = textarea.value;
+    let start = textarea.selectionStart;
+    while (start > 0 && s[start - 1] !== '\n') {
+        start--;
+    }
+    let length = textarea.value.length;
+    let end = textarea.selectionEnd;
+    while (end < length && s[end + 1] !== '\n') {
+        end++;
+    }
+    let str = textarea.value.slice(start, end + 1).trim();
+    const res = await fetch(`${baseUri}/cc?q=${encodeURIComponent(str)}`);
+    const obj = await res.json();
+    const contents = (obj["newhh"]["dataList"][0]["pinyin"] + "\n" || '') + obj["newhh"]["dataList"][0]["sense"].map(x => x["def"][0]).join("\n");
+    textarea.setRangeText(contents, start, end + 1, 'end');
 });
-document.querySelector('#code').addEventListener('click', evt => {
+document.querySelector('#code').addEventListener('click', async evt => {
     // findCodeBlock((start, end, str) => {
     //     const prefix = /^\s+/.exec(str)[0];
     //     textarea.setRangeText(str.split('\n')
@@ -485,7 +501,22 @@ document.querySelector('#code').addEventListener('click', evt => {
     //         .join('\n')
     //         , start, end);
     // });
-    formatComments(textarea);
+    //formatComments(textarea);
+    const s = textarea.value;
+    let start = textarea.selectionStart;
+    while (start > 0 && s[start - 1] !== '\n') {
+        start--;
+    }
+    let length = textarea.value.length;
+    let end = textarea.selectionEnd;
+    while (end < length && s[end + 1] !== '\n') {
+        end++;
+    }
+    let str = textarea.value.slice(start, end + 1).trim();
+    const res = await fetch(`${baseUri}/ec?q=${encodeURIComponent(str)}`);
+    const obj = await res.json();
+    const contents = obj["translation"].map(x => x).join("");
+    textarea.setRangeText(contents, start, end + 1, 'end');
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
     copyLine(textarea);

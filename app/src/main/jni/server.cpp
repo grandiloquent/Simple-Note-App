@@ -1537,7 +1537,18 @@ in vec4 a_position;
         auto s = Trans(q, to);
         res.set_content(s, "application/json");
     });
-
+    server.Get("/cc", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto q = req.get_param_value("q");
+        auto s = Dic(true, q);
+        res.set_content(s, "application/json");
+    });
+    server.Get("/ec", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto q = req.get_param_value("q");
+        auto s = Ec(q);
+        res.set_content(s, "application/json");
+    });
     server.Get("/title", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto q = req.get_param_value("path");

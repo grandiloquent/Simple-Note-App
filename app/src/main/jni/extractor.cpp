@@ -101,10 +101,8 @@ static std::string hash(const char *buf) {
 static std::string buildPayload(const std::string &s, int salt) {
 
     std::stringstream ss;
-//    ss << "4da34b556074bc9f"
-//       << s << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
     ss << "4da34b556074bc9f"
-       << s << salt << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
+       << s << salt << "Wt5i6HHltTGFAQgSUgofeWdFZyDxKwOy";
     return ss.str();
 }
 
@@ -214,3 +212,28 @@ std::string Weather(const std::string &province, const std::string &city) {
     }
 }
 
+
+std::string Ec(const std::string &q) {
+
+    auto s = httplib::detail::encode_url(q);
+    int salt = time(NULL);
+    auto payload = buildPayload(q, salt);
+    auto sign = hash(payload.c_str());
+
+    httplib::Client cli("openapi.youdao.com", 80);
+    std::stringstream ss;
+
+    ss << "/api?q=" << s << "&salt=" << salt << "&sign=" << sign
+       << "&appKey=4da34b556074bc9f" << "&from=EN&to=zh-CHS";
+
+    if (auto res = cli.Get(
+            ss.str(),
+            {{"User-Agent",
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}})) {
+
+        return res->body;
+    } else {
+        return {};
+    }
+}

@@ -211,7 +211,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SERVERS)) {
                 FetchNodes(this);
             } else if (intent.getAction().equals(ACTION_INPUT)) {
-                Utils.launchInputMethodPicker(this);
+                Shared.setText(this,"vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub");
             }
 
         }

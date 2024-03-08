@@ -516,7 +516,7 @@ document.querySelector('#code').addEventListener('click', async evt => {
     const res = await fetch(`${baseUri}/ec?q=${encodeURIComponent(str)}`);
     const obj = await res.json();
     const contents = obj["translation"].map(x => x).join("");
-    textarea.setRangeText(contents, end + 1, end + 1, 'end');
+    textarea.setRangeText("\n\n"+contents, end + 1, end + 1, 'end');
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
     copyLine(textarea);

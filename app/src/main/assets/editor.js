@@ -416,7 +416,7 @@ openLink.addEventListener('click', async evt => {
     }
     let str = textarea.value.slice(start, end + 1);
 
-    if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str)) {
+    if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /[\u4e00-\u9fa5]/.test(str)) {
         if (typeof NativeAndroid != 'undefined') {
             NativeAndroid.launchApp(str);
         }

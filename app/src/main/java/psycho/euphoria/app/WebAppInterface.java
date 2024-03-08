@@ -74,6 +74,23 @@ public class WebAppInterface {
 
     }
 
+    @JavascriptInterface
+    public void createPdfFromImages(String dir) {
+        File directory = new File(dir);
+        if (!directory.isDirectory()) {
+            return;
+        }
+        File[] files = directory.listFiles(file -> file.isFile() && (file.getName().endsWith(".jpg")
+                || file.getName().endsWith(".png")
+                || file.getName().endsWith(".jpeg")
+        ));
+        if (files == null || files.length == 0) return;
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (File file : files) {
+            arrayList.add(file.getPath());
+        }
+        Utils.createPdfFromImages(new File(dir, "image.pdf").getPath(), arrayList, 32, 32, 32, 32);
+    }
 
     @JavascriptInterface
     public void downloadFile(String fileName, String uri) {
@@ -98,9 +115,49 @@ public class WebAppInterface {
         return mSharedPreferences.getString(key, "");
     }
 
+    @JavascriptInterface
+    public String getVideoAddress(String url) {
+        AtomicReference<String> result = new AtomicReference<>();
+        Thread thread = new Thread(() -> {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                String res = Shared.readString(connection);
+                res = Shared.substringAfter(res, "sl: \"");
+                res = Shared.substringBefore(res, "\"");
+                result.set(res);
+            } catch (Exception ignored) {
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return result.get();
+    }
+
+    private static void openLocalPage(Context context, String path) {
+        PackageManager pm = context.getPackageManager();
+        Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+        launchIntent.setData(Uri.parse("http://" +
+                Shared.getDeviceIP(context) + ":8500" + path));
+        context.startActivity(launchIntent);
+    }
 
     @JavascriptInterface
     public void launchApp(String text) {
+        String path = null;
+        if (text.equals("文本图片")) {
+            path = "/text.html";
+        }
+        if (text.equals("天气")) {
+            path = "/weather.html";
+        }
+        if (path != null) {
+            openLocalPage(mContext, path);
+            return;
+        }
         Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found
@@ -314,46 +371,6 @@ public class WebAppInterface {
             previous = timeOfSyncSample;
         }
         return timeOfSyncSamples[timeOfSyncSamples.length - 1];
-    }
-
-    @JavascriptInterface
-    public String getVideoAddress(String url) {
-        AtomicReference<String> result = new AtomicReference<>();
-        Thread thread = new Thread(() -> {
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                String res = Shared.readString(connection);
-                res = Shared.substringAfter(res, "sl: \"");
-                res = Shared.substringBefore(res, "\"");
-                result.set(res);
-            } catch (Exception ignored) {
-            }
-        });
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return result.get();
-    }
-
-    @JavascriptInterface
-    public void createPdfFromImages(String dir) {
-        File directory = new File(dir);
-        if (!directory.isDirectory()) {
-            return;
-        }
-        File[] files = directory.listFiles(file -> file.isFile() && (file.getName().endsWith(".jpg")
-                || file.getName().endsWith(".png")
-                || file.getName().endsWith(".jpeg")
-        ));
-        if (files == null || files.length == 0) return;
-        ArrayList<String> arrayList = new ArrayList<>();
-        for (File file : files) {
-            arrayList.add(file.getPath());
-        }
-        Utils.createPdfFromImages(new File(dir, "image.pdf").getPath(), arrayList, 32, 32, 32, 32);
     }
 
 }

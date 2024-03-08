@@ -17,13 +17,13 @@
                 const s = document.querySelector('textarea').value;
                 const canvas = document.createElement('canvas');
                 document.body.appendChild(canvas);
-                canvas.width = 840;
+                canvas.width = 640;
                 canvas.height = 192;
                 const ctx = canvas.getContext('2d');
                 //ctx.textBaseline = 'middle';
                 ctx.font = "16px 苹方"
                 ctx.fillStyle = '#333';
-                const maxWidth = 800;
+                const maxWidth = 600;
                 const array = s.split('');
                 let width = 0;
                 let values = [];

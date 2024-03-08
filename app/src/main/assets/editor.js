@@ -516,7 +516,7 @@ document.querySelector('#code').addEventListener('click', async evt => {
     const res = await fetch(`${baseUri}/ec?q=${encodeURIComponent(str)}`);
     const obj = await res.json();
     const contents = obj["translation"].map(x => x).join("");
-    textarea.setRangeText(contents, start, end + 1, 'end');
+    textarea.setRangeText(contents, end + 1, end + 1, 'end');
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
     copyLine(textarea);
@@ -662,18 +662,21 @@ document.querySelector('.link').addEventListener('click', evt => {
 
 const contentCopy = document.querySelector('#content_copy');
 contentCopy.addEventListener('click', evt => {
-    const re = new RegExp(/[;\s,:']/);
-    const s = textarea.value;
-    let start = textarea.selectionStart;
+    // const re = new RegExp(/[;\s,:']/);
+    // const s = textarea.value;
+    // let start = textarea.selectionStart;
 
-    while (start > 0 && !re.test(s[start - 1])) {
-        start--;
-    }
-    let length = textarea.value.length;
-    let end = textarea.selectionEnd;
-    while (end < length && !re.test(s[end])) {
-        end++;
-    }
-    writeText(`- \`${s.substring(start, end)}\`：`);
-
+    // while (start > 0 && !re.test(s[start - 1])) {
+    //     start--;
+    // }
+    // let length = textarea.value.length;
+    // let end = textarea.selectionEnd;
+    // while (end < length && !re.test(s[end])) {
+    //     end++;
+    // }
+    // writeText(`- \`${s.substring(start, end)}\`：`);
+    const positions = findExtendPosition(textarea);
+    let s = textarea.value.substring(positions[0], positions[1]);
+    textarea.setRangeText("", positions[0], positions[1]);
+    writeText(s);
 });

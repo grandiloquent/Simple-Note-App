@@ -21,18 +21,18 @@
                 canvas.height = 192;
                 const ctx = canvas.getContext('2d');
                 //ctx.textBaseline = 'middle';
-                ctx.font = "16px 苹方"
+                ctx.font = "32px 苹方"
                 ctx.fillStyle = '#333';
                 const maxWidth = 600;
                 const array = s.split('');
                 let width = 0;
                 let values = [];
-                let y = 24;
+                let y = 68;
                 for (let index = 0; index < array.length; index++) {
                     if (array[index] === '\n') {
                         values = [];
                         width = 0;
-                        y += 24;
+                        y += 48;
                         continue;
                     }
                     width += ctx.measureText(array[index]).width;
@@ -42,22 +42,22 @@
 
                         values = [];
                         width = 0;
-                        y += 24;
+                        y += 48;
                     }
 
                 }
-                canvas.height = y;
-                ctx.font = "16px 苹方"
+                canvas.height = y + 40;
+                ctx.font = "32px 苹方"
                 ctx.fillStyle = '#333';
                 values = [];
                 width = 0;
-                y = 24;
+                y = 68;
                 for (let index = 0; index < array.length; index++) {
                     if (array[index] === '\n') {
                         ctx.fillText(values.join(''), 20, y);
                         values = [];
                         width = 0;
-                        y += 24;
+                        y += 48;
                         continue;
                     }
                     width += ctx.measureText(array[index]).width;
@@ -68,7 +68,7 @@
                         ctx.fillText(values.join(''), 20, y);
                         values = [];
                         width = 0;
-                        y += 24;
+                        y += 48;
                     }
 
                 }

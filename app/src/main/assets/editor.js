@@ -477,21 +477,15 @@ document.querySelector('#format-code').addEventListener('click', async evt => {
     //     .replaceAll(/\s+-\s+/g, "");
     // textarea.setRangeText(s, positions[0], positions[1]);
 
-    const s = textarea.value;
-    let start = textarea.selectionStart;
-    while (start > 0 && s[start - 1] !== '\n') {
-        start--;
-    }
-    let length = textarea.value.length;
-    let end = textarea.selectionEnd;
-    while (end < length && s[end + 1] !== '\n') {
-        end++;
-    }
-    let str = textarea.value.slice(start, end + 1).trim();
+
+    let str = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
     const res = await fetch(`${baseUri}/cc?q=${encodeURIComponent(str)}`);
     const obj = await res.json();
-    const contents = (obj["newhh"]["dataList"][0]["pinyin"] + "\n" || '') + obj["newhh"]["dataList"][0]["sense"].map(x => x["def"][0]).join("\n");
-    textarea.setRangeText(contents, start, end + 1, 'end');
+    const contents = (obj["newhh"]["dataList"][0]["pinyin"] + "\n" || '') + obj["newhh"]["dataList"][0]["sense"].map(x =>
+        (x["def"] && x["def"][0]) || '').join("\n");
+    const dialog = document.createElement("custom-dialog");
+    document.body.appendChild(dialog);
+    dialog.appendChild(document.createTextNode(contents));
 });
 document.querySelector('#code').addEventListener('click', async evt => {
     // findCodeBlock((start, end, str) => {
@@ -519,7 +513,25 @@ document.querySelector('#code').addEventListener('click', async evt => {
     textarea.setRangeText("\n\n" + contents, end + 1, end + 1, 'end');
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
-    copyLine(textarea);
+    //copyLine(textarea);
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    while (start - 1 > -1) {
+        start--;
+        if (textarea.value[start] === '\n' && textarea.value[start + 1] === '#'
+            && textarea.value[start + 2] === '#') {
+            break
+        }
+    }
+    while (end < textarea.value.length) {
+        end++;
+        if (textarea.value[end] === '\n') {
+            break;
+        }
+    }
+    writeText(textarea.value.substring(start, end));
+    textarea.setRangeText("", start, end);
+    
 });
 
 const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";

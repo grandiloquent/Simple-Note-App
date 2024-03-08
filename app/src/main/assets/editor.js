@@ -516,7 +516,7 @@ document.querySelector('#code').addEventListener('click', async evt => {
     const res = await fetch(`${baseUri}/ec?q=${encodeURIComponent(str)}`);
     const obj = await res.json();
     const contents = obj["translation"].map(x => x).join("");
-    textarea.setRangeText("\n\n"+contents, end + 1, end + 1, 'end');
+    textarea.setRangeText("\n\n" + contents, end + 1, end + 1, 'end');
 });
 document.querySelector('#copy-line').addEventListener('click', evt => {
     copyLine(textarea);
@@ -677,6 +677,13 @@ contentCopy.addEventListener('click', evt => {
     // writeText(`- \`${s.substring(start, end)}\`：`);
     const positions = findExtendPosition(textarea);
     let s = textarea.value.substring(positions[0], positions[1]);
-    textarea.setRangeText("", positions[0], positions[1]);
-    writeText(s);
+    let [start, end] = positions;
+    while (start - 1 > -1 && /\s/.test(textarea.value[start - 1])) {
+        start--;
+    }
+    while (end + 1 < textarea.value.length && /\s/.test(textarea.value[end + 1])) {
+        end++;
+    }
+    textarea.setRangeText("\n", start, end);
+    //writeText(s);
 });

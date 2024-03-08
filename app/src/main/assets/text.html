@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <textarea></textarea>
+    <button>确定</button>
+    <script>
+        document.querySelector('button')
+            .addEventListener('click', () => {
+                const s = document.querySelector('textarea').value;
+                const canvas = document.createElement('canvas');
+                document.body.appendChild(canvas);
+                canvas.width = 840;
+                canvas.height = 192;
+                const ctx = canvas.getContext('2d');
+                //ctx.textBaseline = 'middle';
+                ctx.font = "16px 苹方"
+                ctx.fillStyle = '#333';
+                const maxWidth = 800;
+                const array = s.split('');
+                let width = 0;
+                let values = [];
+                let y = 24;
+                for (let index = 0; index < array.length; index++) {
+                    if (array[index] === '\n') {
+                        values = [];
+                        width = 0;
+                        y += 24;
+                        continue;
+                    }
+                    width += ctx.measureText(array[index]).width;
+                    if (width < maxWidth) {
+                        values.push(array[index]);
+                    } else {
+
+                        values = [];
+                        width = 0;
+                        y += 24;
+                    }
+
+                }
+                canvas.height = y;
+                ctx.font = "16px 苹方"
+                ctx.fillStyle = '#333';
+                values = [];
+                width = 0;
+                y = 24;
+                for (let index = 0; index < array.length; index++) {
+                    if (array[index] === '\n') {
+                        ctx.fillText(values.join(''), 20, y);
+                        values = [];
+                        width = 0;
+                        y += 24;
+                        continue;
+                    }
+                    width += ctx.measureText(array[index]).width;
+                    if (width < maxWidth) {
+                        values.push(array[index]);
+                    } else {
+
+                        ctx.fillText(values.join(''), 20, y);
+                        values = [];
+                        width = 0;
+                        y += 24;
+                    }
+
+                }
+
+                const saveImage = (canvas, filename) => {
+
+                    var link = document.createElement("a");
+                    var imgData = canvas.toDataURL({
+                        format: 'png',
+                        multiplier: 4
+                    });
+
+
+                    var objurl = imgData;
+
+                    link.download = `${filename}.png`;
+
+                    link.href = objurl;
+
+                    link.click();
+                };
+                saveImage(canvas, "100");
+            })
+
+    </script>
+</body>
+
+</html>

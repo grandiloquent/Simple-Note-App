@@ -282,8 +282,11 @@ function showContextMenu(evt) {
     });
     addContextMenuItem(bottomSheet, '选择', () => {
         bottomSheet.remove();
-        localStorage.setItem("paths", JSON.stringify([path]));
-        toast.setAttribute('message', '已成功写入剪切板');
+                let array = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+                array.push(path)
+                array = [...new Set(array)];
+                localStorage.setItem("paths", JSON.stringify(array));
+                toast.setAttribute('message', '已成功写入剪切板');
     });
     addContextMenuItem(bottomSheet, '选择相同类型', () => {
         bottomSheet.remove();

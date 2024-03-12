@@ -3,6 +3,7 @@ package psycho.euphoria.app;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -13,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -143,6 +145,7 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
+        requestNotificationPermission(this);
         if (VERSION.SDK_INT >= VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
@@ -231,6 +234,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         initialize();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);
 //        intent.setData(Uri.fromFile(
@@ -323,6 +327,44 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static final String POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
+
+    public static void requestNotificationPermission(Activity activity) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (activity.checkSelfPermission(POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
+                if (!activity.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
+                    enableNotification(activity);
+                } else {
+                    activity.requestPermissions(new String[]{POST_NOTIFICATIONS}, 100);
+                }
+            }
+        } else {
+            boolean enabled = activity.getSystemService(NotificationManager.class).areNotificationsEnabled();
+            if (!enabled) {
+                enableNotification(activity);
+            }
+        }
+    }
+
+    public static void enableNotification(Context context) {
+        try {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+            intent.putExtra(Settings.EXTRA_CHANNEL_ID, context.getApplicationInfo().uid);
+            intent.putExtra("app_package", context.getPackageName());
+            intent.putExtra("app_uid", context.getApplicationInfo().uid);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+            intent.setData(uri);
+            context.startActivity(intent);
+        }
     }
 
 

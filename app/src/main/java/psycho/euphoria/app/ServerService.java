@@ -51,7 +51,7 @@ public class ServerService extends Service {
     public static final String ACTION_READER = "psycho.euphoria.app.ServerService.ACTION_READER";
     public static final String ACTION_SERVERS = "psycho.euphoria.app.ServerService.ACTION_SERVERS";
 
-
+    public static final String ACTION_APP = "psycho.euphoria.app.ServerService.ACTION_APP";
     public static final String ACTION_INPUT = "psycho.euphoria.app.ServerService.ACTION_INPUT";
 
     static {
@@ -66,9 +66,6 @@ public class ServerService extends Service {
 
     public static void createNotification(ServerService context, String address) {
         PendingIntent piDismiss = getPendingIntentDismiss(context);
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(MainActivity.KEY_ADDRESS, address);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_small);
         notificationLayout.setOnClickPendingIntent(R.id.other, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
@@ -77,7 +74,8 @@ public class ServerService extends Service {
                 .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.app, PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.app, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_APP), PendingIntent.FLAG_MUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.explorer, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_BRO), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.op, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
@@ -211,7 +209,11 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SERVERS)) {
                 FetchNodes(this);
             } else if (intent.getAction().equals(ACTION_INPUT)) {
-                Shared.setText(this,"vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub");
+                Shared.setText(this, "vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub");
+            } else if (intent.getAction().equals(ACTION_APP)) {
+                Intent app = new Intent(this, MainActivity.class);
+                app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(app);
             }
 
         }

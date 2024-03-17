@@ -176,7 +176,7 @@ public class MainActivity extends Activity {
 
     private void openFilePage() {
         if (mUrl != null) {
-            String url = Shared.substringBeforeLast(mUrl, "/") + "/files.html";
+            String url = Shared.substringBeforeLast(mUrl, "/") + "/app.html";
             openWithChrome(this, url);
         } else {
             Toast.makeText(this, "链接为空", Toast.LENGTH_SHORT).show();

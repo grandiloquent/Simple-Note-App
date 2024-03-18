@@ -204,7 +204,7 @@ public class ServerService extends Service {
                 // com.android.chrome
             } else if (intent.getAction().equals(ACTION_READER)) {
                 PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("org.readera");
+                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.o");
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SERVERS)) {
                 FetchNodes(this);

@@ -156,7 +156,10 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.CAMERA);
         }
-        if (permissions.size() > 0) {
+        if (checkSelfPermission(permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.RECORD_AUDIO);
+        }
+        if (!permissions.isEmpty()) {
             requestPermissions(permissions.toArray(new String[0]), 0);
         }
         aroundFileUriExposedException();
@@ -234,7 +237,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initialize();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);
 //        intent.setData(Uri.fromFile(

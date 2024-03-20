@@ -36,6 +36,7 @@ import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -219,11 +220,17 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SERVERS)) {
                 FetchNodes(this);
             } else if (intent.getAction().equals(ACTION_INPUT)) {
-                if (recordingInProgress.get()) {
-                    stopRecording();
-                } else {
-                    startRecording();
-                }
+//                if (recordingInProgress.get()) {
+//                    Toast.makeText(this, "关闭", Toast.LENGTH_SHORT).show();
+//                    stopRecording();
+//                } else {
+//                    startRecording();
+//                    Toast.makeText(this, "开始", Toast.LENGTH_SHORT).show();
+//
+//                }
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.soundrecorder");
+                startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_APP)) {
                 Intent app = new Intent(this, MainActivity.class);
                 app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -281,11 +288,12 @@ public class ServerService extends Service {
             Toast.makeText(this, "需要录音权限", Toast.LENGTH_SHORT).show();
             return;
         }
-        BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ,
-                CHANNEL_CONFIG, AUDIO_FORMAT) * BUFFER_SIZE_FACTOR;
+        BUFFER_SIZE = 512;// AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ,
+        //CHANNEL_CONFIG, AUDIO_FORMAT) * BUFFER_SIZE_FACTOR;
         SAMPLING_RATE_IN_HZ = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_SYSTEM);
+        int minBufferSize = AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ, CHANNEL_CONFIG, AUDIO_FORMAT);
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLING_RATE_IN_HZ,
-                CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+                CHANNEL_CONFIG, AUDIO_FORMAT, minBufferSize);
         recorder.startRecording();
         recordingInProgress.set(true);
         recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
@@ -307,22 +315,30 @@ public class ServerService extends Service {
 
         @Override
         public void run() {
-            int i = 0;
-            File file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".pcm"));
+            int i = 1;
+            File file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".mp3"));
             while (file.exists()) {
-                file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".pcm"));
+                i++;
+                file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".mp3"));
+
             }
-            final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+            int state = Mp3Encoder.native_encoder_init(SAMPLING_RATE_IN_HZ, SAMPLING_RATE_IN_HZ, 2, 196, 2);
+            short[] audioData = new short[BUFFER_SIZE];
+            int mp3BufferSize = (int) (1.25 * BUFFER_SIZE + 7200);
+            byte[] mp3Buffer = new byte[mp3BufferSize];
             try (final FileOutputStream outStream = new FileOutputStream(file)) {
                 while (recordingInProgress.get()) {
-                    int result = recorder.read(buffer, BUFFER_SIZE);
+                    int result = recorder.read(audioData, 0, BUFFER_SIZE);
                     if (result < 0) {
                         throw new RuntimeException("Reading of audio buffer failed: " +
                                 getBufferReadFailureReason(result));
                     }
-                    outStream.write(buffer.array(), 0, BUFFER_SIZE);
-                    buffer.clear();
+                    result = Mp3Encoder.native_encoder_process(audioData, BUFFER_SIZE, mp3Buffer, mp3BufferSize);
+                   // Mp3Encoder.native_encoder_flush(mp3Buffer);
+                    if (result > 0)
+                        outStream.write(mp3Buffer, 0, result);
                 }
+                Mp3Encoder.native_encoder_close();
             } catch (IOException e) {
                 throw new RuntimeException("Writing of recorded audio failed", e);
             }

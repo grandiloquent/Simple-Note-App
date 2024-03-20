@@ -42,9 +42,22 @@ add_library(server SHARED server.cpp utils.cpp)
 target_link_libraries(server httplib shared android sqlite3 nlohmann_json::nlohmann_json extractor Zipper)
 target_include_directories(server PRIVATE zipper/zipper)
 
+include_directories(lame)
+aux_source_directory(lame SRC_LIST)
+
+add_library( # Sets the name of the library.
+        NativeMp3Encoder
+
+        # Sets the library as a shared library.
+        SHARED
+
+        NativeMp3Encoder.cpp
+        ${SRC_LIST})
+
 target_link_libraries(nativelib
         android
-#        mbedtls
+        #        mbedtls
         server
         camera2ndk
-        mediandk)
+        mediandk
+        NativeMp3Encoder)

@@ -131,3 +131,4 @@ Java_psycho_euphoria_app_ServerService_deleteCamera(JNIEnv *env, jclass clazz) {
         cameraEngine1 = nullptr;
     }
 }
+

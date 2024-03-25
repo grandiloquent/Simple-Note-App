@@ -57,6 +57,8 @@ public class ServerService extends Service {
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
     public static final String ACTION_SHUTDOWN = "psycho.euphoria.app.ServerService.ACTION_SHUTDOWN";
+    public static final String ACTION_SHOOT = "psycho.euphoria.app.ServerService.ACTION_SHOOT";
+
     public static final String ACTION_BRO = "psycho.euphoria.app.ServerService.ACTION_BRO";
 
     public static final String ACTION_OP = "psycho.euphoria.app.ServerService.ACTION_OP";
@@ -195,9 +197,10 @@ public class ServerService extends Service {
                         "com.jingdong.app.mall"
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
+            } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
-                Shared.setText(this, "");
+                Shared.setText(this, "vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub");
             } else if (intent.getAction().equals(ACTION_BRO)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.n");

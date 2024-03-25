@@ -164,6 +164,12 @@ public class WebAppInterface {
             mContext.startActivity(launchIntent);
             return;
         }
+        if (text.equals("其他")) {
+            Intent service = new Intent(mContext, ServerService.class);
+            service.setAction(ServerService.ACTION_SHOOT);
+            mContext.startService(service);
+            return;
+        }
         Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found

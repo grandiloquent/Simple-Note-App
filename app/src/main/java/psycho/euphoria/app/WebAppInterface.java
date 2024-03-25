@@ -158,6 +158,12 @@ public class WebAppInterface {
             openLocalPage(mContext, path);
             return;
         }
+        if (text.equals("阅读")) {
+            PackageManager pm = mContext.getPackageManager();
+            Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
+            mContext.startActivity(launchIntent);
+            return;
+        }
         Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found

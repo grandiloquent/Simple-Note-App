@@ -8,6 +8,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -196,9 +197,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
-                startActivity(launchIntent);
+                Shared.setText(this, "");
             } else if (intent.getAction().equals(ACTION_BRO)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.n");
@@ -334,7 +333,7 @@ public class ServerService extends Service {
                                 getBufferReadFailureReason(result));
                     }
                     result = Mp3Encoder.native_encoder_process(audioData, BUFFER_SIZE, mp3Buffer, mp3BufferSize);
-                   // Mp3Encoder.native_encoder_flush(mp3Buffer);
+                    // Mp3Encoder.native_encoder_flush(mp3Buffer);
                     if (result > 0)
                         outStream.write(mp3Buffer, 0, result);
                 }

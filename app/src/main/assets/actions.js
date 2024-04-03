@@ -282,11 +282,11 @@ function showContextMenu(evt) {
     });
     addContextMenuItem(bottomSheet, '选择', () => {
         bottomSheet.remove();
-                let array = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
-                array.push(path)
-                array = [...new Set(array)];
-                localStorage.setItem("paths", JSON.stringify(array));
-                toast.setAttribute('message', '已成功写入剪切板');
+        let array = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+        array.push(path)
+        array = [...new Set(array)];
+        localStorage.setItem("paths", JSON.stringify(array));
+        toast.setAttribute('message', '已成功写入剪切板');
     });
     addContextMenuItem(bottomSheet, '选择相同类型', () => {
         bottomSheet.remove();
@@ -500,6 +500,13 @@ function showVideoInformation(path) {
 function showImage(path) {
     const div = document.createElement('div');
     div.className = 'photo-viewer';
+    const img = document.createElement('img');
+    img.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
+    div.appendChild(img);
+    document.body.appendChild(div);
+    img.addEventListener('click', () => {
+        div.remove();
+    })
     const deleteButton = document.createElement('button');
     deleteButton.textContent = "X"
     deleteButton.style = `
@@ -517,20 +524,47 @@ function showImage(path) {
     box-sizing: content-box;
 `
     div.appendChild(deleteButton);
-    deleteButton.addEventListener('click',async evt => {
+    deleteButton.addEventListener('click', async evt => {
+        evt.stopPropagation();
         const res = await fetch(`${baseUri}/file/delete`, {
             method: 'POST',
             body: JSON.stringify([path])
         });
-        queryElementByPath(path).remove();
+        const pv = queryElementByPath(path);
+        path = pv.nextSibling.dataset.path
+        const g = document.createElement('img');
+        g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
+        img.replaceWith(g);
+        pv.remove();
     })
-    const img = document.createElement('img');
-    img.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
-    div.appendChild(img);
-    document.body.appendChild(div);
-    img.addEventListener('click', () => {
-        div.remove();
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = "-"
+    nextButton.style = `
+    position: fixed;
+    background: #fff;
+    z-index: 10001;
+    right: 32px;
+    top: 32px;
+    padding: 12px;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    line-height: 32px;
+    font-size: 24px;
+    box-sizing: content-box;`
+
+    div.appendChild(nextButton);
+    nextButton.addEventListener('click', async evt => {
+        evt.stopPropagation();
+        const pv = queryElementByPath(path);
+        path = pv.nextSibling.dataset.path
+        const g = document.createElement('img');
+        g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
+        img.replaceWith(g);
+
     })
+
     div.addEventListener('click', () => {
         div.remove();
     })

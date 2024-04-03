@@ -531,7 +531,7 @@ document.querySelector('#copy-line').addEventListener('click', evt => {
     }
     writeText(textarea.value.substring(start, end));
     textarea.setRangeText("", start, end);
-    
+
 });
 
 const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
@@ -635,6 +635,12 @@ ${await readText()}`
         const contents = obj["sentences"].map(x => x["trans"]).join(" ");
         textarea.setRangeText(contents, textarea.selectionStart,
             textarea.selectionEnd, 'end');
+    } else if (evt.key === 'F2') {
+        evt.preventDefault();
+        const str = (await readText()).replaceAll(/[\n\r]+/g, ' ');
+        textarea.value=`${textarea.value}
+        
+${str}`;
     }
 });
 

@@ -500,7 +500,7 @@ function showVideoInformation(path) {
 function showImage(path) {
     const div = document.createElement('div');
     div.className = 'photo-viewer';
-    const img = document.createElement('img');
+    let img = document.createElement('img');
     img.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
     div.appendChild(img);
     document.body.appendChild(div);
@@ -535,6 +535,7 @@ function showImage(path) {
         const g = document.createElement('img');
         g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
         img.replaceWith(g);
+        img=g;
         pv.remove();
     })
 
@@ -562,6 +563,7 @@ function showImage(path) {
         const g = document.createElement('img');
         g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
         img.replaceWith(g);
+        img=g;
 
     })
 

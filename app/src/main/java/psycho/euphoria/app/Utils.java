@@ -186,27 +186,23 @@ public class Utils {
         killProcesses(new String[]{"com.icbc",
                 "com.android.nfc",
                 "nekox.messenger",
-
                 "com.goodix.fingerprint",
                 "com.android.camera",
-
                 "com.chinasofti.shanghaihuateng.metroapp",
-                 "com.icbc", "com.jeffmony.videodemo",
+                "com.icbc", "com.jeffmony.videodemo",
                 "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
                 "com.tencent.qqmusic",
                 "com.yueme.itv", "euphoria.psycho.browser",
                 "euphoria.psycho.fileserver", "euphoria.psycho.knife",
                 "euphoria.psycho.lynda", "euphoria.psycho.porn",
-                "euphoria.psycho.server","org.readera",
+                "euphoria.psycho.server", "org.readera",
                 "org.telegram.messenger", "psycho.euphoria.editor",
                 "psycho.euphoria.source", "psycho.euphoria.notepad",
                 "psycho.euphoria.plane", "psycho.euphoria.reader",
                 "psycho.euphoria.translator", "psycho.euphoria.unknown",
                 "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
                 "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-
                 "com.tencent.qqmusic",
-
                 "nekox.messenger",
                 "com.azure.authenticator",
                 "com.tencent.mobileqq",
@@ -233,6 +229,7 @@ public class Utils {
                         "psycho.euphoria.v",
                         "psycho.euphoria.l",
                         "psycho.euphoria.n",
+                        "psycho.euphoria.svg",
                         "com.android.settings",
                         "com.zhiliaoapp.musically",
                         "psycho.euphoria.app"

@@ -203,7 +203,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
-                Shared.setText(this, "vless://77a571fb-4fd2-4b37-8596-2b7d9728bb5c@45.80.111.9:8880?path=%2F%3Fed%3D2048&security=none&encryption=none&host=xw.r4d.workers.dev&type=ws#%D8%B1%D8%A7%DB%8C%DA%AF%D8%A7%D9%86+%7C+VLESS+%7C+%40vpn_xw+%7C+DE%F0%9F%87%A9%F0%9F%87%AA+%7C+0%EF%B8%8F%E2%83%A31%EF%B8%8F%E2%83%A3");
+                Shared.setText(this, "vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub");
             } else if (intent.getAction().equals(ACTION_BRO)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.n");

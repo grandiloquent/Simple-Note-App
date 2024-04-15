@@ -154,6 +154,9 @@ public class WebAppInterface {
         if (text.equals("天气")) {
             path = "/weather.html";
         }
+        if (text.equals("拼音")) {
+            path = "/pinyin.html";
+        }
         if (path != null) {
             openLocalPage(mContext, path);
             return;

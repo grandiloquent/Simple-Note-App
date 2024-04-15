@@ -67,6 +67,9 @@ public class ServerService extends Service {
 
     public static final String ACTION_APP = "psycho.euphoria.app.ServerService.ACTION_APP";
     public static final String ACTION_INPUT = "psycho.euphoria.app.ServerService.ACTION_INPUT";
+    public static final String ACTION_ROBOT = "psycho.euphoria.app.ServerService.ACTION_ROBOT";
+    public static final String ACTION_SPEED = "psycho.euphoria.app.ServerService.ACTION_SPEED";
+    public static final String ACTION_ENGLISH = "psycho.euphoria.app.ServerService.ACTION_ENGLISH";
 
     static {
 /*
@@ -100,6 +103,12 @@ public class ServerService extends Service {
                 .setAction(ACTION_SERVERS), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.input, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_INPUT), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.robot, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_ROBOT), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.speed, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_SPEED), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.english, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_ENGLISH), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setCustomContentView(notificationLayout)
@@ -197,9 +206,9 @@ public class ServerService extends Service {
                         "com.jingdong.app.mall"
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
-                PackageManager pm =getPackageManager();
+                PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
-              startActivity(launchIntent);
+                startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
@@ -240,6 +249,17 @@ public class ServerService extends Service {
                 Intent app = new Intent(this, MainActivity.class);
                 app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(app);
+            } else if (intent.getAction().equals(ACTION_ROBOT)) {
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+                launchIntent.setData(Uri.parse("https://gemini.google.com/app"));
+                startActivity(launchIntent);
+            } else if (intent.getAction().equals(ACTION_SPEED)) {
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("com.v2ray.ang");
+                startActivity(launchIntent);
+            } else if (intent.getAction().equals(ACTION_ENGLISH)) {
+                Utils.english(this);
             }
 
         }

@@ -2,13 +2,31 @@ package psycho.euphoria.app;
 
 
 import android.app.ActivityManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.CountDownTimer;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnKeyListener;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
@@ -21,7 +39,9 @@ import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -30,10 +50,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
 import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -43,8 +67,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import static java.lang.Math.max;
 
 public class Utils {
     public static Rectangle calculateCommonPageSize(List<String> imagesUri) {
@@ -321,5 +348,77 @@ public class Utils {
             }
 
         }).start();
+    }
+
+    public static void english(Context context) {
+        final WindowManager.LayoutParams params;
+        params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                LayoutParams.FLAG_KEEP_SCREEN_ON,
+                PixelFormat.TRANSLUCENT);
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        //获取屏幕的高度
+        DisplayMetrics dm = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+        params.format = PixelFormat.RGBA_8888;
+        params.gravity = Gravity.LEFT | Gravity.TOP;
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layout = inflater.inflate(R.layout.float_layout_s, null);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        int margin = max(width, height) / 6; //dpToPx(context, 30);
+        if (width > height)
+            layoutParams.setMargins(margin << 1, margin, margin << 1, margin);
+        else
+            layoutParams.setMargins(margin >> 1, margin >> 1, margin >> 1, margin << 2);
+        layout.findViewById(R.id.layout).setLayoutParams(layoutParams);
+        windowManager.addView(layout, params);
+        EditText editText = (EditText) layout.findViewById(R.id.dst);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int iv, int i1, int i2) {
+                if (charSequence.toString().endsWith("2")) {
+                    windowManager.removeView(layout);
+                } else if (charSequence.toString().endsWith("1")) {
+                    final StringBuilder sb = new StringBuilder();
+                    Thread thread = new Thread(() -> {
+                        String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(editText.getText().toString());
+                        try {
+                            HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)));
+                            h.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74");
+                            h.addRequestProperty("Accept-Encoding", "gzip, deflate, br");
+                            String line = null;
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(h.getInputStream())));
+                            StringBuilder sb1 = new StringBuilder();
+                            while ((line = reader.readLine()) != null) {
+                                sb1.append(line).append('\n');
+                            }
+                            JSONObject object = new JSONObject(sb1.toString());
+                            JSONArray array = object.getJSONArray("sentences");
+                            for (int i = 0; i < array.length(); i++) {
+                                sb.append(array.getJSONObject(i).getString("trans"));
+                            }
+                            Shared.setText(context, sb.toString());
+                            windowManager.removeView(layout);
+                        } catch (Exception e) {
+                        }
+                    });
+                    thread.start();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        //editText.setText(ss.toString());
+        //layout.setOnClickListener(v -> windowManager.removeView(layout));
     }
 }

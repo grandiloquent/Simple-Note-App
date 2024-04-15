@@ -287,7 +287,7 @@ public class ServerService extends Service {
                 Utils.english(this);
             } else if (intent.getAction().equals(ACTION_BROWSER)) {
                 PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("com.v2ray.ang");
+                Intent launchIntent = pm.getLaunchIntentForPackage("org.mozilla.firefox");
                 startActivity(launchIntent);
 
             }

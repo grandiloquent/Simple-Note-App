@@ -389,7 +389,8 @@ public class Utils {
                 } else if (charSequence.toString().endsWith("1")) {
                     final StringBuilder sb = new StringBuilder();
                     Thread thread = new Thread(() -> {
-                        String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(editText.getText().toString());
+                        String s = editText.getText().toString();
+                        String uri = "http://translate.google.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + Uri.encode(s.substring(0, s.length() - 1));
                         try {
                             HttpURLConnection h = (HttpURLConnection) new URL(uri).openConnection(new Proxy(Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)));
                             h.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74");

@@ -215,7 +215,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
-                Shared.setText(this, "vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub" +
+                Shared.setText(this, "vless://e28bb3f8-e64a-4419-9496-33c46220354b@172.67.194.57:443?path=%2F%3Fed%3D2048&security=tls&encryption=none&host=sdgf.bdfstt.sbs&type=ws&sni=sdgf.bdfstt.sbs#t.me%2FConfigsHub\n" +
                         "vless://f4f69ee1-09df-4ca2-a002-89ee0ec8156a@accolade.toptechnonews.com:443?encryption=none&security=tls&sni=accolade.toptechnonews.com&type=ws&host=accolade.toptechnonews.com&path=%2fnimws#accolade.toptechnonews.com_VLESS_WS\n" +
                         "vless://86cb9a9b-dc2e-45d6-b35d-7ce1daa32a15@172.64.229.31:8443?encryption=none&security=tls&sni=dns68.shift.cloudns.org&type=ws&host=dns68.shift.cloudns.org&path=%2f%3fed%3d2048#%f0%9f%94%92+VL-WS-TLS+%f0%9f%87%ba%f0%9f%87%b8+US-172.64.229.31%3a8443+%f0%9f%93%a1+PING-001.75-MS\n" +
                         "vless://d674009a-4a87-4180-a8fe-9a54f66bd7c9@93.95.230.201:8443?encryption=none&security=tls&sni=vpn.restia.love&type=ws&host=vpn.restia.love&path=%2f%3fed%3d2048#%f0%9f%94%92+VL-WS-TLS+%f0%9f%87%ae%f0%9f%87%b8+IS-93.95.230.201%3a8443+%f0%9f%93%a1+PING-101.30-MS\n" +

@@ -101,7 +101,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="英文" />
+            android:text="编辑" />
 
         <TextView
             android:id="@+id/speed"
@@ -114,7 +114,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="机器人" />
+            android:text="查询" />
         <TextView
             android:id="@+id/browser"
             android:layout_width="0dp"

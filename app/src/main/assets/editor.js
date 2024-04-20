@@ -98,7 +98,10 @@ async function translate(baseUri, to) {
     const res = await fetch(`${baseUri}/trans?q=${encodeURIComponent(str)}&to=${to || 'zh'}`);
     const obj = await res.json();
     const contents = obj["sentences"].map(x => x["trans"]).join(" ");
-    textarea.setRangeText(contents, start, end + 1, 'end');
+    textarea.setRangeText(`
+${str}
+
+${contents}`, start, end + 1, 'end');
 }
 async function saveNote() {
     let s = textarea.value.trim();

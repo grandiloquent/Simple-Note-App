@@ -284,7 +284,11 @@ public class ServerService extends Service {
                 Intent launchIntent = pm.getLaunchIntentForPackage("com.v2ray.ang");
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_ENGLISH)) {
-                Utils.english(this);
+                PackageManager pm = getPackageManager();
+                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+                launchIntent.setData(Uri.parse("http://" +
+                        Shared.getDeviceIP(this) + ":8500/editor.html"));
+                startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_BROWSER)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("org.mozilla.firefox");

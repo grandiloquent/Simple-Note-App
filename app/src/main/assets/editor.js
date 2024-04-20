@@ -102,6 +102,7 @@ async function translate(baseUri, to) {
 ${str}
 
 ${contents}`, start, end + 1, 'end');
+    writeText(contents);
 }
 async function saveNote() {
     let s = textarea.value.trim();
@@ -641,7 +642,7 @@ ${await readText()}`
     } else if (evt.key === 'F2') {
         evt.preventDefault();
         const str = (await readText()).replaceAll(/[\n\r]+/g, ' ');
-        textarea.value=`${textarea.value}
+        textarea.value = `${textarea.value}
         
 ${str}`;
     }

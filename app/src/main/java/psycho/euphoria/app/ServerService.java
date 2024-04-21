@@ -277,7 +277,8 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_ROBOT)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-                launchIntent.setData(Uri.parse("https://gemini.google.com/app"));
+                                launchIntent.setData(Uri.parse("http://" +
+                        Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SPEED)) {
                 PackageManager pm = getPackageManager();

@@ -67,6 +67,7 @@ Java_psycho_euphoria_app_ServerService_dic(JNIEnv *env, jclass clazz, jboolean i
         if (js["dataList"][0].contains("pinyin"))
             ss << js["dataList"][0]["pinyin"].get<std::string>() << "\n";
         for (auto &explain: js["dataList"][0]["sense"]) {
+            if(explain.contains("def"))
             ss << explain["def"][0].get<std::string>() << "\n";
         }
         jstring result;

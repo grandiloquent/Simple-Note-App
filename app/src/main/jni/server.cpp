@@ -8,14 +8,41 @@ using db = sqlite::Database<db_name>;
 void serveFile(const std::filesystem::path &p, httplib::Response &res,
                const std::map<std::string, std::string> t) {
 
-    if (p.extension().string() == ".html" || p.extension().string() == ".xhtml") {
+    if (p.extension().string() == ".html" || p.extension().string() == ".xhtml"
+            ) {
         auto s = ReadAllText(p);
         s = ReplaceFirst(s, "</head>",
                          R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
         res.set_content(s, "text/html");
         return;
     }
+    if (p.extension().string() == ".ncx") {
+        auto s = ReadAllText(p);
+        s = s + R"(
+<style>
+    navmap {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+<script>
+    const searchParams = new URL(window.location).searchParams;
+    document.querySelectorAll('navPoint')
+        .forEach(x => {
+            x.addEventListener('click', evt => {
+                const src = x.querySelector('content').getAttribute('src');
+                let p = searchParams.get('path');
+                let index = p.lastIndexOf('/');
+                p = p.substring(0, index);
+                p = p + "/" + src;
+                window.open(`?path=${encodeURIComponent(p)}`, '_blank');
+            })
+        })
+</script>)";
 
+        res.set_content(s, "text/html");
+        return;
+    }
     std::shared_ptr<std::ifstream> fs = std::make_shared<std::ifstream>();
     fs->exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
@@ -217,7 +244,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                         "text/plain; charset=UTF-8");
 
     });
-    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm))?)",
+    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm|ncx))?)",
                [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
                                             httplib::Response &res) {
 
@@ -1561,7 +1588,8 @@ in vec4 a_position;
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
 
-                   if (!path.ends_with(".html") && !path.ends_with(".xhtml")) {
+                   if (!path.ends_with(".html") && !path.ends_with(".xhtml")
+                       && !path.ends_with(".ncx")) {
                        std::string value{"attachment; filename=\""};
                        value.append(SubstringAfterLast(path, "/"));
                        value.append("\"");

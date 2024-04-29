@@ -20,7 +20,7 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
         auto s = ReadAllText(p);
         s = s + R"(
 <style>
-    navmap {
+    navmap,navpoint {
         display: flex;
         flex-direction: column;
     }

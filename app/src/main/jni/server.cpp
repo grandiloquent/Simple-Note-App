@@ -30,7 +30,8 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
     document.querySelectorAll('navPoint')
         .forEach(x => {
             x.addEventListener('click', evt => {
-                const src = x.querySelector('content').getAttribute('src');
+evt.stopPropagation();
+               let src = evt.currentTarget.querySelector('content').getAttribute('src');
                 let p = searchParams.get('path');
                 let index = p.lastIndexOf('/');
                 p = p.substring(0, index);

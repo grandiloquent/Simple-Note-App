@@ -34,6 +34,9 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
                 let p = searchParams.get('path');
                 let index = p.lastIndexOf('/');
                 p = p.substring(0, index);
+ index = src.lastIndexOf('#');
+if(index!==-1)
+               src=src.substring(0, index);
                 p = p + "/" + src;
                 window.open(`?path=${encodeURIComponent(p)}`, '_blank');
             })

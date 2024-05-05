@@ -268,7 +268,8 @@ public class Shared {
     }
 
     public static String getDeviceIP(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        return "0.0.0.0";
+       /* WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         try {
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             int rawIp = wifiInfo.getIpAddress();
@@ -287,6 +288,7 @@ public class Shared {
         } catch (Exception e) {
             return "0.0.0.0";
         }
+        */
     }
 
     public static String getExternalStoragePath(Context context) {
@@ -734,6 +736,7 @@ https://android.googlesource.com/platform/tools/tradefederation/+/ae241fc/src/co
     public interface Listener {
         void onSuccess(String value);
     }
+
     public static void createFloatView(Context context, String s) {
         final WindowManager.LayoutParams params;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -798,6 +801,7 @@ https://android.googlesource.com/platform/tools/tradefederation/+/ae241fc/src/co
 //        mFloatLayout.measure(w, h);
         //设置监听浮动窗口的触摸移动
     }
+
     public static class CommandResult {
 
         // 结果码

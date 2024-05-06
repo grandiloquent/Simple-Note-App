@@ -36,6 +36,7 @@ async function bindPlayEvent() {
         primaryProgress.style.transform = `scaleX(${audio.currentTime / audio.duration
 
             })`;
+           
     });
     audio.addEventListener('play', evt => {
         playPauseButton.querySelector('path').setAttribute('d', 'M9,19H7V5H9ZM17,5H15V19h2Z');
@@ -63,7 +64,7 @@ async function bindPlayEvent() {
         const file = files[
             getRandomInt(0, files.length)
         ];
-        audio.src = `${baseUri}/api/file?path=${file.path}`;
+        audio.src = `${baseUri}/file?path=${encodeURIComponent(file.path)}`;
         audio.play();
         title.textContent = substringAfterLast(file.path, "/");
     })
@@ -112,8 +113,11 @@ async function bindPlayEvent() {
 async function playMusic(path, text) {
     audio.src = `${baseUri}/file?path=${path
         }`
+    
+
     title.textContent = text;
     audio.play();
+    //audio.currentTime =210;
 }
 async function searchIndex(path) {
     for (let index = 0; index < window.files.length; index++) {

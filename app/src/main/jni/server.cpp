@@ -26,7 +26,7 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
 
     document.body.insertAdjacentHTML('afterbegin', `<div style="display:flex;flex-direction:column">${buffers.join('\n')}</div>`);
 })()
-</script>)")
+</script>)");
         res.set_content(s, "text/html");
         return;
     }

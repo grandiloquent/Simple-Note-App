@@ -13,6 +13,20 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
         auto s = ReadAllText(p);
         s = ReplaceFirst(s, "</head>",
                          R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
+        s= ReplaceFirst(s,"</body>",R"(<script>
+(() => {
+    const headers = [...document.querySelectorAll('h1,h2,h3')];
+    const buffers = [];
+    let index = 0;
+    headers.forEach(h => {
+        const id = `header_id_${index++}`;
+        h.id = id;
+        buffers.push(`<a href="#${id}">${h.textContent}</a>`)
+    });
+
+    document.body.insertAdjacentHTML('afterbegin', `<div style="display:flex;flex-direction:column">${buffers.join('\n')}</div>`);
+})()
+</script>)")
         res.set_content(s, "text/html");
         return;
     }

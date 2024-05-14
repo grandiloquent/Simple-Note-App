@@ -1614,7 +1614,7 @@ in vec4 a_position;
                        res.set_header("Content-Disposition", value);
                    }
 
-                   std::filesystem::path p(httplib::detail::decode_url(path, true));
+                   std::filesystem::path p(httplib::detail::decode_url(path, false));
                    serveFile(p, res, t);
                });
     server.Get("/tidy",
@@ -1652,7 +1652,7 @@ in vec4 a_position;
                &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
-                   std::filesystem::path p(httplib::detail::decode_url(path, true));
+                   std::filesystem::path p(httplib::detail::decode_url(path, false));
                    nlohmann::json doc = nlohmann::json::array();
                    for (
                        auto const &dir

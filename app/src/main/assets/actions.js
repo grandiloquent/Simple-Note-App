@@ -470,13 +470,13 @@ async function onShowFavorites() {
     document.body.appendChild(bottomSheet);
 }
 async function addFavorite(path) {
-    const res = await fetch(`${baseUri}/fav/insert?path=${path}`);
+    const res = await fetch(`${baseUri}/fav/insert?path=${encodeURIComponent(path)}`);
     toast.setAttribute('message', '成功');
 }
 async function unCompressFile(path) {
     let res;
     try {
-        res = await fetch(`${baseUri}/unzip?path=${path}`);
+        res = await fetch(`${baseUri}/unzip?path=${encodeURIComponent(path)}`);
         toast.setAttribute('message', '成功');
     } catch (error) {
         toast.setAttribute('message', '错误');

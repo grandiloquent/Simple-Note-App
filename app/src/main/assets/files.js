@@ -28,11 +28,11 @@ function onItemClick(evt) {
         return;
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/video.html?path=${path}`
+        window.location = `/video.html?path=${encodeURIComponent(path)}`
         return;
     }
     if (txtRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/code/editor.html?path=${path}`
+        window.location = `/code/editor.html?path=${encodeURIComponent(path)}`
         return;
     }
     if (path.endsWith(".pdf")) {

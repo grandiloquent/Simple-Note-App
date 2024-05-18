@@ -83,8 +83,7 @@ window.addEventListener("popstate", function (e) {
 document.addEventListener("keydown", function (e) {
     if (e.key === "F4") {
         const searchParams = new URL(window.location).searchParams;
-        path = path || searchParams.get("path") || '/storage/emulated/0';
-        fetch(`${baseUri}/lift?path=${encodeURIComponent(path)}`);
+        fetch(`${baseUri}/lift?path=${encodeURIComponent(searchParams.get("path"))}`);
         e.preventDefault();
 
     }

@@ -80,7 +80,15 @@ function onItemClick(evt) {
 window.addEventListener("popstate", function (e) {
     window.location = location;
 });
+document.addEventListener("keydown", function (e) {
+    if (e.key === "F4") {
+        const searchParams = new URL(window.location).searchParams;
+        path = path || searchParams.get("path") || '/storage/emulated/0';
+        fetch(`${baseUri}/lift?path=${encodeURIComponent(path)}`);
+        e.preventDefault();
 
+    }
+});
 ////////////////////////////////////////////////////////////////
 bind();
 initializeDropZone();

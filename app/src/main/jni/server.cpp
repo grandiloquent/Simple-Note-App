@@ -1714,6 +1714,40 @@ in vec4 a_position;
                    fs::rename(p, parent.append(p.filename().string()));
                });
 
+    server.Get("/lift", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        std::filesystem::path p(httplib::detail::decode_url(path, false));
+        //auto parent = p.parent_path();
+        for (const fs::directory_entry &dir_entry:
+                fs::recursive_directory_iterator(p)) {
+            if (dir_entry.is_regular_file() && (dir_entry.path().extension() == ".mp4")) {
+                std::filesystem::path s = dir_entry.path();
+
+                if (s.parent_path() == p) {
+                    continue;
+                }
+                fs::path pp{p};
+                std::filesystem::path n = pp.append("0.mp4");
+                for (int i = 1; i < 1000; ++i) {
+                    if (fs::exists(n)) {
+                        pp = fs::path{p};
+                        n = pp.append(std::to_string(i) + ".mp4");
+                    } else {
+                        break;
+                    }
+                }
+                fs::rename(s, n);
+            }
+        }
+        for (const fs::directory_entry &dir_entry:
+                fs::directory_iterator(p)) {
+            if (dir_entry.is_directory()) {
+
+                fs::remove_all(dir_entry.path());
+            }
+        }
+    });
     server.listen(host, port);
 }
 

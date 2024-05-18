@@ -8,12 +8,12 @@ using db = sqlite::Database<db_name>;
 void serveFile(const std::filesystem::path &p, httplib::Response &res,
                const std::map<std::string, std::string> t) {
 
-    if (p.extension().string() == ".html" || p.extension().string() == ".xhtml"
-            ) {
+    if (p.extension().string() == ".html" || p.extension().string() == ".xhtml") {
         auto s = ReadAllText(p);
-        s = ReplaceFirst(s, "</head>",
-                         R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
-        s= ReplaceFirst(s,"</body>",R"(<script>
+        s = ReplaceFirst(
+                s, "</head>",
+                R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
+        s = ReplaceFirst(s, "</body>", R"(<script>
 (() => {
     const headers = [...document.querySelectorAll('h1,h2,h3')];
     const buffers = [];
@@ -72,36 +72,35 @@ if(index!==-1)
     fs->seekg(0, std::ios_base::end);
     auto end = fs->tellg();
 
-    if (end == 0)return;
+    if (end == 0)
+        return;
     fs->seekg(0);
     std::map<std::string, std::string> file_extension_and_mimetype_map;
     auto contentType = httplib::detail::find_content_type(p, t);
     if (contentType == nullptr) {
         contentType = "application/octet-stream";
     }
-    res.set_content_provider(static_cast<size_t>(end),
-                             contentType,
-                             [fs](uint64_t offset,
-                                  uint64_t length,
-                                  httplib::DataSink &sink) {
-                                 if (fs->fail()) {
-                                     return false;
-                                 }
-                                 fs->seekg(offset, std::ios_base::beg);
-                                 size_t bufSize = 81920;
-                                 char buffer[bufSize];
+    res.set_content_provider(
+            static_cast<size_t>(end), contentType,
+            [fs](uint64_t offset, uint64_t length, httplib::DataSink &sink) {
+                if (fs->fail()) {
+                    return false;
+                }
+                fs->seekg(offset, std::ios_base::beg);
+                size_t bufSize = 81920;
+                char buffer[bufSize];
 
-                                 try {
-                                     fs->read(buffer, bufSize);
-                                 } catch (std::system_error &e) {
-                                 }
-                                 sink.write(buffer,
-                                            static_cast<size_t>(fs->gcount()));
-                                 return true;
-                             });
+                try {
+                    fs->read(buffer, bufSize);
+                } catch (std::system_error &e) {
+                }
+                sink.write(buffer, static_cast<size_t>(fs->gcount()));
+                return true;
+            });
 }
 
-std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
+std::vector<std::string> split(const std::string &s,
+                               const std::string &delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
     std::vector<std::string> res;
@@ -116,7 +115,8 @@ std::vector<std::string> split(const std::string &s, const std::string &delimite
     return res;
 }
 
-std::string join(const std::vector<std::string> &lst, const std::string &delim) {
+std::string join(const std::vector<std::string> &lst,
+                 const std::string &delim) {
     std::string ret;
     for (const auto &s: lst) {
         if (!ret.empty())
@@ -128,7 +128,8 @@ std::string join(const std::vector<std::string> &lst, const std::string &delim) 
 
 void mergeSubtitles(const std::string &dir) {
     std::regex re("\\.(?:srt)$");
-    std::regex find(R"(\s*\d+[\r\n]+(\d{2}:){2}\d{2},\d{3} --> (\d{2}:){2}\d{2},\d{3}[\r\n]+)");
+    std::regex find(
+            R"(\s*\d+[\r\n]+(\d{2}:){2}\d{2},\d{3} --> (\d{2}:){2}\d{2},\d{3}[\r\n]+)");
     std::vector<std::string> fileBuf;
 
     std::vector<std::string> tocBuf;
@@ -172,7 +173,6 @@ void mergeSubtitles(const std::string &dir) {
         }
     }
 
-
     std::ofstream out(R"(C:\Users\Administrator\Desktop\source.html)",
                       std::ios::out | std::ios::trunc);
     out << R"(<!DOCTYPE html>
@@ -196,13 +196,12 @@ void mergeSubtitles(const std::string &dir) {
     out.close();
 }
 
-static void serveTextContent(const httplib::Request &req, httplib::Response &res) {
+static void serveTextContent(const httplib::Request &req,
+                             httplib::Response &res) {}
 
-}
-
-void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int port) {
-    static const char table[]
-            = R"(CREATE TABLE IF NOT EXISTS "favorite" (
+void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
+                 int port) {
+    static const char table[] = R"(CREATE TABLE IF NOT EXISTS "favorite" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"path"	TEXT NOT NULL UNIQUE,
 	"create_at"	INTEGER,
@@ -214,103 +213,105 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
     std::map<std::string, std::string> t{};
     httplib::Server server;
 
-//    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
-//               [&](const httplib::Request &req, httplib::Response &res) {
-//                   res.set_header("Access-Control-Allow-Origin", "*");
-//
-//                   auto file = FindFile(req);
-//
-//                   if (is_regular_file(file)) {
-//                       serveFile(file, res, t);
-//                       return;
-//                   }
-//
-//               }
-//    );
-/*
- CREATE TABLE IF NOT EXISTS "snippet" (
-	"id"	INTEGER,
-	"content"	TEXT,
-	PRIMARY KEY("id" AUTOINCREMENT)
- */
-//    static const char contentTableSql[]
-//            = R"(ALTER TABLE snippet ADD COLUMN keyword TEXT)";
-//       db::QueryResult fetch_row = db::query<contentTableSql>();
+    //    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
+    //               [&](const httplib::Request &req, httplib::Response &res) {
+    //                   res.set_header("Access-Control-Allow-Origin", "*");
+    //
+    //                   auto file = FindFile(req);
+    //
+    //                   if (is_regular_file(file)) {
+    //                       serveFile(file, res, t);
+    //                       return;
+    //                   }
+    //
+    //               }
+    //    );
+    /*
+     CREATE TABLE IF NOT EXISTS "snippet" (
+            "id"	INTEGER,
+            "content"	TEXT,
+            PRIMARY KEY("id" AUTOINCREMENT)
+     */
+    //    static const char contentTableSql[]
+    //            = R"(ALTER TABLE snippet ADD COLUMN keyword TEXT)";
+    //       db::QueryResult fetch_row = db::query<contentTableSql>();
 
-
-    jclass jclass1 = static_cast<jclass>(env->NewGlobalRef(
-            env->FindClass("psycho/euphoria/app/ImageUitls")));
+    jclass jclass1 = static_cast<jclass>(
+            env->NewGlobalRef(env->FindClass("psycho/euphoria/app/ImageUitls")));
     JavaVM *jvm;
     env->GetJavaVM(&jvm);
-    server.Post("/file/write", [](const httplib::Request &req, httplib::Response &res,
-                                  const httplib::ContentReader &content_reader) {
-        res.set_header("Access-Control-Allow-Origin", "*");
+    server.Post("/file/write",
+                [](const httplib::Request &req, httplib::Response &res,
+                   const httplib::ContentReader &content_reader) {
+                    res.set_header("Access-Control-Allow-Origin", "*");
 
-        std::string body;
-        content_reader([&](const char *data, size_t data_length) {
-            body.append(data, data_length);
-            return true;
-        });
-        auto path = req.get_param_value("path");
-        std::ofstream wf(path, std::ios::out | std::ios::binary);
-        if (!wf) {
-            res.status = 500;
-            return;
-        }
-        wf.write(body.c_str(), body.size());
-        res.set_content("Success",
-                        "text/plain; charset=UTF-8");
+                    std::string body;
+                    content_reader([&](const char *data, size_t data_length) {
+                        body.append(data, data_length);
+                        return true;
+                    });
+                    auto path = req.get_param_value("path");
+                    std::ofstream wf(path, std::ios::out | std::ios::binary);
+                    if (!wf) {
+                        res.status = 500;
+                        return;
+                    }
+                    wf.write(body.c_str(), body.size());
+                    res.set_content("Success", "text/plain; charset=UTF-8");
+                });
+    server.Get(
+            R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm|ncx))?)",
+            [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
+                                         httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+                auto p = req.path == "/" ? "index.html" : req.path.substr(1);
+                if (!p.ends_with(".html")) {
+                    auto file = FindFile(req);
+                    if (is_regular_file(file)) {
+                        serveFile(file, res, t);
+                        return;
+                    }
+                }
 
-    });
-    server.Get(R"(/(.+\.(?:js|css|html|xhtml|ttf|png|jpg|jpeg|gif|json|svg|wasm|ncx))?)",
-               [&t, mgr, env, jclass1, jvm](const httplib::Request &req,
-                                            httplib::Response &res) {
+                auto str = std::string{}; // m[p];
 
-                   res.set_header("Access-Control-Allow-Origin", "*");
-                   auto p = req.path == "/" ? "index.html" : req.path.substr(1);
-                   if (!p.ends_with(".html")) {
-                       auto file = FindFile(req);
-                       if (is_regular_file(file)) {
-                           serveFile(file, res, t);
-                           return;
-                       }
-                   }
-
-                   auto str = std::string{}; //m[p];
-
-                   if (str.empty()) {
-//                       if (p.ends_with("files.html")) {
-//
-//                           if (jvm->AttachCurrentThread(reinterpret_cast<JNIEnv **>((void **) &env),
-//                                                        NULL) != 0){
-//                               return;
-//                           }
-//                           jmethodID jmethodId = env->GetStaticMethodID(jclass1, "combineImages",
-//                                                                        "()V");
-//                           env->CallStaticVoidMethod(jclass1, jmethodId);
-//                       }
-                       unsigned char *data;
-                       unsigned int len = 0;
-                       ReadBytesAsset(mgr, p,
-                                      &data, &len);
-                       str = std::string(reinterpret_cast<const char *>(data), len);
-                       //m[p] = str;
-                   }
-                   if (str.length() == 0 && p.ends_with(".html")) {
-                       auto file = FindFile(req);
-                       res.status = 302;
-                       res.set_header("location",
-                                      SubstringBeforeLast(req.path, "/") + "/file?path=" +
-                                      EncodeUrl(file.string()));
-                       return;
-                   }
-                   auto content_type = httplib::detail::find_content_type(p, t);
-                   res.set_content(str, content_type);
-               });
+                if (str.empty()) {
+                    //                       if (p.ends_with("files.html")) {
+                    //
+                    //                           if
+                    //                           (jvm->AttachCurrentThread(reinterpret_cast<JNIEnv
+                    //                           **>((void **) &env),
+                    //                                                        NULL) != 0){
+                    //                               return;
+                    //                           }
+                    //                           jmethodID jmethodId =
+                    //                           env->GetStaticMethodID(jclass1,
+                    //                           "combineImages",
+                    //                                                                        "()V");
+                    //                           env->CallStaticVoidMethod(jclass1,
+                    //                           jmethodId);
+                    //                       }
+                    unsigned char *data;
+                    unsigned int len = 0;
+                    ReadBytesAsset(mgr, p, &data, &len);
+                    str = std::string(reinterpret_cast<const char *>(data), len);
+                    // m[p] = str;
+                }
+                if (str.length() == 0 && p.ends_with(".html")) {
+                    auto file = FindFile(req);
+                    res.status = 302;
+                    res.set_header("location",
+                                   SubstringBeforeLast(req.path, "/") +
+                                   "/file?path=" + EncodeUrl(file.string()));
+                    return;
+                }
+                auto content_type = httplib::detail::find_content_type(p, t);
+                res.set_content(str, content_type);
+            });
     server.Get("/notes", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(SELECT id,title,update_at FROM note WHERE start = 0 ORDER BY update_at DESC)";
+        static const char query[] =
+                R"(SELECT id,title,update_at FROM note WHERE start = 0 ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view id, title, update_at;
 
@@ -333,8 +334,8 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
         auto q = req.get_param_value("q");
         auto all = req.get_param_value("all");
         if (q.empty()) {
-            static const char query[]
-                    = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC limit 100)";
+            static const char query[] =
+                    R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC limit 100)";
             db::QueryResult fetch_row = db::query<query>();
             std::string_view id, title, update_at;
             nlohmann::json doc = nlohmann::json::array();
@@ -351,11 +352,10 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(doc.dump(), "application/json");
 
         } else if (!all.empty()) {
-// ORDER BY update_at DESC
+            // ORDER BY update_at DESC
 
-
-            static const char queryv[]
-                    = R"(SELECT id,title,content,update_at FROM code)";
+            static const char queryv[] =
+                    R"(SELECT id,title,content,update_at FROM code)";
             db::QueryResult fetch_row_v = db::query<queryv>();
             std::string_view id, title, content, update_at;
 
@@ -373,13 +373,12 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                     };
                     doc.push_back(j);
                 }
-
             }
             res.set_content(doc.dump(), "application/json");
         } else {
 
-            static const char queryv[]
-                    = R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
+            static const char queryv[] =
+                    R"(SELECT id,title,update_at FROM code ORDER BY update_at DESC)";
             db::QueryResult fetch_row_v = db::query<queryv>();
             std::string_view id, title, update_at;
 
@@ -396,44 +395,42 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
                     };
                     doc.push_back(j);
                 }
-
             }
             res.set_content(doc.dump(), "application/json");
         }
-
     });
-    server.Get("/snippets", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(SELECT content,keyword,id FROM snippet ORDER BY views)";
-        db::QueryResult fetch_row = db::query<query>();
-        std::string_view content, keyword, id;
-        nlohmann::json doc = nlohmann::json::array();
-        while (fetch_row(content, keyword, id)) {
-            nlohmann::json j = {
-                    {"content", content},
-                    {"keyword", keyword},
-                    {"id",      id}
-            };
-            doc.push_back(j);
-        }
-        res.set_content(doc.dump(), "application/json");
-    });
-    server.Get("/snippet", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto k = req.get_param_value("k");
-        static const char query[]
-                = R"(SELECT content FROM snippet where keyword = ?1)";
-        db::QueryResult fetch_row = db::query<query>(k);
-        std::string_view content;
-        if (fetch_row(content)) {
-            res.set_content(content.data(), content.size(), "application/json");
-        }
+    server.Get("/snippets",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   static const char query[] =
+                           R"(SELECT content,keyword,id FROM snippet ORDER BY views)";
+                   db::QueryResult fetch_row = db::query<query>();
+                   std::string_view content, keyword, id;
+                   nlohmann::json doc = nlohmann::json::array();
+                   while (fetch_row(content, keyword, id)) {
+                       nlohmann::json j = {
+                               {"content", content},
+                               {"keyword", keyword},
+                               {"id",      id}};
+                       doc.push_back(j);
+                   }
+                   res.set_content(doc.dump(), "application/json");
+               });
+    server.Get(
+            "/snippet", [](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+                auto k = req.get_param_value("k");
+                static const char query[] =
+                        R"(SELECT content FROM snippet where keyword = ?1)";
+                db::QueryResult fetch_row = db::query<query>(k);
+                std::string_view content;
+                if (fetch_row(content)) {
+                    res.set_content(content.data(), content.size(), "application/json");
+                }
+            });
 
-    });
-
-
-    server.Post("/snippet", [](const httplib::Request &req, httplib::Response &res,
+    server.Post("/snippet", [](const httplib::Request &req,
+                               httplib::Response &res,
                                const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
@@ -456,39 +453,39 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             id = doc["id"];
         }
         if (id == 0) {
-            static const char query[]
-                    = R"(INSERT INTO snippet (content,keyword) VALUES(?1,?2))";
+            static const char query[] =
+                    R"(INSERT INTO snippet (content,keyword) VALUES(?1,?2))";
             db::QueryResult fetch_row = db::query<query>(content, keyword);
 
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         } else {
-            static const char query[]
-                    = R"(UPDATE snippet SET content=coalesce(NULLIF(?1,''),content),keyword=coalesce(NULLIF(?2,''),keyword) where id =?3)";
+            static const char query[] =
+                    R"(UPDATE snippet SET content=coalesce(NULLIF(?1,''),content),keyword=coalesce(NULLIF(?2,''),keyword) where id =?3)";
             db::QueryResult fetch_row = db::query<query>(content, keyword, id);
 
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         }
-
     });
-    server.Post("/snippet/delete", [](const httplib::Request &req, httplib::Response &res,
-                                      const httplib::ContentReader &content_reader) {
-        res.set_header("Access-Control-Allow-Origin", "*");
+    server.Post(
+            "/snippet/delete", [](const httplib::Request &req, httplib::Response &res,
+                                  const httplib::ContentReader &content_reader) {
+                res.set_header("Access-Control-Allow-Origin", "*");
 
-        std::string body;
-        content_reader([&](const char *data, size_t data_length) {
-            body.append(data, data_length);
-            return true;
-        });
-        static const char query[]
-                = R"(DELETE FROM snippet WHERE content = ?1)";
-        db::QueryResult fetch_row = db::query<query>(body);
+                std::string body;
+                content_reader([&](const char *data, size_t data_length) {
+                    body.append(data, data_length);
+                    return true;
+                });
+                static const char query[] = R"(DELETE FROM snippet WHERE content = ?1)";
+                db::QueryResult fetch_row = db::query<query>(body);
 
-        res.set_content(std::to_string(fetch_row.resultCode()),
-                        "text/plain; charset=UTF-8");
-    });
-    server.Post("/snippet/hit", [](const httplib::Request &req, httplib::Response &res,
+                res.set_content(std::to_string(fetch_row.resultCode()),
+                                "text/plain; charset=UTF-8");
+            });
+    server.Post("/snippet/hit", [](const httplib::Request &req,
+                                   httplib::Response &res,
                                    const httplib::ContentReader &content_reader) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
@@ -497,20 +494,19 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             body.append(data, data_length);
             return true;
         });
-        static const char query[]
-                = R"(UPDATE snippet SET views = COALESCE(views,0) + 1 WHERE content = ?1)";
+        static const char query[] =
+                R"(UPDATE snippet SET views = COALESCE(views,0) + 1 WHERE content = ?1)";
         db::QueryResult fetch_row = db::query<query>(body);
 
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
     });
 
-
     server.Get("/code", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto id = req.get_param_value("id");
-        static const char query[]
-                = R"(select title, content, create_at, update_at from code WHERE id = ?1)";
+        static const char query[] =
+                R"(select title, content, create_at, update_at from code WHERE id = ?1)";
         db::QueryResult fetch_row = db::query<query>(id);
         std::string_view title, content, create_at, update_at;
 
@@ -525,81 +521,90 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host, int
             res.set_content(j.dump(), "application/json");
         }
     });
-    server.Get("/code/random", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto q = req.get_param_value("q");
-        auto o = req.get_param_value("o");
-        static const char query[]
-                = R"(select id,title from code ORDER BY update_at DESC)";
-        db::QueryResult fetch_row = db::query<query>(
+    server.Get("/code/random",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto q = req.get_param_value("q");
+                   auto o = req.get_param_value("o");
+                   static const char query[] =
+                           R"(select id,title from code ORDER BY update_at DESC)";
+                   db::QueryResult fetch_row = db::query<query>(
 
-        );
-        // OFFSETo.empty() ? 0 : atoi(o.c_str())
-        std::string_view id, title;
-        std::regex c("[\u4e00-\u9fa5]+");
-        while (fetch_row(id, title)) {
+                   );
+                   // OFFSETo.empty() ? 0 : atoi(o.c_str())
+                   std::string_view id, title;
+                   std::regex c("[\u4e00-\u9fa5]+");
+                   while (fetch_row(id, title)) {
 
-            if (q.empty()) {
-                if (!std::regex_search(title.data(), c)) {
-                    res.set_content(id.data(), id.size(), "text/plain");
-                    return;
-                }
-            } else {
-                if ((title == q)) {
-                    res.set_content(id.data(), id.size(), "text/plain");
-                    return;
-                }
-            }
+                       if (q.empty()) {
+                           if (!std::regex_search(title.data(), c)) {
+                               res.set_content(id.data(), id.size(), "text/plain");
+                               return;
+                           }
+                       } else {
+                           if ((title == q)) {
+                               res.set_content(id.data(), id.size(), "text/plain");
+                               return;
+                           }
+                       }
+                   }
+                   static const char query_r[] =
+                           R"(select id,title from code ORDER BY random() LIMIT 1)";
+                   db::QueryResult fetch_row_r = db::query<query_r>();
+                   if (fetch_row_r(id, title)) {
+                       res.set_content(id.data(), id.size(), "text/plain");
+                   }
+                   /*
+                    static const char query[]
+                           = R"(select id,title from code ORDER BY random() LIMIT
+                   1)"; db::QueryResult fetch_row = db::query<query>();
+                   std::string_view id, title;
+                   std::regex c("[\\u4e00-\\u9fa5]+");
+                   int count = 10;
+                   while (count > 0) {
+                       if (fetch_row(id, title)) {
+                           if (!std::regex_search(title.data(), c)) {
+                               res.set_content(id.data(), id.size(),
+                   "application/json"); return;
+                           }
+                       }
+                       count--;
+                   }
+                   if (fetch_row(id, title)) {
+                       res.set_content(id.data(), id.size(), "application/json");
+                   }
+                    */
+               });
 
-        }
-        static const char query_r[]
-                = R"(select id,title from code ORDER BY random() LIMIT 1)";
-        db::QueryResult fetch_row_r = db::query<query_r>();
-        if (fetch_row_r(id, title)) {
-            res.set_content(id.data(), id.size(), "text/plain");
-        }
-        /*
-         static const char query[]
-                = R"(select id,title from code ORDER BY random() LIMIT 1)";
-        db::QueryResult fetch_row = db::query<query>();
-        std::string_view id, title;
-        std::regex c("[\\u4e00-\\u9fa5]+");
-        int count = 10;
-        while (count > 0) {
-            if (fetch_row(id, title)) {
-                if (!std::regex_search(title.data(), c)) {
-                    res.set_content(id.data(), id.size(), "application/json");
-                    return;
-                }
-            }
-            count--;
-        }
-        if (fetch_row(id, title)) {
-            res.set_content(id.data(), id.size(), "application/json");
-        }
-         */
-    });
+    server.Get(
+            "/viewer", [](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+                auto id = req.get_param_value("id");
+                static const char query[] = R"(select content from code WHERE id = ?1)";
+                db::QueryResult fetch_row = db::query<query>(id);
+                std::string content;
+                if (fetch_row(content)) {
 
-    server.Get("/viewer", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto id = req.get_param_value("id");
-        static const char query[]
-                = R"(select content from code WHERE id = ?1)";
-        db::QueryResult fetch_row = db::query<query>(id);
-        std::string content;
-        if (fetch_row(content)) {
-
-            if (content.find("three.js") != std::string::npos) {
-//                auto sv = SubstringBeforeLast(content, std::string{
-//                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
-//                sv += R"(const div = document.createElement("div");
-//    div.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\n/g, "<br>")}</span>`).join('\n');
-//    document.body.appendChild(div);
-//)" + SubstringAfterLast(content, std::string{
-//                        "document.body.innerHTML = [...arguments].map(x => `<span>${JSON.stringify(x).replaceAll(/\\\\n/g, \"<br>\")}</span>`).join('\\n');"});
-//
-//                content = sv;
-                std::string s{R"(<html lang='en'>
+                    if (content.find("three.js") != std::string::npos) {
+                        //                auto sv = SubstringBeforeLast(content,
+                        //                std::string{
+                        //                        "document.body.innerHTML =
+                        //                        [...arguments].map(x =>
+                        //                        `<span>${JSON.stringify(x).replaceAll(/\\\\n/g,
+                        //                        \"<br>\")}</span>`).join('\\n');"});
+                        //                sv += R"(const div =
+                        //                document.createElement("div");
+                        //    div.innerHTML = [...arguments].map(x =>
+                        //    `<span>${JSON.stringify(x).replaceAll(/\\n/g,
+                        //    "<br>")}</span>`).join('\n'); document.body.appendChild(div);
+                        //)" + SubstringAfterLast(content, std::string{
+                        //                        "document.body.innerHTML =
+                        //                        [...arguments].map(x =>
+                        //                        `<span>${JSON.stringify(x).replaceAll(/\\\\n/g,
+                        //                        \"<br>\")}</span>`).join('\\n');"});
+                        //
+                        //                content = sv;
+                        std::string s{R"(<html lang='en'>
 <head>
 <meta charset="UTF-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
@@ -743,13 +748,14 @@ document.addEventListener('keydown', evt => {
         }
      </script>
 )"};
-                res.set_content(s + content.data() + R"(
+                        res.set_content(s + content.data() + R"(
 
 </body>
-</html>)", "text/html");
-            } else {
+</html>)",
+                                        "text/html");
+                    } else {
 
-                std::string s{R"(<html lang='en'>
+                        std::string s{R"(<html lang='en'>
 <head>
 <meta charset="UTF-8">
   <meta name='viewport' content='width=device-width, initial-scale=1.0' />
@@ -894,14 +900,14 @@ in vec4 a_position;
      }
      </script>
 )"};
-                res.set_content(s + content.data() + R"(
+                        res.set_content(s + content.data() + R"(
 
 </body>
-</html>)", "text/html");
-
-            }
-        }
-    });
+</html>)",
+                                        "text/html");
+                    }
+                }
+            });
 
     server.Post("/code", [](const httplib::Request &req, httplib::Response &res,
                             const httplib::ContentReader &content_reader) {
@@ -922,63 +928,47 @@ in vec4 a_position;
         bool isUpdate = doc.contains("id") && doc["id"] > -1;
         if (isUpdate) {
             id = doc["id"];
-            static const char queryw[]
-                    = R"(SELECT id from code where id = ?1)";
+            static const char queryw[] = R"(SELECT id from code where id = ?1)";
             db::QueryResult fetch_w = db::query<queryw>(id);
             std::string_view idw;
             if (!fetch_w(idw)) {
                 isUpdate = false;
             }
-
         }
-
 
         if (isUpdate) {
 
-            static const char query[]
-                    = R"(UPDATE code SET title=coalesce(?1,title),content=coalesce(NULLIF(?2,''),content),update_at=?3 where id =?4)";
-            db::QueryResult fetch_row = db::query<query>(title,
-                                                         content,
-                                                         GetTimeStamp(),
-                                                         id
-            );
+            static const char query[] =
+                    R"(UPDATE code SET title=coalesce(?1,title),content=coalesce(NULLIF(?2,''),content),update_at=?3 where id =?4)";
+            db::QueryResult fetch_row =
+                    db::query<query>(title, content, GetTimeStamp(), id);
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         } else {
             if (id == 0) {
-                static const char query[]
-                        = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+                static const char query[] =
+                        R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
 
-                db::QueryResult fetch_row = db::query<query>(title,
-                                                             content,
-                                                             GetTimeStamp(),
-                                                             GetTimeStamp()
-                );
-                static const char queryv[]
-                        = R"(SELECT last_insert_rowid())";
+                db::QueryResult fetch_row =
+                        db::query<query>(title, content, GetTimeStamp(), GetTimeStamp());
+                static const char queryv[] = R"(SELECT last_insert_rowid())";
                 db::QueryResult fetch_id = db::query<queryv>();
                 std::string_view idv;
                 if (fetch_id(idv)) {
-                    res.set_content(idv.data(), idv.size(),
-                                    "text/plain; charset=UTF-8");
+                    res.set_content(idv.data(), idv.size(), "text/plain; charset=UTF-8");
                 } else
                     res.set_content(std::to_string(fetch_row.resultCode()),
                                     "text/plain; charset=UTF-8");
             } else {
-                static const char query[]
-                        = R"(INSERT INTO code (id,title,content,create_at,update_at) VALUES(?1,?2,?3,?4,?5))";
-                db::QueryResult fetch_row = db::query<query>(id, title,
-                                                             content,
-                                                             GetTimeStamp(),
-                                                             GetTimeStamp()
-                );
-                static const char queryv[]
-                        = R"(SELECT last_insert_rowid())";
+                static const char query[] =
+                        R"(INSERT INTO code (id,title,content,create_at,update_at) VALUES(?1,?2,?3,?4,?5))";
+                db::QueryResult fetch_row = db::query<query>(
+                        id, title, content, GetTimeStamp(), GetTimeStamp());
+                static const char queryv[] = R"(SELECT last_insert_rowid())";
                 db::QueryResult fetch_id = db::query<queryv>();
                 std::string_view idv;
                 if (fetch_id(idv)) {
-                    res.set_content(idv.data(), idv.size(),
-                                    "text/plain; charset=UTF-8");
+                    res.set_content(idv.data(), idv.size(), "text/plain; charset=UTF-8");
                 } else
                     res.set_content(std::to_string(fetch_row.resultCode()),
                                     "text/plain; charset=UTF-8");
@@ -997,23 +987,17 @@ in vec4 a_position;
         });
         nlohmann::json doc = nlohmann::json::parse(body);
         for (auto &d: doc) {
-            static const char query[]
-                    = R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
-            db::QueryResult fetch_row = db::query<query>("WebGL Three.js Babylon.js",
-                                                         d.get<std::string>().c_str(),
-                                                         GetTimeStamp(),
-                                                         GetTimeStamp()
-            );
-
+            static const char query[] =
+                    R"(INSERT INTO code (title,content,create_at,update_at) VALUES(?1,?2,?3,?4))";
+            db::QueryResult fetch_row = db::query<query>(
+                    "WebGL Three.js Babylon.js", d.get<std::string>().c_str(),
+                    GetTimeStamp(), GetTimeStamp());
         }
-        res.set_content("OK",
-                        "text/plain; charset=UTF-8");
-
+        res.set_content("OK", "text/plain; charset=UTF-8");
     });
-    server.Get("/fav/list", [](const httplib::Request &req, httplib::Response &res) {
-
-        static const char query[]
-                = R"(SELECT path FROM favorite ORDER BY path)";
+    server.Get("/fav/list", [](const httplib::Request &req,
+                               httplib::Response &res) {
+        static const char query[] = R"(SELECT path FROM favorite ORDER BY path)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view path;
 
@@ -1023,10 +1007,11 @@ in vec4 a_position;
         }
         res.set_content(doc.dump(), "application/json");
     });
-    server.Get("/todo/list", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/todo/list", [](const httplib::Request &req,
+                                httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(SELECT id,title,start,status,update_at FROM note WHERE start > 0 ORDER BY update_at DESC)";
+        static const char query[] =
+                R"(SELECT id,title,start,status,update_at FROM note WHERE start > 0 ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view id, title, start, status, update_at;
 
@@ -1043,17 +1028,19 @@ in vec4 a_position;
         }
         res.set_content(doc.dump(), "application/json");
     });
-    server.Get("/search", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/search", [](const httplib::Request &req,
+                             httplib::Response &res) {
         auto q = req.get_param_value("q");
-        static const char query[]
-                = R"(SELECT id,title,content,update_at FROM note WHERE start = 0 ORDER BY update_at DESC)";
+        static const char query[] =
+                R"(SELECT id,title,content,update_at FROM note WHERE start = 0 ORDER BY update_at DESC)";
         db::QueryResult fetch_row = db::query<query>();
         std::string id, title, content, update_at;
 
         nlohmann::json doc = nlohmann::json::array();
         std::regex q_regex(q);
         while (fetch_row(id, title, content, update_at)) {
-            if (std::regex_search(title, q_regex) || std::regex_search(content, q_regex)) {
+            if (std::regex_search(title, q_regex) ||
+                std::regex_search(content, q_regex)) {
                 nlohmann::json j = {
 
                         {"id",        id},
@@ -1063,15 +1050,14 @@ in vec4 a_position;
                 };
                 doc.push_back(j);
             }
-
         }
         res.set_content(doc.dump(), "application/json");
     });
     server.Get("/note", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto id = req.get_param_value("id");
-        static const char query[]
-                = R"(select title, content, start, status, create_at, update_at from note WHERE id = ?1)";
+        static const char query[] =
+                R"(select title, content, start, status, create_at, update_at from note WHERE id = ?1)";
         db::QueryResult fetch_row = db::query<query>(id);
         std::string_view title, content, start, status, create_at, update_at;
 
@@ -1089,8 +1075,7 @@ in vec4 a_position;
     });
     server.Get("/an", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 1)";
+        static const char query[] = R"(select content from content WHERE id = 1)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
 
@@ -1109,18 +1094,15 @@ in vec4 a_position;
             return true;
         });
 
-        static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (1,?1,?2))";
-        db::QueryResult fetch_row = db::query<query>(body,
-                                                     GetTimeStamp());
+        static const char query[] =
+                R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (1,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body, GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
-
     });
     server.Get("/pn", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 2)";
+        static const char query[] = R"(select content from content WHERE id = 2)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
 
@@ -1139,18 +1121,15 @@ in vec4 a_position;
             return true;
         });
 
-        static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (2,?1,?2))";
-        db::QueryResult fetch_row = db::query<query>(body,
-                                                     GetTimeStamp());
+        static const char query[] =
+                R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (2,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body, GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
-
     });
     server.Get("/ts", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 15
+        static const char query[] = R"(select content from content WHERE id = 15
 )";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
@@ -1170,18 +1149,15 @@ in vec4 a_position;
             return true;
         });
 
-        static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (15,?1,?2))";
-        db::QueryResult fetch_row = db::query<query>(body,
-                                                     GetTimeStamp());
+        static const char query[] =
+                R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (15,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body, GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
-
     });
     server.Get("/fn", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 4)";
+        static const char query[] = R"(select content from content WHERE id = 4)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
 
@@ -1200,19 +1176,16 @@ in vec4 a_position;
             return true;
         });
 
-        static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (4,?1,?2))";
-        db::QueryResult fetch_row = db::query<query>(body,
-                                                     GetTimeStamp());
+        static const char query[] =
+                R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (4,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body, GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
-
     });
 
     server.Get("/jn", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 5)";
+        static const char query[] = R"(select content from content WHERE id = 5)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view content;
 
@@ -1231,33 +1204,28 @@ in vec4 a_position;
             return true;
         });
 
-        static const char query[]
-                = R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (5,?1,?2))";
-        db::QueryResult fetch_row = db::query<query>(body,
-                                                     GetTimeStamp());
+        static const char query[] =
+                R"(INSERT OR REPLACE INTO content (id, content,update_at) VALUES (5,?1,?2))";
+        db::QueryResult fetch_row = db::query<query>(body, GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
-
     });
-    server.Get("/animate/js", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/animate/js", [](const httplib::Request &req,
+                                 httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 5)";
+        static const char query[] = R"(select content from content WHERE id = 5)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view o;
 
         fetch_row(o);
 
-
         res.set_content(o.data(), o.size(), "text/html");
-
     });
 
-
-    server.Get("/animate/shader", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/animate/shader", [](const httplib::Request &req,
+                                     httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        static const char query[]
-                = R"(select content from content WHERE id = 3)";
+        static const char query[] = R"(select content from content WHERE id = 3)";
         db::QueryResult fetch_row = db::query<query>();
         std::string_view vertex;
 
@@ -1268,15 +1236,14 @@ in vec4 a_position;
         })";
         }
 
-        static const char query1[]
-                = R"(select content from content WHERE id = 4)";
+        static const char query1[] = R"(select content from content WHERE id = 4)";
         db::QueryResult fetch_fragment = db::query<query1>();
         std::string_view fragment;
 
         if (!fetch_fragment(fragment)) {
 
             fragment = "";
-            //res.set_content(content.data(), content.size(), "text/plain");
+            // res.set_content(content.data(), content.size(), "text/plain");
         }
         std::stringstream ss;
         ss << R"(<!DOCTYPE html>
@@ -1372,7 +1339,6 @@ in vec4 a_position;
 </html>)";
         auto o = ss.str();
         res.set_content(o.data(), o.size(), "text/html");
-
     });
     server.Post("/note", [](const httplib::Request &req, httplib::Response &res,
                             const httplib::ContentReader &content_reader) {
@@ -1399,65 +1365,55 @@ in vec4 a_position;
         }
         if (doc.contains("id") && doc["id"] > 0) {
             int id = doc["id"];
-            static const char query[]
-                    = R"(UPDATE note SET title=coalesce(?1,title),content=coalesce(?2,content),start=?3,status=?4,update_at=?5 where id =?6)";
-            db::QueryResult fetch_row = db::query<query>(title,
-                                                         content,
-                                                         start,
-                                                         status,
-                                                         GetTimeStamp(),
-                                                         id
-            );
+            static const char query[] =
+                    R"(UPDATE note SET title=coalesce(?1,title),content=coalesce(?2,content),start=?3,status=?4,update_at=?5 where id =?6)";
+            db::QueryResult fetch_row =
+                    db::query<query>(title, content, start, status, GetTimeStamp(), id);
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         } else {
-            static const char query[]
-                    = R"(INSERT INTO note (title,content,start,status,create_at,update_at) VALUES(?1,?2,?3,?4,?5,?6))";
-            db::QueryResult fetch_row = db::query<query>(title,
-                                                         content,
-                                                         start,
-                                                         status,
-                                                         GetTimeStamp(),
-                                                         GetTimeStamp()
-            );
+            static const char query[] =
+                    R"(INSERT INTO note (title,content,start,status,create_at,update_at) VALUES(?1,?2,?3,?4,?5,?6))";
+            db::QueryResult fetch_row = db::query<query>(
+                    title, content, start, status, GetTimeStamp(), GetTimeStamp());
             res.set_content(std::to_string(fetch_row.resultCode()),
                             "text/plain; charset=UTF-8");
         }
     });
-    server.Get("/fav/insert", [](const httplib::Request &req, httplib::Response &res) {
+    server.Get("/fav/insert", [](const httplib::Request &req,
+                                 httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto path = req.get_param_value("path");
 
-        static const char query[]
-                = R"(insert into favorite (path,create_at,update_at) values(?1,?2,?3))";
-        db::QueryResult fetch_row = db::query<query>(path,
-                                                     GetTimeStamp(),
-                                                     GetTimeStamp()
-        );
+        static const char query[] =
+                R"(insert into favorite (path,create_at,update_at) values(?1,?2,?3))";
+        db::QueryResult fetch_row =
+                db::query<query>(path, GetTimeStamp(), GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
     });
-    server.Get("/fav/delete", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto path = req.get_param_value("path");
+    server.Get(
+            "/fav/delete", [](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+                auto path = req.get_param_value("path");
 
-        static const char query[]
-                = R"(delete from favorite where path = ?1)";
-        db::QueryResult fetch_row = db::query<query>(path);
-        res.set_content(std::to_string(fetch_row.resultCode()),
-                        "text/plain; charset=UTF-8");
-    });
-    server.Get("/extract", [](const httplib::Request &req, httplib::Response &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto url = req.get_param_value("url");
-        std::string response;
-        if (url.find("hy11646.com") != std::string::npos) {
-            response = Hy(url);
-        } else {
-            response = Tiktok(url);
-        }
-        res.set_content(response, "application/json");
-    });
+                static const char query[] = R"(delete from favorite where path = ?1)";
+                db::QueryResult fetch_row = db::query<query>(path);
+                res.set_content(std::to_string(fetch_row.resultCode()),
+                                "text/plain; charset=UTF-8");
+            });
+    server.Get("/extract",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto url = req.get_param_value("url");
+                   std::string response;
+                   if (url.find("hy11646.com") != std::string::npos) {
+                       response = Hy(url);
+                   } else {
+                       response = Tiktok(url);
+                   }
+                   res.set_content(response, "application/json");
+               });
     server.Get("/su", [](const httplib::Request &req, httplib::Response &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         auto cmd = req.get_param_value("cmd");
@@ -1466,8 +1422,7 @@ in vec4 a_position;
         std::string buffer;
         if (pipeFP != nullptr) {
             char buf[BUFSIZ];
-            while (fgets(buf, BUFSIZ, pipeFP) !=
-                   nullptr) {
+            while (fgets(buf, BUFSIZ, pipeFP) != nullptr) {
                 buffer += buf;
             }
             pclose(pipeFP);
@@ -1477,8 +1432,8 @@ in vec4 a_position;
     server.Get("/zip", [](const httplib::Request &req, httplib::Response &res) {
         auto path = std::filesystem::path{req.get_param_value("path")};
         if (is_directory(path)) {
-            Zipper zipper(
-                    path.parent_path().string() + "/" + path.filename().string() + ".epub");
+            Zipper zipper(path.parent_path().string() + "/" +
+                          path.filename().string() + ".epub");
             auto length = path.string().length() + 1;
             for (const fs::directory_entry &dir_entry:
                     fs::recursive_directory_iterator(path)) {
@@ -1486,23 +1441,24 @@ in vec4 a_position;
                     std::ifstream input(dir_entry.path());
                     zipper.add(input, dir_entry.path().string().substr(length));
                 }
-
             }
             zipper.close();
         }
-//        std::vector<unsigned char> zip_vect;
-//        Zipper zipper(zip_vect);
-//        for (const fs::directory_entry &dir_entry:
-//                fs::recursive_directory_iterator(path)) {
-//            if (dir_entry.is_regular_file()) {
-//                std::ifstream input(dir_entry.path());
-//                zipper.add(input, dir_entry.path().string().substr(path.length() + 1));
-//            }
-//
-//        }
+        //        std::vector<unsigned char> zip_vect;
+        //        Zipper zipper(zip_vect);
+        //        for (const fs::directory_entry &dir_entry:
+        //                fs::recursive_directory_iterator(path)) {
+        //            if (dir_entry.is_regular_file()) {
+        //                std::ifstream input(dir_entry.path());
+        //                zipper.add(input,
+        //                dir_entry.path().string().substr(path.length() + 1));
+        //            }
+        //
+        //        }
 
-//        res.set_content(reinterpret_cast<char *>(zip_vect.data()), zip_vect.size(),
-//                        "application/zip");
+        //        res.set_content(reinterpret_cast<char *>(zip_vect.data()),
+        //        zip_vect.size(),
+        //                        "application/zip");
     });
     server.Post("/kill", [](const httplib::Request &req, httplib::Response &res,
                             const httplib::ContentReader &content_reader) {
@@ -1523,8 +1479,7 @@ in vec4 a_position;
             std::string buffer;
             if (pipeFP != nullptr) {
                 char buf[BUFSIZ];
-                while (fgets(buf, BUFSIZ, pipeFP) !=
-                       nullptr) {
+                while (fgets(buf, BUFSIZ, pipeFP) != nullptr) {
                     buffer += buf;
                 }
                 pclose(pipeFP);
@@ -1553,7 +1508,7 @@ in vec4 a_position;
     server.Post("/picture", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         // auto size = req.files.size();
-        //auto ret = req.has_file("images");
+        // auto ret = req.has_file("images");
         const auto &image_file = req.get_file_value("images");
         auto dir = "/storage/emulated/0/.editor/images";
         if (!fs::is_directory(dir))
@@ -1601,358 +1556,165 @@ in vec4 a_position;
         res.set_content(s, "text/plain");
     });
 
-    server.Get("/file",
-               [&t](const httplib::Request &req, httplib::Response &res) {
+    server.Get(
+            "/file", [&t](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+                auto path = req.get_param_value("path");
+
+                if (!path.ends_with(".html") && !path.ends_with(".xhtml") &&
+                    !path.ends_with(".ncx")) {
+                    std::string value{"attachment; filename=\""};
+                    value.append(SubstringAfterLast(path, "/"));
+                    value.append("\"");
+                    res.set_header("Content-Disposition", value);
+                }
+
+                std::filesystem::path p(httplib::detail::decode_url(path, false));
+                serveFile(p, res, t);
+            });
+    server.Get("/tidy", [&t](const httplib::Request &req,
+                             httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = std::filesystem::path{req.get_param_value("path")};
+        if (is_directory(path)) {
+            for (const fs::directory_entry &dir_entry:
+                    fs::directory_iterator(path)) {
+                if (dir_entry.is_regular_file()) {
+                    auto s = dir_entry.path().extension().string();
+                    auto w = std::filesystem::path{path.string()};
+                    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) {
+                        return static_cast<char>(std::toupper(c));
+                    });
+                    w /= s;
+                    if (!is_directory(w)) {
+                        std::filesystem::create_directory(w);
+                    }
+                    w /= dir_entry.path().filename();
+                    if (!is_regular_file(w)) {
+                        std::filesystem::rename(dir_entry.path(), w);
+                    }
+                }
+            }
+        };
+    });
+    server.Get("/files", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        std::filesystem::path p(httplib::detail::decode_url(path, false));
+        nlohmann::json doc = nlohmann::json::array();
+        for (auto const &dir: std::filesystem::directory_iterator{p}) {
+            nlohmann::json j = {
+
+                    {"path",          dir.path().string()},
+                    {"isDirectory",   dir.is_directory()},
+                    {"lastWriteTime", std::chrono::duration_cast<std::chrono::seconds>(
+                            dir.last_write_time().time_since_epoch())
+                                              .count()},
+                    {"length",        dir.is_directory() ? 0 : dir.file_size()}};
+            doc.push_back(j);
+        }
+        res.set_content(doc.
+
+                                dump(),
+
+                        "application/json");
+    });
+    server.Post("/file/delete",
+                [](const httplib::Request &req, httplib::Response &res,
+                   const httplib::ContentReader &content_reader) {
+                    res.set_header("Access-Control-Allow-Origin", "*");
+
+                    std::string body;
+                    content_reader([&](const char *data, size_t data_length) {
+                        body.append(data, data_length);
+                        return true;
+                    });
+                    nlohmann::json doc = nlohmann::json::parse(body);
+                    for (const auto &i: doc) {
+                        fs::remove_all(i);
+                    }
+                });
+    server.Post("/file/move",
+                [](const httplib::Request &req, httplib::Response &res,
+                   const httplib::ContentReader &content_reader) {
+                    res.set_header("Access-Control-Allow-Origin", "*");
+
+                    std::string body;
+                    content_reader([&](const char *data, size_t data_length) {
+                        body.append(data, data_length);
+                        return true;
+                    });
+                    nlohmann::json doc = nlohmann::json::parse(body);
+                    auto dst = req.get_param_value("dst");
+                    for (const auto &i: doc) {
+                        fs::path d{dst};
+                        d = d.append(SubstringAfterLast(i, "/"));
+                        fs::rename(i, d);
+                    }
+                });
+    server.Get("/file/rename",
+               [](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
-
-                   if (!path.ends_with(".html") && !path.ends_with(".xhtml")
-                       && !path.ends_with(".ncx")) {
-                       std::string value{"attachment; filename=\""};
-                       value.append(SubstringAfterLast(path, "/"));
-                       value.append("\"");
-                       res.set_header("Content-Disposition", value);
-                   }
-
-                   std::filesystem::path p(httplib::detail::decode_url(path, false));
-                   serveFile(p, res, t);
+                   auto dst = req.get_param_value("dst");
+                   fs::rename(path, dst);
                });
-    server.Get("/tidy",
-               [&t](const httplib::Request &req, httplib::Response &res) {
-                   res.set_header("Access-Control-Allow-Origin", "*");
-                   auto path = std::filesystem::path{req.get_param_value("path")};
-                   if (is_directory(path)) {
-                       for (const fs::directory_entry &dir_entry:
-                               fs::directory_iterator(path)) {
-                           if (dir_entry.is_regular_file()) {
-                               auto s = dir_entry.path().extension().string();
-                               auto w = std::filesystem::path{path.string()};
-                               std::transform(s.begin(), s.end(),
-                                              s.begin(),
-                                              [](unsigned char c) {
-                                                  return static_cast<char>(std::toupper(
-                                                          c));
-                                              });
-                               w /= s;
-                               if (!is_directory(w)) {
-                                   std::filesystem::create_directory(w);
-                               }
-                               w /= dir_entry.path().filename();
-                               if (!is_regular_file(w)) {
-                                   std::filesystem::rename(dir_entry.path(), w);
-                               }
-                           }
-
-                       }
-                   };
-               });
-    server.Get("/files",
-               [](
-                       const httplib::Request &req, httplib::Response
-               &res) {
+    server.Get("/file/new_file",
+               [](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
-                   std::filesystem::path p(httplib::detail::decode_url(path, false));
-                   nlohmann::json doc = nlohmann::json::array();
-                   for (
-                       auto const &dir
-                           : std::filesystem::directory_iterator{
-                           p}) {
-                       nlohmann::json j = {
-
-                               {"path",          dir.path().string()},
-                               {"isDirectory",   dir.is_directory()},
-                               {"lastWriteTime", std::chrono::duration_cast<std::chrono::seconds>(
-                                       dir.last_write_time().time_since_epoch()).count()
-                               },
-                               {
-                                "length",        dir.is_directory() ? 0 : dir.file_size()
-                               }
-                       };
-                       doc.
-                               push_back(j);
-                   }
-                   res.
-                           set_content(doc
-                                               .
-
-                                                       dump(),
-
-                                       "application/json");
+                   if (!fs::exists(path))
+                       std::ofstream f(path);
                });
-    server.Post("/file/delete", [](
-            const httplib::Request &req, httplib::Response
-    &res,
-            const httplib::ContentReader &content_reader
-    ) {
-        res.set_header("Access-Control-Allow-Origin", "*");
+    server.Get("/file/new_dir",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto path = req.get_param_value("path");
+                   if (!fs::exists(path))
+                       fs::create_directory(path);
+               });
+    server.Get("/weather",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   auto province = req.get_param_value("province");
+                   auto city = req.get_param_value("city");
 
-        std::string body;
-        content_reader([&](
-                const char *data, size_t
-        data_length) {
-            body.
-                    append(data, data_length
-            );
-            return true;
-        });
-        nlohmann::json doc = nlohmann::json::parse(body);
-        for (
-            const auto &i
-                : doc) {
-            fs::remove_all(i);
-        }
-    });
-    server.Post("/file/move", [](
-            const httplib::Request &req, httplib::Response
-    &res,
-            const httplib::ContentReader &content_reader
-    ) {
-        res.set_header("Access-Control-Allow-Origin", "*");
+                   res.set_content(Weather(province, city), "application/json");
+               });
 
-        std::string body;
-        content_reader([&](
-                const char *data, size_t
-        data_length) {
-            body.
-                    append(data, data_length
-            );
-            return true;
-        });
-        nlohmann::json doc = nlohmann::json::parse(body);
-        auto dst = req.get_param_value("dst");
-        for (
-            const auto &i
-                : doc) {
-            fs::path d{dst};
-            d = d.append(SubstringAfterLast(i, "/"));
-            fs::rename(i, d
-            );
-        }
-    });
-    server.Get("/file/rename", [](
-            const httplib::Request &req, httplib::Response
-    &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto path = req.get_param_value("path");
-        auto dst = req.get_param_value("dst");
-        fs::rename(path, dst
-        );
-    });
-    server.Get("/file/new_file", [](
-            const httplib::Request &req, httplib::Response
-    &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto path = req.get_param_value("path");
-        if (!
-                fs::exists(path)
-                )
-            std::ofstream f(path);
-    });
-    server.Get("/file/new_dir", [](
-            const httplib::Request &req, httplib::Response
-    &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto path = req.get_param_value("path");
-        if (!
-                fs::exists(path)
-                )
-            fs::create_directory(path);
-    });
-    server.Get("/weather", [](
-            const httplib::Request &req, httplib::Response
-    &res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        auto province = req.get_param_value("province");
-        auto city = req.get_param_value("city");
-
-        res.set_content(Weather(province, city), "application/json");
-
-    });
-
-    server.Post("/upload", [&](
-            const auto &req,
-            auto &res
-    ) {
+    server.Post("/upload", [&](const auto &req, auto &res) {
         res.set_header("Access-Control-Allow-Origin", "*");
 
         std::string f{req.get_file_value("path").content};
         std::ofstream ofs(f, std::ios::binary);
-        ofs << req.get_file_value("file").
-                content;
+        ofs << req.get_file_value("file").content;
         res.set_content("Success", "text/plain");
     });
     server.Get("/recycle",
-               [](
-                       const httplib::Request &req, httplib::Response
-               &res) {
+               [](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    auto path = req.get_param_value("path");
                    std::filesystem::path p(httplib::detail::decode_url(path, true));
                    auto parent = p.parent_path();
-                   for (
-                       const fs::directory_entry &dir_entry
-                           :
-                           fs::recursive_directory_iterator(parent)
-                           ) {
-                       if (dir_entry.
-
-                               is_regular_file() &&
-
-                           (dir_entry.
-
-                                           path()
-
-                                    .
-
-                                            extension()
-
-                            == ".mp4" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            == ".mov" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            == ".MOV" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            ==
-                            ".MP4")) {
+                   for (const fs::directory_entry &dir_entry:
+                           fs::recursive_directory_iterator(parent)) {
+                       if (dir_entry.is_regular_file() && (dir_entry.path().extension() == ".mp4" ||
+                                                           dir_entry.path().extension() == ".mov" ||
+                                                           dir_entry.path().extension() == ".MOV" ||
+                                                           dir_entry.path().extension() ==
+                                                           ".MP4")) {
                            std::filesystem::path s = dir_entry.path();
-                           fs::rename(dir_entry
-                                              .
-
-                                                      path(), s
-
-                                              .replace_extension("v"));
+                           fs::rename(dir_entry.path(), s.replace_extension("v"));
                        }
-
                    }
                    parent = parent.append("recycle");
-                   if (!
-                           fs::exists(parent)
-                           ) {
+                   if (!fs::exists(parent)) {
                        fs::create_directory(parent);
                    }
-                   fs::rename(p, parent
-                           .
-                                   append(p
-                                                  .
-
-                                                          filename()
-
-                                                  .
-
-                                                          string()
-
-                           ));
-               });
-    server.Get("/recycle",
-               [](
-                       const httplib::Request &req, httplib::Response
-               &res) {
-                   res.set_header("Access-Control-Allow-Origin", "*");
-                   auto path = req.get_param_value("path");
-                   std::filesystem::path p(httplib::detail::decode_url(path, true));
-                   auto parent = p.parent_path();
-                   for (
-                       const fs::directory_entry &dir_entry
-                           :
-                           fs::recursive_directory_iterator(parent)
-                           ) {
-                       if (dir_entry.
-
-                               is_regular_file() &&
-
-                           (dir_entry.
-
-                                           path()
-
-                                    .
-
-                                            extension()
-
-                            == ".mp4" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            == ".mov" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            == ".MOV" ||
-                            dir_entry.
-
-                                            path()
-
-                                    .
-
-                                            extension()
-
-                            ==
-                            ".MP4")) {
-                           std::filesystem::path s = dir_entry.path();
-                           fs::rename(dir_entry
-                                              .
-
-                                                      path(), s
-
-                                              .replace_extension("v"));
-                       }
-
-                   }
-                   parent = parent.append("recycle");
-                   if (!
-                           fs::exists(parent)
-                           ) {
-                       fs::create_directory(parent);
-                   }
-                   fs::rename(p, parent
-                           .
-                                   append(p
-                                                  .
-
-                                                          filename()
-
-                                                  .
-
-                                                          string()
-
-                           ));
+                   fs::rename(p, parent.append(p.filename().string()));
                });
 
-    server.
-            listen(host, port
-    );
+    server.listen(host, port);
 }
 
 // https://github.com/yhirose/cpp-httplib
-

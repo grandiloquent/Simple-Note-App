@@ -80,12 +80,15 @@ function onItemClick(evt) {
 window.addEventListener("popstate", function (e) {
     window.location = location;
 });
-document.addEventListener("keydown", function (e) {
+document.addEventListener("keydown", async function (e) {
     if (e.key === "F4") {
-        const searchParams = new URL(window.location).searchParams;
-        fetch(`${baseUri}/lift?path=${encodeURIComponent(searchParams.get("path"))}`);
         e.preventDefault();
-
+        const searchParams = new URL(window.location).searchParams;
+        await fetch(`${baseUri}/lift?path=${encodeURIComponent(searchParams.get("path"))}`);
+        location.reload();
+    } else if (e.key === "F2") {
+        e.preventDefault();
+        renameFile(document.querySelector('[data-path]').dataset.path);
     }
 });
 ////////////////////////////////////////////////////////////////

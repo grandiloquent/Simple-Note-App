@@ -137,7 +137,7 @@ function onDelete() {
 function queryElementByPath(path) {
     return document.querySelector(`[data-path="${path}"]`);
 }
-function renameFile(path) {
+function renameFile(path, guess) {
 
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
@@ -152,7 +152,11 @@ function renameFile(path) {
             filename = substringBeforeLast(filename, "》") + "." + substringAfterLast(filename, ".")
         }
         input.value = filename;
+        
 
+    }
+    if (guess) {
+        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".") + "3.mp4"
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
@@ -535,7 +539,7 @@ function showImage(path) {
         const g = document.createElement('img');
         g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
         img.replaceWith(g);
-        img=g;
+        img = g;
         pv.remove();
     })
 
@@ -563,7 +567,7 @@ function showImage(path) {
         const g = document.createElement('img');
         g.src = `${baseUri}/file?path=${encodeURIComponent(path)}`
         img.replaceWith(g);
-        img=g;
+        img = g;
 
     })
 

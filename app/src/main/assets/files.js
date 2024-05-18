@@ -88,7 +88,8 @@ document.addEventListener("keydown", async function (e) {
         location.reload();
     } else if (e.key === "F2") {
         e.preventDefault();
-        renameFile(document.querySelector('[data-path]').dataset.path);
+ 
+        renameFile(document.querySelector('[data-path]').dataset.path,true);
     }
 });
 ////////////////////////////////////////////////////////////////

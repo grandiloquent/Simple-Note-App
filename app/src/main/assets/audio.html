@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        audio {
+            position: absolute;
+            left: -100%;
+        }
+    </style>
+</head>
+
+<body>
+    <audio></audio>
+    <div>
+        <div id="playOrPause">播放</div>
+        <div id="currentTime"></div>
+        <div id="duration"></div>
+        <input id="start">
+        <input id="end">
+    </div>
+    <script src="shared.js"></script>
+    <script>
+        const searchParams = new URL(window.location).searchParams;
+        const path = searchParams.get('path');
+        const baseUri = window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "";
+        const playOrPause = document.getElementById('playOrPause');
+        const audio = document.querySelector('audio');
+        const currentTime = document.getElementById('currentTime');
+        const duration = document.getElementById('duration');
+        const start = document.getElementById('start');
+        const end = document.getElementById('end');
+        const cacheStartTime = localStorage.getItem('startTime');
+        const cacheEndTime = localStorage.getItem('endTime');
+        let startTime = (cacheStartTime && parseFloat(cacheStartTime)) || 0;
+        if (startTime) {
+            start.value = startTime;
+        }
+
+        let endTime = (cacheEndTime && parseFloat(cacheEndTime)) || 0;
+        if (endTime) {
+            end.value = endTime;
+        }
+        document.title = substringAfterLast(path, "/");
+
+        audio.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
+        playOrPause.addEventListener('click', async evt => {
+            await audio.play();
+        })
+
+        audio.addEventListener('timeupdate', evt => {
+            currentTime.textContent = audio.currentTime;
+            if (startTime && audio.currentTime < startTime) {
+                audio.currentTime = startTime;
+            } else if (endTime && audio.currentTime > endTime) {
+                audio.currentTime = startTime;
+            }
+        });
+        audio.addEventListener('durationchange', evt => {
+            duration.textContent = audio.duration;
+        })
+
+        start.addEventListener('change', evt => {
+            const startValue = start.value.trim();
+            if (parseFloat(startValue)) {
+                localStorage.setItem('startTime', startValue);
+                startTime = parseFloat(startValue)
+            }
+        })
+        end.addEventListener('change', evt => {
+            const endValue = end.value.trim();
+            if (parseFloat(endValue)) {
+                localStorage.setItem('endTime', endValue);
+                endTime = parseFloat(endValue)
+            }
+        })
+
+    </script>
+</body>
+
+</html>

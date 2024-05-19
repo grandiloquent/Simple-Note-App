@@ -24,7 +24,10 @@ function onItemClick(evt) {
         return;
     }
     if (audioRe.test(path)) {
-        window.location = `/music.html?path=${encodeURIComponent(path)}`
+        if (path.indexOf("音乐") !== -1) {
+            window.location = `/audio.html?path=${encodeURIComponent(path)}`
+        } else
+            window.location = `/music.html?path=${encodeURIComponent(path)}`
         return;
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
@@ -88,8 +91,8 @@ document.addEventListener("keydown", async function (e) {
         location.reload();
     } else if (e.key === "F2") {
         e.preventDefault();
- 
-        renameFile(document.querySelector('[data-path]').dataset.path,true);
+
+        renameFile(document.querySelector('[data-path]').dataset.path, true);
     }
 });
 ////////////////////////////////////////////////////////////////

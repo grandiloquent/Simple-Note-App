@@ -68,13 +68,13 @@ async function bindPlayEvent() {
         audio.play();
         title.textContent = substringAfterLast(file.path, "/");
         */
-        let index = window.index || (window.index = 0);
-        if (index + 1 < window.files.length) {
-            window.index++;
+        // let index = window.index || (window.index = 0);
+        // if (index + 1 < window.files.length) {
+        //     window.index++;
 
-        } else {
-            window.index = 0;
-        }
+        // } else {
+        //     window.index = 0;
+        // }
         playMusic(window.files[window.index].path,
             substringAfterLast(window.files[window.index].path, '/'));
     })

@@ -153,11 +153,11 @@ async function initialize() {
     });
 
     video.addEventListener('ended', evt => {
-        if (n + 1 < videos.length) {
-            n++;
-        } else {
-            n = 0;
-        }
+        // if (n + 1 < videos.length) {
+        //     n++;
+        // } else {
+        //     n = 0;
+        // }
         playVideo(baseUri, video, videos[n]);
     });
     const playPause = document.querySelector('#play-pause');

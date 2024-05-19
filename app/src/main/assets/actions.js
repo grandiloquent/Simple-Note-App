@@ -152,15 +152,18 @@ function renameFile(path, guess) {
             filename = substringBeforeLast(filename, "》") + "." + substringAfterLast(filename, ".")
         }
         input.value = filename;
-        
+
 
     }
     if (guess) {
-        input.value = substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/")
+        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".");
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-        const filename = substringBeforeLast(path, pathSeperator) + pathSeperator + input.value.trim();
+        let filename = substringBeforeLast(path, pathSeperator) + pathSeperator + input.value.trim();
+        if (guess) {
+            filename = filename + "." + substringAfterLast(path, ".");
+        }
         const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(path);
         item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);

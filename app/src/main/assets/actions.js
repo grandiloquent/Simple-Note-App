@@ -156,7 +156,7 @@ function renameFile(path, guess) {
 
     }
     if (guess) {
-        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".");
+        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".").replace(/\d+$/,'');
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {

@@ -257,8 +257,12 @@ public class Utils {
                         "psycho.euphoria.l",
                         "psycho.euphoria.n",
                         "psycho.euphoria.svg",
+                        "psycho.euphoria.translator",
                         "com.android.settings",
                         "com.zhiliaoapp.musically",
+                        "com.huahua.learningpth",
+                        "com.wuba",
+                        "com.zhaopin.social",
                         "psycho.euphoria.app"
                 }).toString());
                 wr.close();

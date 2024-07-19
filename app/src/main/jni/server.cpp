@@ -250,7 +250,7 @@ th {
 	color: #c7254e;
     background-color: #f9f2f4;
 }
-)", "text/html");
+)", "text/css");
         return;
     }
     if (p.extension().string() == ".ncx") {

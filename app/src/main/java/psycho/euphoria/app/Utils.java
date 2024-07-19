@@ -234,6 +234,9 @@ public class Utils {
                 "com.azure.authenticator",
                 "com.tencent.mobileqq",
                 "com.xiaomi.account",
+                "com.huahua.learningpth",
+                "com.wuba",
+                "com.zhaopin.social",
                 "sv.mftv"
         });
         new Thread(() -> {

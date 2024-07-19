@@ -30,6 +30,229 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
         res.set_content(s, "text/html");
         return;
     }
+    if (p.filename().string().ends_with("style.css")) {
+        res.set_content(R"(
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+a,em,.programs{
+ word-break: break-all;
+    word-wrap: break-word;
+}
+
+body {
+    font-family: wf_segoe-ui_normal, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+    text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+}
+
+h1,
+h2,
+h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 30px;
+}
+
+.h3,
+h3 {
+    font-size: 24px;
+}
+
+h1,
+h2,
+h3 {
+    font-family: wf_segoe-ui_light, wf_segoe-ui_semilight, wf_segoe-ui_normal, HelveticaNeue-Thin, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, sans-serif;
+}
+
+a {
+    background-color: transparent;
+}
+
+a {
+    color: #0072be;
+    text-decoration: none;
+}
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+a:focus,
+a:hover {
+    color: #23527c;
+    text-decoration: underline;
+}
+
+a:focus,
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+b,
+strong {
+    font-weight: 700;
+}
+
+ol,
+ul {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+img {
+    border: 0;
+}
+
+img {
+    vertical-align: middle;
+}
+
+img {
+    max-width: 100%;
+	height:auto;
+}
+
+code,
+kbd,
+pre,
+samp,.programs ,.programs-b {
+    font-family: monospace, monospace;
+    font-size: 1em;
+}
+
+code,
+kbd,
+pre,
+samp ,.programs ,.programs-b {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+code ,.EmphasisFontCategoryNonProportional,.programs,.programs-b {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #c7254e;
+    background-color: #f9f2f4;
+    border-radius: 4px;
+}
+
+pre,.ProgramCode {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+	white-space: pre-wrap;
+}
+
+pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+table {
+    background-color: transparent;
+}
+
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+td,
+th {
+    padding: 0;
+}
+
+th {
+    text-align: left;
+}
+
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>thead>tr>th {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+
+.table>thead>tr>th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #ddd;
+}
+
+.table>caption+thead>tr:first-child>td,
+.table>caption+thead>tr:first-child>th,
+.table>colgroup+thead>tr:first-child>td,
+.table>colgroup+thead>tr:first-child>th,
+.table>thead:first-child>tr:first-child>td,
+.table>thead:first-child>tr:first-child>th {
+    border-top: 0;
+}
+
+.table>tbody>tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+.source-code {
+    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+	color: #c7254e;
+    background-color: #f9f2f4;
+}
+)", "text/html");
+        return;
+    }
     if (p.extension().string() == ".ncx") {
         auto s = ReadAllText(p);
         s = s + R"(

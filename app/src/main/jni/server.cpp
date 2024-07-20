@@ -25,6 +25,13 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
     });
 
     document.body.insertAdjacentHTML('afterbegin', `<div style="display:flex;flex-direction:column">${buffers.join('\n')}</div>`);
+document.body.addEventListener('click', function (event) {
+  // filter out clicks on any other elements
+  if ((event.target.nodeName == 'A'||event.target.parentNode.nodeName == 'A'||event.target.parentNode.parentNode.nodeName == 'A') && (!event.target.getAttribute('href')||!event.target.getAttribute('href').startsWith("#header"))  ) {
+//console.log(event.target.getAttribute('href'),);
+    event.preventDefault();
+  }
+});
 })()
 </script>)");
         res.set_content(s, "text/html");

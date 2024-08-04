@@ -1074,11 +1074,23 @@ const PDFViewerApplication = {
     }
   },
   downloadOrSave(options = {}) {
-    if (this.pdfDocument?.annotationStorage.size > 0) {
-      this.save(options);
-    } else {
-      this.download(options);
-    }
+    // if (this.pdfDocument?.annotationStorage.size > 0) {
+    //   this.save(options);
+    // } else {
+    //   this.download(options);
+    // }
+    this.pdfDocument.getPage(this.pdfViewer.currentPageNumber)
+    .then(async page=>{
+      page.getTextContent()
+      .then(function(text){ // return content promise
+        writeText(text.items.map(function (s) { 
+          //console.log(s);
+          if(s.hasEOL ){
+            return "\n"+s.str;
+          }
+          return s.str; }).join(' ')
+        ); // value page text 
+      });
   },
   openInExternalApp() {
     this.downloadOrSave({

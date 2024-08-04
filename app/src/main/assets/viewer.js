@@ -1091,6 +1091,7 @@ const PDFViewerApplication = {
           return s.str; }).join(' ')
         ); // value page text 
       });
+    })
   },
   openInExternalApp() {
     this.downloadOrSave({

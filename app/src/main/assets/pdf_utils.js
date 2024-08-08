@@ -2,7 +2,7 @@ async function extractText(pdfDocument, pdfViewer) {
     console.log("Extracting", pdfDocument.numPages);
     const currentPage = pdfViewer.currentPageNumber;
     const buf = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 2; i++) {
         if (currentPage + 1 < pdfDocument.numPages)
             buf.push(await extractPage(pdfDocument, currentPage + i));
     }

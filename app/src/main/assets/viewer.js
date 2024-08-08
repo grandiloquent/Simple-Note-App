@@ -1073,25 +1073,41 @@ const PDFViewerApplication = {
       });
     }
   },
-  downloadOrSave(options = {}) {
+ async downloadOrSave(options = {}) {
+  await extractText(this.pdfDocument,this.pdfViewer);
     // if (this.pdfDocument?.annotationStorage.size > 0) {
     //   this.save(options);
     // } else {
     //   this.download(options);
     // }
-    this.pdfDocument.getPage(this.pdfViewer.currentPageNumber)
-    .then(async page=>{
-      page.getTextContent()
-      .then(function(text){ // return content promise
-        writeText(text.items.map(function (s) { 
-          //console.log(s);
-          if(s.hasEOL ){
-            return "\n"+s.str;
-          }
-          return s.str; }).join(' ')
-        ); // value page text 
-      });
-    })
+//     const page1= await this.pdfDocument.getPage(this.pdfViewer.currentPageNumber);
+//     const text1= await page1.getTextContent();
+//     const s1=text1.items.map(function (s) { 
+//   if(s.hasEOL ){
+//     return "\n"+s.str;
+//   }
+//   return s.str; }).join(' ');
+//   const page2= await this.pdfDocument.getPage(this.pdfViewer.currentPageNumber+1);
+//   const text2= await page2.getTextContent();
+//   const s2=text2.items.map(function (s) { 
+// if(s.hasEOL ){
+//   return "\n"+s.str;
+// }
+// return s.str; }).join(' ');
+// writeText(s1+"\n\n"+s2);
+    // this.pdfDocument.getPage(this.pdfViewer.currentPageNumber)
+    // .then(async page=>{
+    //   page.getTextContent()
+    //   .then(function(text){ // return content promise
+    //     writeText(text.items.map(function (s) { 
+    //       //console.log(s);
+    //       if(s.hasEOL ){
+    //         return "\n"+s.str;
+    //       }
+    //       return s.str; }).join(' ')
+    //     ); // value page text 
+    //   });
+    // })
   },
   openInExternalApp() {
     this.downloadOrSave({
@@ -1596,13 +1612,13 @@ const PDFViewerApplication = {
   requestPresentationMode() {
     this.pdfPresentationMode?.request();
   },
-  triggerPrinting() {
+  triggerPrinting(offset) {
     // if (!this.supportsPrinting) {
     //   return;
     // }
     // window.print();
      
-    this.pdfDocument.getPage(this.pdfViewer.currentPageNumber)
+    this.pdfDocument.getPage(this.pdfViewer.currentPageNumber+(offset||0))
     .then(async page=>{
       /*page.getTextContent()
       .then(function(text){ // return content promise
@@ -1617,7 +1633,10 @@ const PDFViewerApplication = {
 
         let opList = await page.getOperatorList();
         for (let k = 0; k < opList.fnArray.length; k++) {
-            if (opList.fnArray[k] == pdfjsLib.OPS.paintJpegXObject || opList.fnArray[k] == pdfjsLib.OPS.paintImageXObject) {
+          //console.log(opList.fnArray[k]);
+            if (opList.fnArray[k] == pdfjsLib.OPS.paintImageXObjectRepeat
+              || opList.fnArray[k] == pdfjsLib.OPS.paintImageXObject) {
+              //console.log(pdfjsLib.OPS,opList.fnArray[k]);
               function getImage() {
                 return new Promise(async function (res, rej) {
                     let img = null
@@ -1643,7 +1662,7 @@ const PDFViewerApplication = {
                           link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
                           link.click();
                         });
-                        document.body.appendChild(canvas);
+                        document.body.insertAdjacentElement('beforebegin',canvas);
                         canvas.width = img.width;
                         canvas.height = img.height;
                         var ctx = canvas.getContext('2d');
@@ -1681,6 +1700,7 @@ const PDFViewerApplication = {
 
     })
   },
+
   bindEvents() {
     const {
       eventBus,
@@ -2127,8 +2147,9 @@ function webViewerHashchange(evt) {
     });
   };
   var webViewerOpenFile = function (evt) {
-    const fileInput = PDFViewerApplication.appConfig.openFileInput;
-    fileInput.click();
+    // const fileInput = PDFViewerApplication.appConfig.openFileInput;
+    // fileInput.click();
+    PDFViewerApplication.triggerPrinting(1);
   };
 }
 function webViewerPresentationMode() {

@@ -237,6 +237,8 @@ public class Utils {
                 "com.huahua.learningpth",
                 "com.wuba",
                 "com.zhaopin.social",
+                "com.tencent.omapp",
+                "com.ss.android.article.news",
                 "sv.mftv"
         });
         new Thread(() -> {
@@ -266,6 +268,8 @@ public class Utils {
                         "com.huahua.learningpth",
                         "com.wuba",
                         "com.zhaopin.social",
+                        "com.tencent.omapp",
+                        "com.ss.android.article.news",
                         "psycho.euphoria.app"
                 }).toString());
                 wr.close();

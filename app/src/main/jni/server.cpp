@@ -431,9 +431,12 @@ static void serveTextContent(const httplib::Request &req,
 
 void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
                  int port) {
-    static const char table[] = R"(CREATE TABLE IF NOT EXISTS "favorite" (
+    static const char table[] = R"(CREATE TABLE IF NOT EXISTS "note" (
 	"id"	INTEGER NOT NULL UNIQUE,
-	"path"	TEXT NOT NULL UNIQUE,
+	"title"	TEXT,
+	"content"	TEXT,
+	"start"	INTEGER,
+	"status"	INTEGER,
 	"create_at"	INTEGER,
 	"update_at"	INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
@@ -442,7 +445,25 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     std::map<std::string, std::string> t{};
     httplib::Server server;
-
+/*
+ CREATE TABLE "note" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"title"	TEXT,
+	"content"	TEXT,
+	"start"	INTEGER,
+	"status"	INTEGER,
+	"create_at"	INTEGER,
+	"update_at"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+ CREATE TABLE IF NOT EXISTS "favorite" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"path"	TEXT NOT NULL UNIQUE,
+	"create_at"	INTEGER,
+	"update_at"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+ */
     //    server.Get(R"(^/images/([a-zA-Z0-9-]+.(?:png|jpg|svg|jpeg|gif))?$)",
     //               [&](const httplib::Request &req, httplib::Response &res) {
     //                   res.set_header("Access-Control-Allow-Origin", "*");

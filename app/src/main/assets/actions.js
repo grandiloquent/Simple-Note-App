@@ -156,7 +156,7 @@ function renameFile(path, guess) {
 
     }
     if (guess) {
-        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".").replace(/\d+$/,'');
+        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".").replace(/\d+$/, '');
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
@@ -243,8 +243,15 @@ async function render(path) {
                 });
                 queryElementByPath(item.parentNode.dataset.path).remove();
             } else {
-                deleteFile(item.parentNode.dataset.path);
-                const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+                var rect = evt.target.getBoundingClientRect();
+                var x = evt.clientX - rect.left; //x position within the element.
+                var y = evt.clientY - rect.top;  //y position within the element.
+                if (y > rect.width / 2) {
+                    deleteFile(item.parentNode.dataset.path);
+                    const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+                } else {
+                    renameFile(item.parentNode.dataset.path);
+                }
             }
         });
     })

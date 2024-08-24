@@ -206,11 +206,14 @@ public class ServerService extends Service {
                         "com.zhiliaoapp.musically",
                         "com.eg.android.AlipayGphone",
                         "cn.yonghui.hyd",
-                        "com.jingdong.app.mall"
+                        "com.jingdong.app.mall",
+                        "psycho.euphoria.autoclicker"
+
                 });
             } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
+
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
@@ -267,9 +270,11 @@ public class ServerService extends Service {
 //                    Toast.makeText(this, "开始", Toast.LENGTH_SHORT).show();
 //
 //                }
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.soundrecorder");
-                startActivity(launchIntent);
+                Shared.execCmd("am start -n psycho.euphoria.autoclicker/psycho.euphoria.autoclicker.MainActivity",true);
+//                PackageManager pm = getPackageManager();
+//                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.autoclicker");
+//                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_APP)) {
                 Intent app = new Intent(this, MainActivity.class);
                 app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -277,7 +282,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_ROBOT)) {
                 PackageManager pm = getPackageManager();
                 Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-                                launchIntent.setData(Uri.parse("http://" +
+                launchIntent.setData(Uri.parse("http://" +
                         Shared.getDeviceIP(this) + ":8500/app.html"));
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SPEED)) {

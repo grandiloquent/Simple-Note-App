@@ -137,14 +137,6 @@ public class WebAppInterface {
         return result.get();
     }
 
-    private static void openLocalPage(Context context, String path) {
-        PackageManager pm = context.getPackageManager();
-        Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-        launchIntent.setData(Uri.parse("http://" +
-                Shared.getDeviceIP(context) + ":8500" + path));
-        context.startActivity(launchIntent);
-    }
-
     @JavascriptInterface
     public void launchApp(String text) {
         String path = null;
@@ -386,6 +378,14 @@ public class WebAppInterface {
             previous = timeOfSyncSample;
         }
         return timeOfSyncSamples[timeOfSyncSamples.length - 1];
+    }
+
+    private static void openLocalPage(Context context, String path) {
+        PackageManager pm = context.getPackageManager();
+        Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+        launchIntent.setData(Uri.parse("http://" +
+                Shared.getDeviceIP(context) + ":8500" + path));
+        context.startActivity(launchIntent);
     }
 
 }

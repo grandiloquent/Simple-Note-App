@@ -17,9 +17,17 @@ android {
             abiFilters 'arm64-v8a'
         }
     }
-
+    signingConfigs {
+        sginconfig {
+            keyAlias 'platform'
+            keyPassword 'android'
+            storeFile file('/src/main/psycho.keystore')
+            storePassword 'android'
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.sginconfig
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

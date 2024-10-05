@@ -2,9 +2,11 @@ package psycho.euphoria.app;
 
 
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
@@ -53,6 +55,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -196,87 +200,95 @@ public class Utils {
         }
     }
 
-    public static void killProcesses(String[] packages) {
-        String[] results = Utils.sudoForResult("ps -A").split("\n");
-        Pattern pattern = Pattern.compile("\\s+\\d+\\s+");
-        for (String result : results) {
-            if (checkProcessForKill(packages, result)) {
-                Matcher matcher = pattern.matcher(result);
-                if (matcher.find()) {
-                    killProcess(Integer.parseInt(matcher.group().trim()));
-                }
-            }
+    public static void killProcesses(Context context, String[] packages) {
+        PackageManager manager = context.getPackageManager();
+        for (String aPackage : packages) {
+            manager.setApplicationEnabledSetting(aPackage, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, 0);
+            manager.setApplicationEnabledSetting(aPackage, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, 0);
         }
+//        String[] results = Utils.sudoForResult("ps -A").split("\n");
+//        Pattern pattern = Pattern.compile("\\s+\\d+\\s+");
+//        for (String result : results) {
+//            if (checkProcessForKill(packages, result)) {
+//                Matcher matcher = pattern.matcher(result);
+//                if (matcher.find()) {
+//                    killProcess(Integer.parseInt(matcher.group().trim()));
+//                }
+//            }
+//        }
     }
 
     public static void killProcesses(String baseUrl) {
-        killProcesses(new String[]{"com.icbc",
-                "com.android.nfc",
-                "nekox.messenger",
-                "com.goodix.fingerprint",
-                "com.android.camera",
-                "com.chinasofti.shanghaihuateng.metroapp",
-                "com.icbc", "com.jeffmony.videodemo",
-                "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
-                "com.tencent.qqmusic",
-                "com.yueme.itv", "euphoria.psycho.browser",
-                "euphoria.psycho.fileserver", "euphoria.psycho.knife",
-                "euphoria.psycho.lynda", "euphoria.psycho.porn",
-                "euphoria.psycho.server", "org.readera",
-                "org.telegram.messenger", "psycho.euphoria.editor",
-                "psycho.euphoria.source", "psycho.euphoria.notepad",
-                "psycho.euphoria.plane", "psycho.euphoria.reader",
-                "psycho.euphoria.translator", "psycho.euphoria.unknown",
-                "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
-                "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
-                "com.tencent.qqmusic",
-                "nekox.messenger",
-                "com.azure.authenticator",
-                "com.tencent.mobileqq",
-                "com.xiaomi.account",
-                "com.huahua.learningpth",
-                "com.wuba",
-                "com.zhaopin.social",
-                "com.tencent.omapp",
-                "com.ss.android.article.news",
-                "sv.mftv"
-        });
-        new Thread(() -> {
-            String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
-            try {
-                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-                c.setRequestMethod("POST");
-                OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
-                wr.write(new JSONArray(new String[]{
-                        "com.baidu.input_yijia",
-                        "com.tencent.mm",
-                        "com.android.chrome",
-                        "org.mozilla.firefox",
-                        "sv.mftv",
-                        "com.v2ray.ang",
-                        "cn.yonghui.hyd",
-                        "com.jingdong.app.mall",
-                        "com.eg.android.AlipayGphone",
-                        "euphoria.psycho.browser",
-                        "psycho.euphoria.v",
-                        "psycho.euphoria.l",
-                        "psycho.euphoria.n",
-                        "psycho.euphoria.svg",
-                        "psycho.euphoria.translator",
-                        "com.android.settings",
-                        "com.zhiliaoapp.musically",
-                        "com.huahua.learningpth",
-                        "com.wuba",
-                        "com.zhaopin.social",
-                        "com.tencent.omapp",
-                        "com.ss.android.article.news",
-                        "psycho.euphoria.app"
-                }).toString());
-                wr.close();
-                c.getResponseCode();
-            } catch (Exception ignored) {
-            }
-        }).start();
+//        killProcesses(new String[]{"com.icbc",
+//                "com.android.nfc",
+//                "nekox.messenger",
+//                "com.goodix.fingerprint",
+//                "com.android.camera",
+//                "com.chinasofti.shanghaihuateng.metroapp",
+//                "com.icbc", "com.jeffmony.videodemo",
+//                "com.miui.screenrecorder", "com.speedsoftware.rootexplorer",
+//                "com.tencent.qqmusic",
+//                "com.yueme.itv", "euphoria.psycho.browser",
+//                "euphoria.psycho.fileserver", "euphoria.psycho.knife",
+//                "euphoria.psycho.lynda", "euphoria.psycho.porn",
+//                "euphoria.psycho.server", "org.readera",
+//                "org.telegram.messenger", "psycho.euphoria.editor",
+//                "psycho.euphoria.source", "psycho.euphoria.notepad",
+//                "psycho.euphoria.plane", "psycho.euphoria.reader",
+//                "psycho.euphoria.translator", "psycho.euphoria.unknown",
+//                "psycho.euphoria.video", "psycho.euphoria.viewer", "com.moez.QKSMS",
+//                "com.android.stopwatch", "com.autonavi.minimap", "com.duokan.readex",
+//                "com.kuaishou.nebula",
+//                "com.tencent.qqmusic",
+//                "nekox.messenger",
+//                "com.azure.authenticator",
+//                "com.tencent.mobileqq",
+//                "com.xiaomi.account",
+//                "com.huahua.learningpth",
+//                "com.wuba",
+//                "com.zhaopin.social",
+//                "com.tencent.omapp",
+//                "com.ss.android.article.news",
+//                "psycho.euphoria.screenshoots",
+//                "sv.mftv"
+//        });
+//        new Thread(() -> {
+//            String url = Shared.substringBeforeLast(baseUrl, "/") + "/kill";
+//            try {
+//                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+//                c.setRequestMethod("POST");
+//                OutputStreamWriter wr = new OutputStreamWriter(c.getOutputStream());
+//                wr.write(new JSONArray(new String[]{
+//                        "com.baidu.input_yijia",
+//                        "com.tencent.mm",
+//                        "com.android.chrome",
+//                        "org.mozilla.firefox",
+//                        "sv.mftv",
+//                        "com.v2ray.ang",
+//                        "cn.yonghui.hyd",
+//                        "com.jingdong.app.mall",
+//                        "com.eg.android.AlipayGphone",
+//                        "euphoria.psycho.browser",
+//                        "psycho.euphoria.v",
+//                        "psycho.euphoria.l",
+//                        "psycho.euphoria.n",
+//                        "psycho.euphoria.svg",
+//                        "psycho.euphoria.translator",
+//                        "com.android.settings",
+//                        "com.zhiliaoapp.musically",
+//                        "com.huahua.learningpth",
+//                        "com.wuba",
+//                        "com.zhaopin.social",
+//                        "com.tencent.omapp",
+//                        "com.ss.android.article.news",
+//                        "com.kuaishou.nebula",
+//                        "psycho.euphoria.app"
+//                }).toString());
+//                wr.close();
+//                c.getResponseCode();
+//            } catch (Exception ignored) {
+//            }
+//        }).start();
     }
 
     public static void launchInputMethodPicker(Context context) {
@@ -433,4 +445,33 @@ public class Utils {
         //editText.setText(ss.toString());
         //layout.setOnClickListener(v -> windowManager.removeView(layout));
     }
+
+    public static void forceStopPackages(Context context, String[] packages) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(ActivityManager.class);
+        Method mForceStop = null;
+        try {
+            mForceStop = activityManager.getClass().getMethod("forceStopPackageAsUser", String.class, int.class);
+            mForceStop.setAccessible(true);
+        } catch (Exception e) {
+        }
+        final List<RunningAppProcessInfo> runningProcesses = activityManager.getRunningAppProcesses();
+        if (activityManager != null) {
+            for (String str : packages) {
+                try {
+                    if (mForceStop != null)
+                        mForceStop.invoke(activityManager, str, 0);
+                } catch (Exception e) {
+                }
+                activityManager.killBackgroundProcesses(str);
+                for (RunningAppProcessInfo runningProcess : runningProcesses) {
+                    if (runningProcess.processName.equals(str)) {
+                        android.os.Process.sendSignal(runningProcess.pid, android.os.Process.SIGNAL_KILL);
+                    }
+                }
+            }
+
+
+        }
+    }
+
 }

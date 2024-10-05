@@ -145,6 +145,7 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
+
         requestNotificationPermission(this);
         if (VERSION.SDK_INT >= VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
@@ -152,6 +153,7 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, 0);
             }
         }
+//        Log.e("B5aOx2", String.format("vvvvvvvvinitialize, %s", checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE)));
         List<String> permissions = new ArrayList<>();
         if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.CAMERA);
@@ -162,7 +164,15 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.WRITE_EXTERNAL_STORAGE);
         }
-
+//        Log.e("B5aOx2", String.format("initialize, %s", Environment.getExternalStorageDirectory()));
+//
+//        new File("/storage/emulated/0/.editor").mkdirs();
+//        try {
+//            new File("/storage/emulated/0/.editor/app.db")
+//                    .createNewFile();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         if (!permissions.isEmpty()) {
             requestPermissions(permissions.toArray(new String[0]), 0);
         }

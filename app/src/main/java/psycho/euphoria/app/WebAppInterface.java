@@ -15,6 +15,7 @@ import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.service.autofill.FieldClassification.Match;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
@@ -51,6 +52,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -155,9 +157,13 @@ public class WebAppInterface {
             openLocalPage(mContext, path);
             return;
         }
-        if (Pattern.compile("^\\d([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]+$").matcher(text).find()) {
+        if (Pattern.compile("^\\d+([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]+$").matcher(text).find()) {
+            int length = 1;
+            Matcher matcher = Pattern.compile("\\d+").matcher(text);
+            if (matcher.find())
+                length = matcher.group().length();
             PreferenceManager.getDefaultSharedPreferences(mContext)
-                    .edit().putString(text.substring(0, 1), text.substring(1)).apply();
+                    .edit().putString(text.substring(0, length), text.substring(length)).apply();
         }
         if (text.equals("其他")) {
             Intent service = new Intent(mContext, ServerService.class);

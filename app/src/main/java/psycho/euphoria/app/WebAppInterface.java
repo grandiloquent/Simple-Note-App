@@ -2,6 +2,7 @@ package psycho.euphoria.app;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
+import android.app.Presentation;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -50,6 +51,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -153,11 +155,9 @@ public class WebAppInterface {
             openLocalPage(mContext, path);
             return;
         }
-        if (text.equals("阅读")) {
-            PackageManager pm = mContext.getPackageManager();
-            Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
-            mContext.startActivity(launchIntent);
-            return;
+        if (Pattern.compile("^\\d([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]+$").matcher(text).find()) {
+            PreferenceManager.getDefaultSharedPreferences(mContext)
+                    .edit().putString(text.substring(0, 1), text.substring(1)).apply();
         }
         if (text.equals("其他")) {
             Intent service = new Intent(mContext, ServerService.class);

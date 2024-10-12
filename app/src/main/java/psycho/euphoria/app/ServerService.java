@@ -53,16 +53,10 @@ import static psycho.euphoria.app.Utils.FetchNodes;
 
 public class ServerService extends Service {
     public static final String ACTION_APP = "psycho.euphoria.app.ServerService.ACTION_APP";
-    public static final String ACTION_BRO = "psycho.euphoria.app.ServerService.ACTION_BRO";
     public static final String ACTION_DISMISS = "psycho.euphoria.app.ServerService.ACTION_DISMISS";
-    public static final String ACTION_INPUT = "psycho.euphoria.app.ServerService.ACTION_INPUT";
     public static final String ACTION_KILL = "psycho.euphoria.app.ServerService.ACTION_KILL";
-    public static final String ACTION_READER = "psycho.euphoria.app.ServerService.ACTION_READER";
     public static final String ACTION_ROBOT = "psycho.euphoria.app.ServerService.ACTION_ROBOT";
-    public static final String ACTION_SERVERS = "psycho.euphoria.app.ServerService.ACTION_SERVERS";
     public static final String ACTION_SHOOT = "psycho.euphoria.app.ServerService.ACTION_SHOOT";
-    public static final String ACTION_SHUTDOWN = "psycho.euphoria.app.ServerService.ACTION_SHUTDOWN";
-    public static final String ACTION_TRANSLATOR = "psycho.euphoria.app.ServerService.ACTION_TRANSLATOR";
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
@@ -71,6 +65,13 @@ public class ServerService extends Service {
     public static final String ACTION_3 = "psycho.euphoria.app.ServerService.ACTION_3";
     public static final String ACTION_4 = "psycho.euphoria.app.ServerService.ACTION_4";
     public static final String ACTION_5 = "psycho.euphoria.app.ServerService.ACTION_5";
+    public static final String ACTION_6 = "psycho.euphoria.app.ServerService.ACTION_6";
+    public static final String ACTION_7 = "psycho.euphoria.app.ServerService.ACTION_7";
+    public static final String ACTION_8 = "psycho.euphoria.app.ServerService.ACTION_8";
+    public static final String ACTION_9 = "psycho.euphoria.app.ServerService.ACTION_9";
+    public static final String ACTION_10 = "psycho.euphoria.app.ServerService.ACTION_10";
+    public static final String ACTION_11 = "psycho.euphoria.app.ServerService.ACTION_11";
+
     /**
      * Factor by that the minimum buffer size is multiplied. The bigger the factor is the less
      * likely it is that samples will be dropped, but more memory will be used. The minimum buffer
@@ -107,20 +108,8 @@ public class ServerService extends Service {
         notificationLayout.setOnClickPendingIntent(R.id.other, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.dismiss, piDismiss);
-        notificationLayout.setOnClickPendingIntent(R.id.translator, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_TRANSLATOR), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.clean, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_SHUTDOWN), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.app, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_APP), PendingIntent.FLAG_MUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.explorer, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_BRO), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.reader, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_READER), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.servers, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_SERVERS), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.input, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_INPUT), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.robot, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_ROBOT), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.action_1, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
@@ -133,6 +122,18 @@ public class ServerService extends Service {
                 .setAction(ACTION_4), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.action_5, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_5), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_6, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_6), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_7, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_7), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_8, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_8), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_9, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_9), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_10, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_10), PendingIntent.FLAG_IMMUTABLE));
+        notificationLayout.setOnClickPendingIntent(R.id.action_11, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
+                .setAction(ACTION_11), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setCustomContentView(notificationLayout)
@@ -281,44 +282,8 @@ public class ServerService extends Service {
                 Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
                 v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(v);
-            } else if (intent.getAction().equals(ACTION_SHUTDOWN)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.translator");
-                startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
-            } else if (intent.getAction().equals(ACTION_TRANSLATOR)) {
-                Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(v);
-            } else if (intent.getAction().equals(ACTION_BRO)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.soundrecorder");
-//                launchIntent.setData(Uri.parse("http://" +
-//                        Shared.getDeviceIP(this) + ":8500/app.html"));
-                startActivity(launchIntent);
-                // com.android.chrome
-            } else if (intent.getAction().equals(ACTION_READER)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.svg");
-                startActivity(launchIntent);
-            } else if (intent.getAction().equals(ACTION_SERVERS)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("psycho.euphoria.editor");
-//                launchIntent.setData(Uri.parse("http://" +
-//                        Shared.getDeviceIP(this) + ":8500/editor.html"));
-                startActivity(launchIntent);
-            } else if (intent.getAction().equals(ACTION_INPUT)) {
-//                if (recordingInProgress.get()) {
-//                    Toast.makeText(this, "关闭", Toast.LENGTH_SHORT).show();
-//                    stopRecording();
-//                } else {
-//                    startRecording();
-//                    Toast.makeText(this, "开始", Toast.LENGTH_SHORT).show();
-//
-//                }
-                Shared.execCmd("am start -n psycho.euphoria.swipeup/psycho.euphoria.swipeup.MainActivity", true);
-
             } else if (intent.getAction().equals(ACTION_APP)) {
                 Intent app = new Intent(this, MainActivity.class);
                 app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -339,6 +304,20 @@ public class ServerService extends Service {
                 launch(4);
             } else if (intent.getAction().equals(ACTION_5)) {
                 launch(5);
+            } else if (intent.getAction().equals(ACTION_6)) {
+                launch(6);
+            } else if (intent.getAction().equals(ACTION_7)) {
+                launch(7);
+            } else if (intent.getAction().equals(ACTION_8)) {
+                launch(8);
+            } else if (intent.getAction().equals(ACTION_9)) {
+                launch(9);
+            } else if (intent.getAction().equals(ACTION_10)) {
+                launch(10);
+            }else if (intent.getAction().equals(ACTION_11)) {
+                Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(v);
             }
 
         }

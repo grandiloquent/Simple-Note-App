@@ -422,7 +422,10 @@ openLink.addEventListener('click', async evt => {
 
     if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /[\u4e00-\u9fa5]/.test(str)) {
         if (typeof NativeAndroid != 'undefined') {
-            NativeAndroid.launchApp(str);
+           const result= NativeAndroid.launchApp(str);
+        if(result){
+            textarea.setRangeText(result,textarea.selectionStart,textarea.selectionEnd);
+        }
         }
     } else if (!str.trim()) {
         if (typeof NativeAndroid != 'undefined') {

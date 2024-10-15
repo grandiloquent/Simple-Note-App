@@ -10,16 +10,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.service.autofill.FieldClassification.Match;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import com.coremedia.iso.boxes.Container;
 import com.coremedia.iso.boxes.MovieHeaderBox;
@@ -142,7 +146,7 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
-    public void launchApp(String text) {
+    public String launchApp(String text) {
         String path = null;
         if (text.equals("文本图片")) {
             path = "/text.html";
@@ -153,9 +157,35 @@ public class WebAppInterface {
         if (text.equals("拼音")) {
             path = "/pinyin.html";
         }
+        if (text.startsWith("声音")) {
+            AudioManager manager = mContext.getSystemService(AudioManager.class);
+            manager.setStreamVolume(AudioManager.STREAM_MUSIC, Integer.parseInt(
+                    Shared.substringAfterLast(text, "声音")
+            ), 0);
+            return;
+        }
+        if (text.equals("电池")) {
+            BatteryManager batteryManager = mContext.getSystemService(BatteryManager.class);
+            StringBuilder stringBuilder = new StringBuilder();
+            Integer chargeCounter = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
+            Integer capacity = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            stringBuilder.append("电池容量：").append(Utils.getBatteryCapacity(mContext))
+                    .append("\n")
+                    .append(chargeCounter == Integer.MIN_VALUE || capacity == Integer.MIN_VALUE ? 0 : (chargeCounter / capacity) * 100)
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_CHARGE_COUNTER: ")
+                    .append(chargeCounter)
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_CAPACITY: ")
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_ENERGY_COUNTER: ")
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER));
+            return stringBuilder.toString();
+        }
         if (path != null) {
             openLocalPage(mContext, path);
-            return;
+            return null;
         }
         if (Pattern.compile("^\\d+([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]+$").matcher(text).find()) {
             int length = 1;
@@ -169,12 +199,13 @@ public class WebAppInterface {
             Intent service = new Intent(mContext, ServerService.class);
             service.setAction(ServerService.ACTION_SHOOT);
             mContext.startService(service);
-            return;
+            return null;
         }
         Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found
         }
+        return null;
     }
 
     @JavascriptInterface

@@ -162,7 +162,7 @@ public class WebAppInterface {
             manager.setStreamVolume(AudioManager.STREAM_MUSIC, Integer.parseInt(
                     Shared.substringAfterLast(text, "声音")
             ), 0);
-            return;
+            return null;
         }
         if (text.equals("电池")) {
             BatteryManager batteryManager = mContext.getSystemService(BatteryManager.class);
@@ -180,7 +180,18 @@ public class WebAppInterface {
                     .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
                     .append("\n")
                     .append("BATTERY_PROPERTY_ENERGY_COUNTER: ")
-                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER));
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER))
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_CURRENT_NOW: ")
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW))
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_STATUS: ")
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS))
+                    .append("\n")
+                    .append("BATTERY_PROPERTY_CURRENT_AVERAGE: ")
+                    .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE))
+
+            ;
             return stringBuilder.toString();
         }
         if (path != null) {

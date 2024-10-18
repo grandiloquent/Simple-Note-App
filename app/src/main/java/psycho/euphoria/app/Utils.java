@@ -182,6 +182,14 @@ public class Utils {
         return new Rectangle(options.outWidth, options.outHeight);
     }
 
+    public static boolean isNumber(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            int p = text.codePointAt(i);
+            if (p > 57 || p < 48) return false;
+        }
+        return true;
+    }
+
     public static void killProcess(int pid) {
         try {
             Process rootProcess = Runtime.getRuntime().exec(new String[]{"su"});
@@ -473,16 +481,15 @@ public class Utils {
 
         }
     }
+
     public static double getBatteryCapacity(Context context) {
         Object mPowerProfile;
         double batteryCapacity = 0;
         final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
-
         try {
             mPowerProfile = Class.forName(POWER_PROFILE_CLASS)
                     .getConstructor(Context.class)
                     .newInstance(context);
-
             batteryCapacity = (double) Class
                     .forName(POWER_PROFILE_CLASS)
                     .getMethod("getBatteryCapacity")
@@ -491,7 +498,6 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return batteryCapacity;
 
     }

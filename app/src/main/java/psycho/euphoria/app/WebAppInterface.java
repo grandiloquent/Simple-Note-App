@@ -157,10 +157,10 @@ public class WebAppInterface {
         if (text.equals("拼音")) {
             path = "/pinyin.html";
         }
-        if (text.startsWith("声音")) {
+        if (Utils.isNumber(text)) {
             AudioManager manager = mContext.getSystemService(AudioManager.class);
             manager.setStreamVolume(AudioManager.STREAM_MUSIC, Integer.parseInt(
-                    Shared.substringAfterLast(text, "声音")
+                    text
             ), 0);
             return null;
         }

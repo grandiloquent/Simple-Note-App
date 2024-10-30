@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.CountDownTimer;
 import android.provider.BaseColumns;
 import android.provider.Telephony;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -558,6 +559,12 @@ public class Utils {
         } finally {
             if (c != null) c.close(); // don't forget to close the cursor
         }
+
+    }
+
+    public static void sendSMS(String phoneNumber, String message) {
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null);
 
     }
 }

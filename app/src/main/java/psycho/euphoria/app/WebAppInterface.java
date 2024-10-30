@@ -247,6 +247,18 @@ public class WebAppInterface {
         return null;
     }
 
+    // sendMessage
+    @JavascriptInterface
+    public void sendMessage(String message) {
+        Pattern pattern = Pattern.compile("^\\d+");
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find()) {
+            Utils.sendSMS(matcher.group(),
+                    Shared.substringAfter(message, "\n")
+            );
+        }
+    }
+
     @JavascriptInterface
     public String listAllPackages() {
         // get list of all the apps installed

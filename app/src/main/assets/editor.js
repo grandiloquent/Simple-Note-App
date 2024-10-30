@@ -431,6 +431,10 @@ openLink.addEventListener('click', async evt => {
         if (typeof NativeAndroid != 'undefined') {
             textarea.value = NativeAndroid.listAllPackages();
         }
+    }else if(textarea.value.trim().startsWith("发短信")){
+    if (typeof NativeAndroid != 'undefined') {
+    NativeAndroid.sendMessage(substringAfter(textarea.value.trim(),"\n"));
+    }
     } else {
         if (str.startsWith("$")) {
             if (/\$ +ffmpeg +/.test(str)) {

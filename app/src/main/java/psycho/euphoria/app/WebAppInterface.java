@@ -224,6 +224,22 @@ public class WebAppInterface {
             }
             return stringBuilder.toString();
         }
+        if (Pattern.compile("^短信[0-9]+$").matcher(text).find()) {
+            Matcher matcher = Pattern.compile("\\d+").matcher(text);
+            if (matcher.find()) {
+                Utils.deleteSMS(mContext, Integer.parseInt(matcher.group()));
+            }
+            return null;
+        }
+        if (Pattern.compile("^电话[0-9]+$").matcher(text).find()) {
+            Matcher matcher = Pattern.compile("\\d+").matcher(text);
+            if (matcher.find()) {
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + matcher.group()));
+                mContext.startActivity(intent);
+            }
+            return null;
+        }
         Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text));
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found

@@ -25,6 +25,7 @@ import android.os.Process;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +59,7 @@ import static psycho.euphoria.app.Utils.FetchNodes;
 public class MainActivity extends Activity {
 
     public static final String KEY_ADDRESS = "psycho.euphoria.notes.address";
+    public static final String POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
     private static final String USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
     private WebView mWebView;
     //    private BroadcastReceiver mBroadcastReceiver;
@@ -67,6 +69,25 @@ public class MainActivity extends Activity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         // AroundFileUriExposedException.aroundFileUriExposedException(MainActivity.this);
+    }
+
+    public static void enableNotification(Context context) {
+        try {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+            intent.putExtra(Settings.EXTRA_CHANNEL_ID, context.getApplicationInfo().uid);
+            intent.putExtra("app_package", context.getPackageName());
+            intent.putExtra("app_uid", context.getApplicationInfo().uid);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+            intent.setData(uri);
+            context.startActivity(intent);
+        }
     }
 
     public static WebView initializeWebView(MainActivity context) {
@@ -81,6 +102,23 @@ public class MainActivity extends Activity {
     public static void launchServer(MainActivity context) {
         Intent intent = new Intent(context, ServerService.class);
         context.startService(intent);
+    }
+
+    public static void requestNotificationPermission(Activity activity) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (activity.checkSelfPermission(POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
+                if (!activity.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
+                    enableNotification(activity);
+                } else {
+                    activity.requestPermissions(new String[]{POST_NOTIFICATIONS}, 100);
+                }
+            }
+        } else {
+            boolean enabled = activity.getSystemService(NotificationManager.class).areNotificationsEnabled();
+            if (!enabled) {
+                enableNotification(activity);
+            }
+        }
     }
 
     public static void requestStorageManagerPermission(Activity context) {
@@ -164,6 +202,29 @@ public class MainActivity extends Activity {
         }
         if (checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (checkSelfPermission(permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.READ_SMS);
+        }
+        if (checkSelfPermission(permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.RECEIVE_SMS);
+        }
+
+        if (checkSelfPermission(permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.SEND_SMS);
+        }
+        if (checkSelfPermission(permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.CALL_PHONE);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            final String myPackageName = getPackageName();
+            if (!Telephony.Sms.getDefaultSmsPackage(this).equals(myPackageName)) {
+
+                Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+                intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
+                startActivityForResult(intent, 1);
+            }
         }
 //        Log.e("B5aOx2", String.format("initialize, %s", Environment.getExternalStorageDirectory()));
 //
@@ -251,7 +312,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        
+
         super.onCreate(savedInstanceState);
         initialize();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);
@@ -345,44 +406,6 @@ public class MainActivity extends Activity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public static final String POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
-
-    public static void requestNotificationPermission(Activity activity) {
-        if (Build.VERSION.SDK_INT >= 33) {
-            if (activity.checkSelfPermission(POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
-                if (!activity.shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
-                    enableNotification(activity);
-                } else {
-                    activity.requestPermissions(new String[]{POST_NOTIFICATIONS}, 100);
-                }
-            }
-        } else {
-            boolean enabled = activity.getSystemService(NotificationManager.class).areNotificationsEnabled();
-            if (!enabled) {
-                enableNotification(activity);
-            }
-        }
-    }
-
-    public static void enableNotification(Context context) {
-        try {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-            intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
-            intent.putExtra(Settings.EXTRA_CHANNEL_ID, context.getApplicationInfo().uid);
-            intent.putExtra("app_package", context.getPackageName());
-            intent.putExtra("app_uid", context.getApplicationInfo().uid);
-            context.startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", context.getPackageName(), null);
-            intent.setData(uri);
-            context.startActivity(intent);
-        }
     }
 
 

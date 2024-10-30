@@ -16,6 +16,8 @@ import android.graphics.PixelFormat;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.CountDownTimer;
+import android.provider.BaseColumns;
+import android.provider.Telephony;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -505,19 +507,17 @@ public class Utils {
         return batteryCapacity;
 
     }
+
     public static List<Sms> getAllSms(Activity context) {
         List<Sms> lstSms = new ArrayList<Sms>();
         Sms objSms = new Sms();
         Uri message = Uri.parse("content://sms/");
         ContentResolver cr = context.getContentResolver();
-
         Cursor c = cr.query(message, null, null, null, null);
         //context.startManagingCursor(c);
         int totalSMS = c.getCount();
-
         if (c.moveToFirst()) {
             for (int i = 0; i < totalSMS; i++) {
-
                 objSms = new Sms();
                 objSms.setId(c.getString(c.getColumnIndexOrThrow("_id")));
                 objSms.setAddress(c.getString(c
@@ -530,7 +530,6 @@ public class Utils {
                 } else {
                     objSms.setFolderName("sent");
                 }
-
                 lstSms.add(objSms);
                 c.moveToNext();
             }
@@ -539,7 +538,26 @@ public class Utils {
         // throw new RuntimeException("You have no SMS");
         // }
         c.close();
-
         return lstSms;
+    }
+
+    public static void deleteSMS(Context context, int position) {
+        Uri deleteUri = Telephony.Sms.CONTENT_URI;
+        int count = 0;
+        Cursor c = context.getContentResolver().query(deleteUri, new String[]{BaseColumns._ID}, null,
+                null, null); // only query _ID and not everything
+        try {
+            while (c.moveToNext()) {
+                // Delete the SMS
+                String pid = c.getString(c.getColumnIndexOrThrow("_id"));// Get _id;
+                Uri uri = Telephony.Sms.CONTENT_URI.buildUpon().appendPath(pid).build();
+                count = context.getContentResolver().delete(uri,
+                        null, null);
+            }
+        } catch (Exception e) {
+        } finally {
+            if (c != null) c.close(); // don't forget to close the cursor
+        }
+
     }
 }

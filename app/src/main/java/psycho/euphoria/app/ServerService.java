@@ -23,6 +23,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -289,10 +290,13 @@ public class ServerService extends Service {
                 app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(app);
             } else if (intent.getAction().equals(ACTION_ROBOT)) {
-                PackageManager pm = getPackageManager();
-                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-                launchIntent.setData(Uri.parse("http://" +
-                        Shared.getDeviceIP(this) + ":8500/app.html"));
+//                PackageManager pm = getPackageManager();
+//                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
+//                launchIntent.setAction(Intent.ACTION_VIEW).addCategory(Intent.CATEGORY_BROWSABLE).setType("text/plain")
+//                        .setData(Uri.parse("http://" +
+//                        Shared.getDeviceIP(this) + ":8500/app.html"));
+                Intent launchIntent=new Intent(Intent.ACTION_VIEW,Uri.parse("http://0.0.0.0:8500/app.html"));
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_1)) {
                 launch(1);
@@ -314,7 +318,7 @@ public class ServerService extends Service {
                 launch(9);
             } else if (intent.getAction().equals(ACTION_10)) {
                 launch(10);
-            }else if (intent.getAction().equals(ACTION_11)) {
+            } else if (intent.getAction().equals(ACTION_11)) {
                 Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(v);

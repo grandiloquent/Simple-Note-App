@@ -190,7 +190,6 @@ public class WebAppInterface {
                     .append("\n")
                     .append("BATTERY_PROPERTY_CURRENT_AVERAGE: ")
                     .append(batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE))
-
             ;
             return stringBuilder.toString();
         }
@@ -212,7 +211,20 @@ public class WebAppInterface {
             mContext.startService(service);
             return null;
         }
-        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
+        if (text.equals("短信")) {
+            List<Sms> smsList = Utils.getAllSms(mContext);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Sms sms : smsList) {
+                stringBuilder.append(
+                                sms.getMsg()
+                        ).append("\n")
+                        .append(sms.getAddress()).append("\n")
+                        .append(sms.getTime()).append("\n")
+                        .append(sms.getId()).append("\n\n");
+            }
+            return stringBuilder.toString();
+        }
+        Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text));
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found
         }

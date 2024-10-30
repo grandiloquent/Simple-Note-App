@@ -240,7 +240,7 @@ public class WebAppInterface {
             }
             return null;
         }
-        Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(text));
+        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
         if (launchIntent != null) {
             mContext.startActivity(launchIntent);//null pointer check in case package name was not found
         }

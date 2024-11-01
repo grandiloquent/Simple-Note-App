@@ -1894,7 +1894,7 @@ in vec4 a_position;
                                                              : dir.file_size()}};
                 doc.push_back(j);
             } catch (std::exception) {
-               
+
             }
         }
         res.set_content(doc.dump(), "application/json");

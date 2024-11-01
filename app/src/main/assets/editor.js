@@ -420,21 +420,49 @@ openLink.addEventListener('click', async evt => {
     }
     let str = textarea.value.slice(start, end + 1);
 
-    if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /[\u4e00-\u9fa50-9]/.test(str)) {
+    if (textarea.value.trim().startsWith("发短信")) {
         if (typeof NativeAndroid != 'undefined') {
-           const result= NativeAndroid.launchApp(str);
-        if(result){
-            textarea.setRangeText(result,textarea.selectionStart,textarea.selectionEnd);
+            NativeAndroid.sendMessage(substringAfter(textarea.value.trim(), "\n"));
         }
+    } else if (textarea.value.trim().startsWith("大小")) {
+        const path = substringAfter(textarea.value.trim(), '\n').trim();
+        let baseUri = window.location.host === '127.0.0.1:5500' ? SETTINGS.host : '';
+        try {
+            const response = await fetch(`${baseUri}/filessize?path=${encodeURIComponent(path)}`);
+            if (response.status > 399 || response.status < 200) {
+                throw new Error(`${response.status}: ${response.statusText}`)
+            }
+            const results = await response.json();
+            const buffer = [];
+            results.sort((x, y) => {
+                const dif = x.length - y.length;
+                if (dif > 0) {
+                    return -1;
+                } else if (dif < 0) {
+                    return 1;
+                }
+                return 0;
+
+            }).forEach(element => {
+                buffer.push(`${element.path}
+${humanFileSize(element.length)}`)
+
+            });
+            textarea.value += "\n\n\n"+buffer.join('\n');
+        } catch (error) {
+            console.log(error);
+        }
+    } else if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /[^\u4e00-\u9fa5][0-9]/.test(str)) {
+        if (typeof NativeAndroid != 'undefined') {
+            const result = NativeAndroid.launchApp(str);
+            if (result) {
+                textarea.setRangeText(result, textarea.selectionStart, textarea.selectionEnd);
+            }
         }
     } else if (!str.trim()) {
         if (typeof NativeAndroid != 'undefined') {
             textarea.value = NativeAndroid.listAllPackages();
         }
-    }else if(textarea.value.trim().startsWith("发短信")){
-    if (typeof NativeAndroid != 'undefined') {
-    NativeAndroid.sendMessage(substringAfter(textarea.value.trim(),"\n"));
-    }
     } else {
         if (str.startsWith("$")) {
             if (/\$ +ffmpeg +/.test(str)) {

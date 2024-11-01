@@ -429,6 +429,16 @@ void mergeSubtitles(const std::string &dir) {
 static void serveTextContent(const httplib::Request &req,
                              httplib::Response &res) {}
 
+std::uintmax_t directorySize(const std::filesystem::path &directory) {
+    std::uintmax_t size{0};
+    for (const auto &entry: std::filesystem::recursive_directory_iterator(directory)) {
+        if (entry.is_regular_file() && !entry.is_symlink()) {
+            size += entry.file_size();
+        }
+    }
+    return size;
+}
+
 void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
                  int port) {
     static const char table[] = R"(CREATE TABLE IF NOT EXISTS "note" (
@@ -1864,12 +1874,32 @@ in vec4 a_position;
                     {"length",        dir.is_directory() ? 0 : dir.file_size()}};
             doc.push_back(j);
         }
-        res.set_content(doc.
-
-                                dump(),
-
-                        "application/json");
+        res.set_content(doc.dump(), "application/json");
     });
+    server.Get("/filessize", [](const httplib::Request &req, httplib::Response &res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        auto path = req.get_param_value("path");
+        std::filesystem::path p(httplib::detail::decode_url(path, false));
+        nlohmann::json doc = nlohmann::json::array();
+        for (auto const &dir: std::filesystem::directory_iterator{p}) {
+            try {
+                nlohmann::json j = {
+
+                        {"path",          dir.path().string()},
+                        {"isDirectory",   dir.is_directory()},
+                        {"lastWriteTime", std::chrono::duration_cast<std::chrono::seconds>(
+                                dir.last_write_time().time_since_epoch())
+                                                  .count()},
+                        {"length",        dir.is_directory() ? directorySize(dir.path())
+                                                             : dir.file_size()}};
+                doc.push_back(j);
+            } catch (std::exception) {
+               
+            }
+        }
+        res.set_content(doc.dump(), "application/json");
+    });
+
     server.Post("/file/delete",
                 [](const httplib::Request &req, httplib::Response &res,
                    const httplib::ContentReader &content_reader) {

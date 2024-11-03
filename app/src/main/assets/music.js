@@ -60,7 +60,7 @@ async function bindPlayEvent() {
         }
     });
     audio.addEventListener('ended', evt => {
-        audio.load();
+        //audio.load();
         /*const file = files[
             getRandomInt(0, files.length)
         ];
@@ -68,13 +68,13 @@ async function bindPlayEvent() {
         audio.play();
         title.textContent = substringAfterLast(file.path, "/");
         */
-        // let index = window.index || (window.index = 0);
-        // if (index + 1 < window.files.length) {
-        //     window.index++;
+         let index = window.index || (window.index = 0);
+         if (index + 1 < window.files.length) {
+             window.index++;
 
-        // } else {
-        //     window.index = 0;
-        // }
+         } else {
+             window.index = 0;
+         }
         playMusic(window.files[window.index].path,
             substringAfterLast(window.files[window.index].path, '/'));
     })

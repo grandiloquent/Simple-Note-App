@@ -448,7 +448,7 @@ openLink.addEventListener('click', async evt => {
 ${humanFileSize(element.length)}`)
 
             });
-            textarea.value += "\n\n\n"+buffer.join('\n');
+            textarea.value += "\n\n\n" + buffer.join('\n');
         } catch (error) {
             console.log(error);
         }
@@ -744,3 +744,19 @@ contentCopy.addEventListener('click', evt => {
     textarea.setRangeText("\n", start, end);
     //writeText(s);
 });
+
+document.getElementById('cut-before')
+    .addEventListener('click', evt => {
+        let start = textarea.selectionStart;
+        const strings = textarea.substring(0, start);
+        writeText(strings);
+        textarea.setRangeText("", 0, start);
+    });
+
+document.getElementById('cut-after')
+    .addEventListener('click', evt => {
+        let start = textarea.selectionStart;
+        const strings = textarea.substring(start);
+        writeText(strings);
+        textarea.setRangeText("", start, textarea.value.length);
+    });

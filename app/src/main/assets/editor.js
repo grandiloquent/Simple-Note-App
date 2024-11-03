@@ -748,15 +748,15 @@ contentCopy.addEventListener('click', evt => {
 document.getElementById('cut-before')
     .addEventListener('click', evt => {
         let start = textarea.selectionStart;
-        const strings = textarea.substring(0, start);
+        const strings = textarea.value.substring(0, start);
         writeText(strings);
         textarea.setRangeText("", 0, start);
     });
 
 document.getElementById('cut-after')
-    .addEventListener('click', evt => {
+    .addEventListener('click', evtg => {
         let start = textarea.selectionStart;
-        const strings = textarea.substring(start);
+        const strings = textarea.value.substring(start);
         writeText(strings);
         textarea.setRangeText("", start, textarea.value.length);
     });

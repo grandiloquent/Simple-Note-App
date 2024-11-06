@@ -280,7 +280,10 @@ public class ServerService extends Service {
 //
 //                });
                 // android.settings.APP_MEMORY_USAGE
-                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+//                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+//                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                startActivity(v);
+                Intent v = new Intent(Settings.ACTION_SOUND_SETTINGS);
                 v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(v);
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
@@ -295,7 +298,7 @@ public class ServerService extends Service {
 //                launchIntent.setAction(Intent.ACTION_VIEW).addCategory(Intent.CATEGORY_BROWSABLE).setType("text/plain")
 //                        .setData(Uri.parse("http://" +
 //                        Shared.getDeviceIP(this) + ":8500/app.html"));
-                Intent launchIntent=new Intent(Intent.ACTION_VIEW,Uri.parse("http://0.0.0.0:8500/app.html"));
+                Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://0.0.0.0:8500/app.html"));
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_1)) {

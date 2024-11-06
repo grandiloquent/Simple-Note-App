@@ -452,7 +452,7 @@ ${humanFileSize(element.length)}`)
         } catch (error) {
             console.log(error);
         }
-    } else if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /[^\u4e00-\u9fa5][0-9]/.test(str)) {
+    } else if (/^([a-zA-Z0-9_]+\.)+[a-zA-Z0-9_]+$/.test(str) || /^[\u4e00-\u9fa5][0-9]?/.test(str)) {
         if (typeof NativeAndroid != 'undefined') {
             const result = NativeAndroid.launchApp(str);
             if (result) {

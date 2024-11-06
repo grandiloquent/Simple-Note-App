@@ -1,0 +1,23 @@
+<resources>
+    <style name="MyTheme" parent="@android:style/Theme.Material">
+        <item name="android:actionBarStyle">@style/MyTheme.ActionBarStyle</item>
+        <item name="android:actionMenuTextColor">#999</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyTheme.Overflow</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:navigationBarColor">#00000000</item>
+    </style>
+
+    <style name="MyTheme.ActionBarStyle" parent="@android:style/Widget.Material.ActionBar">
+        <item name="android:titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
+        <item name="android:textColor">#999</item>
+    </style>
+    <style name="MyTheme.Overflow" parent="@android:style/Widget.Material.ActionButton.Overflow">
+        <item name="android:tint">#999</item>
+    </style>
+</resources>

@@ -36,8 +36,10 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -249,6 +251,7 @@ public class MainActivity extends Activity {
 //            mWebView.loadUrl(address + "/index.html");
 //
 //        }
+
         mUrl = String.format("http://%s:8500/index.html", Shared.getDeviceIP(this));
         openIndex();
     }

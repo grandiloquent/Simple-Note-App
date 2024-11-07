@@ -258,10 +258,13 @@ public class ServerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_DISMISS)) {
-                stopForeground(true);
-                stopSelf();
-                Process.killProcess(Process.myPid());
-                return START_NOT_STICKY;
+//                stopForeground(true);
+//                stopSelf();
+//                Process.killProcess(Process.myPid());
+//                return START_NOT_STICKY;
+                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(v);
             } else if (intent.getAction().equals(ACTION_KILL)) {
 //                Utils.killProcesses(this, new String[]{
 //                        "nekox.messenger",

@@ -186,7 +186,6 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
-
         requestNotificationPermission(this);
         if (VERSION.SDK_INT >= VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
@@ -205,24 +204,30 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.WRITE_EXTERNAL_STORAGE);
         }
+        if (checkSelfPermission(permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.READ_PHONE_STATE);
+        }
+        if (checkSelfPermission(permission.PROCESS_OUTGOING_CALLS) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.PROCESS_OUTGOING_CALLS);
+        }
+        if (checkSelfPermission(permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(permission.VIBRATE);
+        }
         if (checkSelfPermission(permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.READ_SMS);
         }
         if (checkSelfPermission(permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.RECEIVE_SMS);
         }
-
         if (checkSelfPermission(permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.SEND_SMS);
         }
         if (checkSelfPermission(permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(permission.CALL_PHONE);
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final String myPackageName = getPackageName();
-            if (!Telephony.Sms.getDefaultSmsPackage(this).equals(myPackageName)) {
-
+            if (Telephony.Sms.getDefaultSmsPackage(this) == null || !Telephony.Sms.getDefaultSmsPackage(this).equals(myPackageName)) {
                 Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
                 intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
                 startActivityForResult(intent, 1);
@@ -251,7 +256,6 @@ public class MainActivity extends Activity {
 //            mWebView.loadUrl(address + "/index.html");
 //
 //        }
-
         mUrl = String.format("http://%s:8500/index.html", Shared.getDeviceIP(this));
         openIndex();
     }
@@ -315,7 +319,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         initialize();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);

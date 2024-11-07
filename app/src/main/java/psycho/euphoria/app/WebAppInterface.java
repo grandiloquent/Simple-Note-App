@@ -212,6 +212,7 @@ public class WebAppInterface {
             return null;
         }
         if (text.equals("短信")) {
+            Log.e("B5aOx2", String.format("launchApp, %s", "短信"));
             List<Sms> smsList = Utils.getAllSms(mContext);
             StringBuilder stringBuilder = new StringBuilder();
             for (Sms sms : smsList) {

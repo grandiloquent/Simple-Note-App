@@ -61,6 +61,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import psycho.euphoria.app.AppUtils.AppDatabase;
+
 public class WebAppInterface {
 
     private MainActivity mContext;
@@ -241,10 +243,12 @@ public class WebAppInterface {
             }
             return null;
         }
-        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
-        if (launchIntent != null) {
-            mContext.startActivity(launchIntent);//null pointer check in case package name was not found
-        }
+//        Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(text);
+//        if (launchIntent != null) {
+//            mContext.startActivity(launchIntent);//null pointer check in case package name was not found
+//        }
+        AppDatabase appDatabase=new AppDatabase(mContext);
+        appDatabase.insert(text);
         return null;
     }
 

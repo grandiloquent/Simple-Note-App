@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.app.role.RoleManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -228,9 +229,18 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final String myPackageName = getPackageName();
             if (Telephony.Sms.getDefaultSmsPackage(this) == null || !Telephony.Sms.getDefaultSmsPackage(this).equals(myPackageName)) {
-                Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
-                intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
-                startActivityForResult(intent, 1);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    RoleManager roleManager = (RoleManager) getSystemService(ROLE_SERVICE);
+                    Intent roleManagerIntent = roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS);
+                    roleManagerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    roleManagerIntent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
+                    startActivityForResult(roleManagerIntent, 0);
+                } else {
+                    Intent intent =
+                            new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+                    intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
+                    startActivity(intent);
+                }
             }
         }
 //        Log.e("B5aOx2", String.format("initialize, %s", Environment.getExternalStorageDirectory()));

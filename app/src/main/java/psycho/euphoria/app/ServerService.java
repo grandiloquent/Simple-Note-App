@@ -286,9 +286,12 @@ public class ServerService extends Service {
 //                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
 //                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
 //                startActivity(v);
-                Intent v = new Intent(Settings.ACTION_SOUND_SETTINGS);
-                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(v);
+//                Intent v = new Intent(Settings.ACTION_SOUND_SETTINGS);
+//                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                startActivity(v);
+
+                AppUtils.launchList(this);
+
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
                 Utils.takePhoto();
             } else if (intent.getAction().equals(ACTION_APP)) {

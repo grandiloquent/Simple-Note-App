@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.os.Process;
 import android.provider.Settings;
+import android.telecom.VideoProfile;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -66,11 +67,6 @@ public class ServerService extends Service {
     public static final String ACTION_3 = "psycho.euphoria.app.ServerService.ACTION_3";
     public static final String ACTION_4 = "psycho.euphoria.app.ServerService.ACTION_4";
     public static final String ACTION_5 = "psycho.euphoria.app.ServerService.ACTION_5";
-    public static final String ACTION_6 = "psycho.euphoria.app.ServerService.ACTION_6";
-    public static final String ACTION_7 = "psycho.euphoria.app.ServerService.ACTION_7";
-    public static final String ACTION_8 = "psycho.euphoria.app.ServerService.ACTION_8";
-    public static final String ACTION_9 = "psycho.euphoria.app.ServerService.ACTION_9";
-    public static final String ACTION_10 = "psycho.euphoria.app.ServerService.ACTION_10";
     public static final String ACTION_11 = "psycho.euphoria.app.ServerService.ACTION_11";
 
     /**
@@ -123,16 +119,7 @@ public class ServerService extends Service {
                 .setAction(ACTION_4), PendingIntent.FLAG_IMMUTABLE));
         notificationLayout.setOnClickPendingIntent(R.id.action_5, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_5), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_6, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_6), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_7, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_7), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_8, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_8), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_9, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_9), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_10, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_10), PendingIntent.FLAG_IMMUTABLE));
+
         notificationLayout.setOnClickPendingIntent(R.id.action_11, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
                 .setAction(ACTION_11), PendingIntent.FLAG_IMMUTABLE));
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
@@ -289,7 +276,6 @@ public class ServerService extends Service {
 //                Intent v = new Intent(Settings.ACTION_SOUND_SETTINGS);
 //                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
 //                startActivity(v);
-
                 AppUtils.launchList(this);
 
             } else if (intent.getAction().equals(ACTION_SHOOT)) {
@@ -308,25 +294,22 @@ public class ServerService extends Service {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(launchIntent);
             } else if (intent.getAction().equals(ACTION_1)) {
-                launch(1);
+                AudioManager audioManager = getSystemService(AudioManager.class);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             } else if (intent.getAction().equals(ACTION_2)) {
-                launch(2);
+                AudioManager audioManager = getSystemService(AudioManager.class);
+                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 1, 0);
+                Toast.makeText(this, Integer.toString(value + 10), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_3)) {
-                launch(3);
+                AudioManager audioManager = getSystemService(AudioManager.class);
+                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 1, 0);
+                Toast.makeText(this, Integer.toString(value + 1), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_4)) {
                 launch(4);
             } else if (intent.getAction().equals(ACTION_5)) {
                 launch(5);
-            } else if (intent.getAction().equals(ACTION_6)) {
-                launch(6);
-            } else if (intent.getAction().equals(ACTION_7)) {
-                launch(7);
-            } else if (intent.getAction().equals(ACTION_8)) {
-                launch(8);
-            } else if (intent.getAction().equals(ACTION_9)) {
-                launch(9);
-            } else if (intent.getAction().equals(ACTION_10)) {
-                launch(10);
             } else if (intent.getAction().equals(ACTION_11)) {
                 Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);

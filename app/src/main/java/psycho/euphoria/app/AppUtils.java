@@ -57,7 +57,8 @@ public class AppUtils {
         layout.setBackgroundColor(Color.RED);
         AppItemAdapter appItemAdapter = new AppItemAdapter(context);
         layout.setAdapter(appItemAdapter);
-        List<AppItem> appItems = new AppDatabase(context).listAll();
+        AppDatabase appDatabase=new AppDatabase(context);
+        List<AppItem> appItems = appDatabase.listAll();
         if (appItems.isEmpty()) {
             AppItem appItem = new AppItem();
             appItem.packageName = "com.android.settings";
@@ -80,6 +81,7 @@ public class AppUtils {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AppItem item = appItemAdapter.getItem(position);
+                appDatabase.updateViews(item.packageName);
                 Intent intent = context.getPackageManager().getLaunchIntentForPackage(item.packageName);
                 context.startActivity(intent);
                 windowManager.removeView(layout);
@@ -173,21 +175,8 @@ public class AppUtils {
             super(context, context.getDatabasePath("app.db").getPath(), null, 1);
         }
 
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL("create table if not exists app(_id integer primary key,package_name text unique,flag text, create_at integer) ");
-        }
-
-        public List<AppItem> listAll() {
-            Cursor cursor = getReadableDatabase().rawQuery("select package_name from app", null);
-            List<AppItem> apps = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                AppItem appItem = new AppItem();
-                appItem.packageName = cursor.getString(0);
-                apps.add(appItem);
-            }
-            cursor.close();
-            return apps;
+        public void delete(String packageName) {
+            getWritableDatabase().delete("app", "package_name = ?", new String[]{packageName});
         }
 
         public void insert(String packageName) {
@@ -205,8 +194,25 @@ public class AppUtils {
             getWritableDatabase().insert("app", null, values);
         }
 
-        public void delete(String packageName) {
-            getWritableDatabase().delete("app", "package_name = ?", new String[]{packageName});
+        public List<AppItem> listAll() {
+            Cursor cursor = getReadableDatabase().rawQuery("select package_name from app order by views desc", null);
+            List<AppItem> apps = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                AppItem appItem = new AppItem();
+                appItem.packageName = cursor.getString(0);
+                apps.add(appItem);
+            }
+            cursor.close();
+            return apps;
+        }
+
+        public void updateViews(String packageName) {
+            getWritableDatabase().execSQL("UPDATE app SET views = COALESCE(views,0) + 1 WHERE package_name = ?", new String[]{packageName});
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("create table if not exists app(_id integer primary key,package_name text unique,flag text,views integer, create_at integer) ");
         }
 
         @Override

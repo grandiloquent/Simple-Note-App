@@ -4,58 +4,38 @@ import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.app.role.RoleManager;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.hardware.input.InputManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Process;
 import android.os.StrictMode;
-import android.provider.MediaStore;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Telephony;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import psycho.euphoria.app.CustomWebChromeClient;
-import psycho.euphoria.app.CustomWebViewClient;
-import psycho.euphoria.app.ServerService;
-import psycho.euphoria.app.WebAppInterface;
 
 import static psycho.euphoria.app.ServerService.ACTION_DISMISS;
-import static psycho.euphoria.app.ServerService.START_SERVER_ACTION;
 import static psycho.euphoria.app.Utils.FetchNodes;
 
 
@@ -187,44 +167,12 @@ public class MainActivity extends Activity {
     }
 
     private void initialize() {
-        requestNotificationPermission(this);
-        if (VERSION.SDK_INT >= VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 0);
-            }
-        }
-//        Log.e("B5aOx2", String.format("vvvvvvvvinitialize, %s", checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE)));
-        List<String> permissions = new ArrayList<>();
-        if (checkSelfPermission(permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.CAMERA);
-        }
-        if (checkSelfPermission(permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.RECORD_AUDIO);
-        }
-        if (checkSelfPermission(permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.WRITE_EXTERNAL_STORAGE);
-        }
-        if (checkSelfPermission(permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.READ_PHONE_STATE);
-        }
-        if (checkSelfPermission(permission.PROCESS_OUTGOING_CALLS) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.PROCESS_OUTGOING_CALLS);
-        }
-        if (checkSelfPermission(permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.VIBRATE);
-        }
-        if (checkSelfPermission(permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.READ_SMS);
-        }
-        if (checkSelfPermission(permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.RECEIVE_SMS);
-        }
-        if (checkSelfPermission(permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.SEND_SMS);
-        }
-        if (checkSelfPermission(permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(permission.CALL_PHONE);
+        String checkedPermissions = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("permission", null);
+        if (checkedPermissions == null) {
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putString("permission", "1").apply();
+            requestPermissions();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final String myPackageName = getPackageName();
@@ -252,9 +200,6 @@ public class MainActivity extends Activity {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-        if (!permissions.isEmpty()) {
-            requestPermissions(permissions.toArray(new String[0]), 0);
-        }
         aroundFileUriExposedException();
         requestStorageManagerPermission(this);
         mWebView = initializeWebView(this);
@@ -317,6 +262,48 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void requestPermissions() {
+        requestNotificationPermission(this);
+        if (VERSION.SDK_INT >= VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 0);
+            }
+        }
+        List<String> permissions = new ArrayList<>();
+        String[] permissionWanted = new String[]{
+                permission.ACCESS_WIFI_STATE,
+                permission.INTERNET,
+                permission.RECORD_AUDIO,
+                permission.WRITE_EXTERNAL_STORAGE,
+                permission.MOUNT_UNMOUNT_FILESYSTEMS,
+                permission.READ_EXTERNAL_STORAGE,
+                permission.MANAGE_EXTERNAL_STORAGE,
+                permission.FOREGROUND_SERVICE,
+                permission.QUERY_ALL_PACKAGES,
+                permission.SYSTEM_ALERT_WINDOW,
+                permission.POST_NOTIFICATIONS,
+                permission.CHANGE_COMPONENT_ENABLED_STATE,
+                permission.READ_SMS,
+                permission.RECEIVE_SMS,
+                permission.SEND_SMS,
+                permission.CALL_PHONE,
+                permission.READ_PHONE_STATE,
+                permission.PROCESS_OUTGOING_CALLS,
+                permission.VIBRATE,
+                permission.KILL_BACKGROUND_PROCESSES,
+                permission.RESTART_PACKAGES
+        };
+        for (String p : permissionWanted) {
+            if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(p);
+            }
+        }
+        if (!permissions.isEmpty()) {
+            requestPermissions(permissions.toArray(new String[0]), 0);
+        }
+    }
+
     private void stopService() {
         Intent stopService = new Intent(this, ServerService.class);
         stopService.setAction(ACTION_DISMISS);
@@ -331,6 +318,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initialize();
+        //getDatabasePath("app.db").delete();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);
 //        intent.setData(Uri.fromFile(
 //                new File("/storage/emulated/0/Pictures/WeiXin").listFiles()[0]

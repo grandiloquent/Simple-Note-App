@@ -312,6 +312,7 @@ public class ServerService extends Service {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value - 1, 0);
                 Toast.makeText(this, Integer.toString(value -1), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_5)) {
+              //     getSystemService(ActivityManager.class).killBackgroundProcesses("com.kuaishou.nebula");
                 launch(5);
             } else if (intent.getAction().equals(ACTION_11)) {
                 Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);

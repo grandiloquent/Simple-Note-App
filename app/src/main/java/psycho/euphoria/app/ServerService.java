@@ -299,7 +299,7 @@ public class ServerService extends Service {
             } else if (intent.getAction().equals(ACTION_2)) {
                 AudioManager audioManager = getSystemService(AudioManager.class);
                 int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 1, 0);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 10, 0);
                 Toast.makeText(this, Integer.toString(value + 10), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_3)) {
                 AudioManager audioManager = getSystemService(AudioManager.class);
@@ -307,7 +307,10 @@ public class ServerService extends Service {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 1, 0);
                 Toast.makeText(this, Integer.toString(value + 1), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_4)) {
-                launch(4);
+                AudioManager audioManager = getSystemService(AudioManager.class);
+                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value - 1, 0);
+                Toast.makeText(this, Integer.toString(value -1), Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(ACTION_5)) {
                 launch(5);
             } else if (intent.getAction().equals(ACTION_11)) {

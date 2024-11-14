@@ -19,7 +19,7 @@ async function initialize() {
             .filter(video => {
                 return !video.isDirectory && (
                     video.path.endsWith(".mp4") ||
-                    video.path.endsWith(".v") ||
+                    video.path.endsWith(".vv") ||
                     video.path.endsWith(".MP4") ||
                     video.path.endsWith(".MOV") ||
                     video.path.endsWith(".mov")

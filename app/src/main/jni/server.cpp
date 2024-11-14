@@ -1983,9 +1983,11 @@ in vec4 a_position;
                                                            dir_entry.path().extension() == ".mov" ||
                                                            dir_entry.path().extension() == ".MOV" ||
                                                            dir_entry.path().extension() ==
-                                                           ".MP4")) {
+                                                           ".MP4")||
+                               dir_entry.path().extension() ==
+                               ".v")  {
                            std::filesystem::path s = dir_entry.path();
-                           fs::rename(dir_entry.path(), s.replace_extension("v"));
+                           fs::rename(dir_entry.path(), s.replace_extension("vv"));
                        }
                    }
                    parent = parent.append("recycle");

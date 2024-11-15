@@ -53,8 +53,8 @@ body {
     font-family: wf_segoe-ui_normal, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #333;
-    background-color: #fff;
+    color: #999;
+    background-color: #000;
     text-rendering: optimizeLegibility;
 }
 
@@ -512,12 +512,13 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
                         return true;
                     });
                     auto path = req.get_param_value("path");
-                    std::ofstream wf(path, std::ios::out | std::ios::binary);
+                    std::ofstream wf(path,  std::ofstream::binary);
                     if (!wf) {
                         res.status = 500;
                         return;
                     }
                     wf.write(body.c_str(), body.size());
+                    wf.close();
                     res.set_content("Success", "text/plain; charset=UTF-8");
                 });
     server.Get(

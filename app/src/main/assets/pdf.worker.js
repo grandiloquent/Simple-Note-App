@@ -40638,7 +40638,8 @@ function addState(parentState, pattern, checkFn, iterateFn, processFn) {
     const item = pattern[i];
     state = state[item] ||= [];
   }
-  state[pattern.at(-1)] = {
+  // pattern.at(-1)
+  state[pattern[pattern.length-1]] = {
     checkFn,
     iterateFn,
     processFn

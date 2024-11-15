@@ -3104,7 +3104,7 @@ function getVisibleElements({
     ids.add(view.id);
   }
   const first = visible[0],
-    last = visible.at(-1);
+    last = visible[visible.length-1];
   if (sortByVisibility) {
     visible.sort(function (a, b) {
       const pc = a.percent - b.percent;

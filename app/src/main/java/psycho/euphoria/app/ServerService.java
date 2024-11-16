@@ -244,7 +244,7 @@ public class ServerService extends Service {
         @android.webkit.JavascriptInterface
         public void volume(int value) {
             AudioManager audioManager = mContext.getSystemService(AudioManager.class);
-            int v = value == -1 ? 0 : audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + value;
+            int v = value == 0 ? 0 : audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + value;
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, v, 0);
         }
 
@@ -277,12 +277,14 @@ public class ServerService extends Service {
                         Drawable pd = packageManager.getApplicationIcon(name);
                         Bitmap bm = Bitmap.createBitmap(pd.getIntrinsicWidth(), pd.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bm);
+                        pd.setBounds(0, 0, pd.getIntrinsicWidth(), pd.getIntrinsicHeight());
                         pd.draw(canvas);
                         FileOutputStream fos = null;
                         fos = new FileOutputStream(file);
                         bm.compress(CompressFormat.PNG, 100, fos);
                         fos.close();
                     } catch (Exception e) {
+                        Log.e("B5aOx2", String.format("launch, %s", e.getMessage()));
                     }
 
                 }

@@ -10,7 +10,7 @@
             margin: 0;
             background: #000;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr ;
             row-gap: 8px;
         }
 
@@ -25,11 +25,23 @@
 
         .ico {
             margin-bottom: 6px;
-            min-height: 64px;
+            display: flex;
+            justify-content: center;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        img{
+            max-width: 100%;
+            max-height: 100%;
+        }
+        svg{
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .label {
-            font-size: 16px;
+            font-size: 10px;
             color: #999;
         }
     </style>
@@ -83,17 +95,21 @@
             NativeAndroid.close();
         }
         async function fetchDatas() {
-            let baseUri = window.location.host === '127.0.0.1:5500' ? "http://192.168.8.55:8500" : '';
+            let baseUri = window.location.host === '127.0.0.1:5500' ? "http://192.168.8.73:8500" : '';
             try {
-                const response = await fetch(`${baseUri}/apps`, {
-                    headers: {
-                        "Authorization": window.localStorage.getItem("Authorization")
-                    }
-                });
+                const response = await fetch(`${baseUri}/app`);
                 if (response.status > 399 || response.status < 200) {
                     throw new Error(`${response.status}: ${response.statusText}`)
                 }
-                const results = await response.text();
+                const results = await response.json();
+                results.forEach(x => {
+                    document.body.insertAdjacentHTML('beforeend', `<a class="item" data-src="${x.name}">
+        <div class="ico">
+            <img src="${baseUri}/apps/${x.name}.png">
+        </div>
+        <div class="label">${x.title}</div>
+    </a>`)
+                })
             } catch (error) {
                 console.log(error);
             }
@@ -101,18 +117,19 @@
         }
         async function initiazle() {
             injectDefaults();
+            await fetchDatas();
             document.querySelectorAll('.ico')
                 .forEach(x => {
-                    x.style.width = document.body.offsetWidth / 5 + 'px';
+                    x.style.width = document.body.offsetWidth / 4 + 'px';
                     x.style.height = x.style.width;
                 })
             document.querySelectorAll('.item')
                 .forEach(x => {
-                    x.addEventListener('click', evt => {
+                    x.addEventListener('click',async evt => {
                         if (x.dataset.src === 'close') {
                             close();
                         } else if (x.dataset.src === 'volume_off') {
-                            NativeAndroid.volume(-1);
+                            NativeAndroid.volume(0);
                         } else if (x.dataset.src === 'volume_up') {
                             NativeAndroid.volume(10);
                         } else if (x.dataset.src === 'volume_down') {
@@ -125,7 +142,19 @@
                             NativeAndroid.accessibility();
                         } else {
                             close();
-                            NativeAndroid.launch(x.dataset.src)
+                            NativeAndroid.launch(x.dataset.src);
+                            let baseUri = window.location.host === '127.0.0.1:5500' ? "http://192.168.8.73:8500" : '';
+                            try {
+                              const response = await fetch(`${baseUri}/app?name=${x.dataset.src}`, {
+                               method:'PUT'
+                              });
+                              if (response.status > 399 || response.status < 200) {
+                                throw new Error(`${response.status}: ${response.statusText}`)
+                              }
+                              const results = await response.text();
+                            } catch (error) {
+                              console.log(error);
+                            }
                         }
 
                     })

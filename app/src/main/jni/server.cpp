@@ -452,6 +452,16 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
 	PRIMARY KEY("id" AUTOINCREMENT)
 ))";
     db::query<table>();
+    static const char table1[] = R"(CREATE TABLE IF NOT EXISTS "app" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"name"	TEXT UNIQUE,
+	"title"	TEXT,
+	"views" INTEGER,
+	"create_at"	INTEGER,
+	"update_at"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+))";
+    db::query<table1>();
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     std::map<std::string, std::string> t{};
     httplib::Server server;
@@ -512,7 +522,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
                         return true;
                     });
                     auto path = req.get_param_value("path");
-                    std::ofstream wf(path,  std::ofstream::binary);
+                    std::ofstream wf(path, std::ofstream::binary);
                     if (!wf) {
                         res.status = 500;
                         return;
@@ -1984,9 +1994,9 @@ in vec4 a_position;
                                                            dir_entry.path().extension() == ".mov" ||
                                                            dir_entry.path().extension() == ".MOV" ||
                                                            dir_entry.path().extension() ==
-                                                           ".MP4")||
-                               dir_entry.path().extension() ==
-                               ".v")  {
+                                                           ".MP4") ||
+                           dir_entry.path().extension() ==
+                           ".v") {
                            std::filesystem::path s = dir_entry.path();
                            fs::rename(dir_entry.path(), s.replace_extension("vv"));
                        }
@@ -2032,6 +2042,64 @@ in vec4 a_position;
             }
         }
     });
+    server.Post("/app", [](const httplib::Request &req, httplib::Response &res,
+                           const httplib::ContentReader &content_reader) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string body;
+        content_reader([&](const char *data, size_t data_length) {
+            body.append(data, data_length);
+            return true;
+        });
+        nlohmann::json doc = nlohmann::json::parse(body);
+        std::string name = doc["name"];
+        std::string title = doc["title"];
+
+        static const char query[] =
+                R"(INSERT INTO app (name,title,create_at,update_at) VALUES(?1,?2,?3,?4))";
+        db::QueryResult fetch_row = db::query<query>(
+                name,title, GetTimeStamp(), GetTimeStamp());
+        res.set_content(std::to_string(fetch_row.resultCode()),
+                        "text/plain; charset=UTF-8");
+    });
+    server.Get("/app",
+               [](const httplib::Request &req, httplib::Response &res) {
+                   res.set_header("Access-Control-Allow-Origin", "*");
+                   static const char query[] =
+                           R"(SELECT name FROM app ORDER BY views DESC)";
+                   db::QueryResult fetch_row = db::query<query>();
+                   std::string_view name;
+                   nlohmann::json doc = nlohmann::json::array();
+                   while (fetch_row(name)) {
+                       nlohmann::json j = {
+                               {"name", name}};
+                       doc.push_back(j);
+                   }
+                   res.set_content(doc.dump(), "application/json");
+               });
+    server.Delete(
+            "/app", [](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+
+                std::string body = req.get_param_value("name");
+                static const char query[] = R"(DELETE FROM app WHERE name = ?1)";
+                db::QueryResult fetch_row = db::query<query>(body);
+
+                res.set_content(std::to_string(fetch_row.resultCode()),
+                                "text/plain; charset=UTF-8");
+            });
+    server.Put(
+            "/app", [](const httplib::Request &req, httplib::Response &res) {
+                res.set_header("Access-Control-Allow-Origin", "*");
+
+                std::string body = req.get_param_value("name");
+                static const char query[] =
+                        R"(UPDATE app SET views = COALESCE(views,0) + 1 WHERE name = ?1)";
+                db::QueryResult fetch_row = db::query<query>(body);
+
+                res.set_content(std::to_string(fetch_row.resultCode()),
+                                "text/plain; charset=UTF-8");
+            });
     server.listen(host, port);
 }
 

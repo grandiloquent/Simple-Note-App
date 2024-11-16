@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            row-gap: 8px;
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .ico {
+            margin-bottom: 6px;
+            min-height: 64px;
+        }
+
+        .label {
+            font-size: 16px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <script>
+        function injectDefaults() {
+            [
+                [
+                    "关闭",
+                    "close",
+                    "m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z",
+                ], [
+                    "静音",
+                    "volume_off",
+                    "M792-56 671-177q-25 16-53 27.5T560-131v-82q14-5 27.5-10t25.5-12L480-368v208L280-360H120v-240h128L56-792l56-56 736 736-56 56Zm-8-232-58-58q17-31 25.5-65t8.5-70q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 53-14.5 102T784-288ZM650-422l-90-90v-130q47 22 73.5 66t26.5 96q0 15-2.5 29.5T650-422ZM480-592 376-696l104-104v208Zm-80 238v-94l-72-72H200v80h114l86 86Zm-36-130Z",
+                ], [
+                    "+10",
+                    "volume_up",
+                    "M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z",
+                ], [
+                    "-1",
+                    "volume_down",
+                    "M200-360v-240h160l200-200v640L360-360H200Zm440 40v-322q45 21 72.5 65t27.5 97q0 53-27.5 96T640-320ZM480-606l-86 86H280v80h114l86 86v-252ZM380-480Z",
+                ], [
+                    "关闭",
+                    "kill_apps",
+                    "m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z",
+                ], [
+                    "访问",
+                    "accessibility",
+                    "M480-800q-33 0-56.5-23.5T400-880q0-33 23.5-56.5T480-960q33 0 56.5 23.5T560-880q0 33-23.5 56.5T480-800ZM360-200v-480q-60-5-122-15t-118-25l20-80q78 21 166 30.5t174 9.5q86 0 174-9.5T820-800l20 80q-56 15-118 25t-122 15v480h-80v-240h-80v240h-80ZM320 0q-17 0-28.5-11.5T280-40q0-17 11.5-28.5T320-80q17 0 28.5 11.5T360-40q0 17-11.5 28.5T320 0Zm160 0q-17 0-28.5-11.5T440-40q0-17 11.5-28.5T480-80q17 0 28.5 11.5T520-40q0 17-11.5 28.5T480 0Zm160 0q-17 0-28.5-11.5T600-40q0-17 11.5-28.5T640-80q17 0 28.5 11.5T680-40q0 17-11.5 28.5T640 0Z",
+                ]
+            ].forEach(x => {
+                document.body.insertAdjacentHTML('beforeend', `<a class="item" data-src="${x[1]}">
+        <div class="ico">
+            <svg viewBox="0 -960 960 960" fill="#5f6368">
+                <path
+                    d="${x[2]}" />
+            </svg>
+        </div>
+        <div class="label">${x[0]}</div>
+    </a>`)
+            })
+        }
+
+        function close() {
+            NativeAndroid.close();
+        }
+        async function fetchDatas() {
+            let baseUri = window.location.host === '127.0.0.1:5500' ? "http://192.168.8.55:8500" : '';
+            try {
+                const response = await fetch(`${baseUri}/apps`, {
+                    headers: {
+                        "Authorization": window.localStorage.getItem("Authorization")
+                    }
+                });
+                if (response.status > 399 || response.status < 200) {
+                    throw new Error(`${response.status}: ${response.statusText}`)
+                }
+                const results = await response.text();
+            } catch (error) {
+                console.log(error);
+            }
+
+        }
+        async function initiazle() {
+            injectDefaults();
+            document.querySelectorAll('.ico')
+                .forEach(x => {
+                    x.style.width = document.body.offsetWidth / 5 + 'px';
+                    x.style.height = x.style.width;
+                })
+            document.querySelectorAll('.item')
+                .forEach(x => {
+                    x.addEventListener('click', evt => {
+                        if (x.dataset.src === 'close') {
+                            close();
+                        } else if (x.dataset.src === 'volume_off') {
+                            NativeAndroid.volume(-1);
+                        } else if (x.dataset.src === 'volume_up') {
+                            NativeAndroid.volume(10);
+                        } else if (x.dataset.src === 'volume_down') {
+                            NativeAndroid.volume(-1);
+                        } else if (x.dataset.src === 'kill_apps') {
+                            close();
+                            NativeAndroid.killApps();
+                        } else if (x.dataset.src === 'accessibility') {
+                            close();
+                            NativeAndroid.accessibility();
+                        } else {
+                            close();
+                            NativeAndroid.launch(x.dataset.src)
+                        }
+
+                    })
+                })
+
+
+
+        }
+        initiazle();
+    </script>
+</body>
+
+</html>

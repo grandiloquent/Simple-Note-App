@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.AudioManager;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
@@ -45,12 +46,14 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -209,7 +212,7 @@ public class WebAppInterface {
         }
         if (text.equals("其他")) {
             Intent service = new Intent(mContext, ServerService.class);
-            service.setAction(ServerService.ACTION_SHOOT);
+            //service.setAction(ServerService.ACTION_SHOOT);
             mContext.startService(service);
             return null;
         }
@@ -247,9 +250,28 @@ public class WebAppInterface {
 //        if (launchIntent != null) {
 //            mContext.startActivity(launchIntent);//null pointer check in case package name was not found
 //        }
-        AppDatabase appDatabase=new AppDatabase(mContext);
-        appDatabase.insert(text);
+        pushApp(text);
         return null;
+    }
+
+    private void pushApp(String text) {
+        PackageManager packageManager = mContext.getPackageManager();
+        try {
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(text, 0);
+            String name = text;
+            String title = packageManager.getApplicationLabel(applicationInfo).toString();
+            HttpURLConnection c = (HttpURLConnection) new URL("http://0.0.0.0:8500/app").openConnection();
+            c.setRequestMethod("POST");
+            OutputStream outputStream = c.getOutputStream();
+            JSONObject object = new JSONObject();
+            object.put("name", name);
+            object.put("title", title);
+            outputStream.write(object.toString().getBytes(StandardCharsets.UTF_8));
+            outputStream.close();
+            c.getResponseCode();
+        } catch (Exception e) {
+        }
+
     }
 
     // sendMessage

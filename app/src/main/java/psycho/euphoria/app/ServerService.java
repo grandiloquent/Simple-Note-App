@@ -14,7 +14,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -45,38 +52,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.os.Process;
 import android.provider.Settings;
 import android.telecom.VideoProfile;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import static java.lang.Math.max;
 import static psycho.euphoria.app.Shared.getDeviceIP;
 import static psycho.euphoria.app.Shared.getUsablePort;
 import static psycho.euphoria.app.Utils.FetchNodes;
 
 public class ServerService extends Service {
-    public static final String ACTION_APP = "psycho.euphoria.app.ServerService.ACTION_APP";
     public static final String ACTION_DISMISS = "psycho.euphoria.app.ServerService.ACTION_DISMISS";
-    public static final String ACTION_KILL = "psycho.euphoria.app.ServerService.ACTION_KILL";
-    public static final String ACTION_ROBOT = "psycho.euphoria.app.ServerService.ACTION_ROBOT";
-    public static final String ACTION_SHOOT = "psycho.euphoria.app.ServerService.ACTION_SHOOT";
     public static final String KP_NOTIFICATION_CHANNEL_ID = "notes_notification_channel";
     public static final String START_SERVER_ACTION = "psycho.euphoria.app.MainActivity.startServer";
-    private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    public static final String ACTION_1 = "psycho.euphoria.app.ServerService.ACTION_1";
-    public static final String ACTION_2 = "psycho.euphoria.app.ServerService.ACTION_2";
-    public static final String ACTION_3 = "psycho.euphoria.app.ServerService.ACTION_3";
-    public static final String ACTION_4 = "psycho.euphoria.app.ServerService.ACTION_4";
-    public static final String ACTION_5 = "psycho.euphoria.app.ServerService.ACTION_5";
-    public static final String ACTION_11 = "psycho.euphoria.app.ServerService.ACTION_11";
 
-    /**
-     * Factor by that the minimum buffer size is multiplied. The bigger the factor is the less
-     * likely it is that samples will be dropped, but more memory will be used. The minimum buffer
-     * size is determined by {@link AudioRecord#getMinBufferSize(int, int, int)} and depends on the
-     * recording settings.
-     */
-    private static final int BUFFER_SIZE_FACTOR = 2;
-    private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
 
     static {
 /*
@@ -85,46 +82,14 @@ public class ServerService extends Service {
         System.loadLibrary("nativelib");
     }
 
-    /**
-     * Signals whether a recording is in progress (true) or not (false).
-     */
-    private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
     SharedPreferences mSharedPreferences;
     String mAddress;
-    private int SAMPLING_RATE_IN_HZ = 44100;
-    /**
-     * Size of the buffer where the audio data is stored by Android
-     */
-    private int BUFFER_SIZE;
-    private AudioRecord recorder = null;
-    private Thread recordingThread = null;
 
-    public static void createNotification(ServerService context, String address) {
-        PendingIntent piDismiss = getPendingIntentDismiss(context);
-        RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_small);
-        notificationLayout.setOnClickPendingIntent(R.id.other, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_KILL), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.dismiss, piDismiss);
-        notificationLayout.setOnClickPendingIntent(R.id.app, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_APP), PendingIntent.FLAG_MUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.robot, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_ROBOT), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_1, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_1), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_2, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_2), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_3, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_3), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_4, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_4), PendingIntent.FLAG_IMMUTABLE));
-        notificationLayout.setOnClickPendingIntent(R.id.action_5, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_5), PendingIntent.FLAG_IMMUTABLE));
 
-        notificationLayout.setOnClickPendingIntent(R.id.action_11, PendingIntent.getService(context, 0, new Intent(context, ServerService.class)
-                .setAction(ACTION_11), PendingIntent.FLAG_IMMUTABLE));
+    public static void createNotification(ServerService context) {
         Notification notification = new Builder(context, KP_NOTIFICATION_CHANNEL_ID).setContentTitle("笔记")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setCustomContentView(notificationLayout)
+                .setContentIntent(getPendingIntentDismiss(context))
                 .build();
         context.startForeground(1, notification);
     }
@@ -180,40 +145,6 @@ public class ServerService extends Service {
         sendBroadcast(intent);
     }
 
-    private void startRecording() {
-        if (checkSelfPermission(permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            Toast.makeText(this, "需要录音权限", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        BUFFER_SIZE = 512;// AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ,
-        //CHANNEL_CONFIG, AUDIO_FORMAT) * BUFFER_SIZE_FACTOR;
-        SAMPLING_RATE_IN_HZ = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_SYSTEM);
-        int minBufferSize = AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ, CHANNEL_CONFIG, AUDIO_FORMAT);
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLING_RATE_IN_HZ,
-                CHANNEL_CONFIG, AUDIO_FORMAT, minBufferSize);
-        recorder.startRecording();
-        recordingInProgress.set(true);
-        recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
-        recordingThread.start();
-    }
-
-    private void stopRecording() {
-        if (null == recorder) {
-            return;
-        }
-        recordingInProgress.set(false);
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-        recordingThread = null;
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -227,9 +158,6 @@ public class ServerService extends Service {
         initialSharedPreferences();
         createNotificationChannel(this);
         String host = getDeviceIP(this);
-        if (host == null) {
-            host = "0.0.0.0";
-        }
         int port = 8500;//getUsablePort(8500);
         mAddress = String.format("http://%s:%d", host, port);
         String finalHost = host;
@@ -237,7 +165,7 @@ public class ServerService extends Service {
             Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             startServer(this, getAssets(), finalHost, port);
         }).start();
-        createNotification(this, mAddress);
+        createNotification(this);
         launchActivity();
     }
 
@@ -245,143 +173,125 @@ public class ServerService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_DISMISS)) {
-//                stopForeground(true);
-//                stopSelf();
-//                Process.killProcess(Process.myPid());
-//                return START_NOT_STICKY;
-                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
-                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(v);
-            } else if (intent.getAction().equals(ACTION_KILL)) {
-//                Utils.killProcesses(this, new String[]{
-//                        "nekox.messenger",
-//                        "com.tencent.mm",
-//                        "com.android.chrome",
-//                        "org.mozilla.firefox",
-//                        "com.zhiliaoapp.musically",
-//                        "com.eg.android.AlipayGphone",
-//                        "cn.yonghui.hyd",
-//                        "com.jingdong.app.mall",
-//                        "psycho.euphoria.autoclicker",
-//                        "com.kuaishou.nebula",
-//                        "psycho.euphoria.screenshoots",
-//                        "com.uptodown"
-//
-//
-//                });
-                // android.settings.APP_MEMORY_USAGE
-//                Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
-//                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                startActivity(v);
-//                Intent v = new Intent(Settings.ACTION_SOUND_SETTINGS);
-//                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                startActivity(v);
-                AppUtils.launchList(this);
-
-            } else if (intent.getAction().equals(ACTION_SHOOT)) {
-                Utils.takePhoto();
-            } else if (intent.getAction().equals(ACTION_APP)) {
-                Intent app = new Intent(this, MainActivity.class);
-                app.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(app);
-            } else if (intent.getAction().equals(ACTION_ROBOT)) {
-//                PackageManager pm = getPackageManager();
-//                Intent launchIntent = pm.getLaunchIntentForPackage("com.android.chrome");
-//                launchIntent.setAction(Intent.ACTION_VIEW).addCategory(Intent.CATEGORY_BROWSABLE).setType("text/plain")
-//                        .setData(Uri.parse("http://" +
-//                        Shared.getDeviceIP(this) + ":8500/app.html"));
-                Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://0.0.0.0:8500/app.html"));
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(launchIntent);
-            } else if (intent.getAction().equals(ACTION_1)) {
-                AudioManager audioManager = getSystemService(AudioManager.class);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
-            } else if (intent.getAction().equals(ACTION_2)) {
-                AudioManager audioManager = getSystemService(AudioManager.class);
-                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 10, 0);
-                Toast.makeText(this, Integer.toString(value + 10), Toast.LENGTH_SHORT).show();
-            } else if (intent.getAction().equals(ACTION_3)) {
-                AudioManager audioManager = getSystemService(AudioManager.class);
-                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value + 1, 0);
-                Toast.makeText(this, Integer.toString(value + 1), Toast.LENGTH_SHORT).show();
-            } else if (intent.getAction().equals(ACTION_4)) {
-                AudioManager audioManager = getSystemService(AudioManager.class);
-                int value = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value - 1, 0);
-                Toast.makeText(this, Integer.toString(value -1), Toast.LENGTH_SHORT).show();
-            } else if (intent.getAction().equals(ACTION_5)) {
-              //     getSystemService(ActivityManager.class).killBackgroundProcesses("com.kuaishou.nebula");
-                launch(5);
-            } else if (intent.getAction().equals(ACTION_11)) {
-                Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(v);
+                new AppDialog(this).show();
             }
-
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
-    private void launch(int i) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String packageName = preferences.getString(Integer.toString(i), null);
-        if (packageName != null) {
-            PackageManager pm = getPackageManager();
-            Intent launchIntent = pm.getLaunchIntentForPackage(packageName);
-            startActivity(launchIntent);
+    private static class AppDialog {
+        private final WindowManager mWindowManager;
+        private final Context mContext;
+
+        public AppDialog(Context context) {
+            mContext = context;
+            mWindowManager = context.getSystemService(WindowManager.class);
         }
+
+        public void show() {
+            WindowManager.LayoutParams params = getWindowManagerLayoutParams();
+            DisplayMetrics dm = new DisplayMetrics();
+            mWindowManager.getDefaultDisplay().getMetrics(dm);
+            int width = dm.widthPixels;
+            int height = dm.heightPixels;
+            params.format = PixelFormat.RGBA_8888;
+            params.gravity = Gravity.LEFT | Gravity.TOP;
+            WebView layout = new WebView(mContext);
+            MainActivity.setWebView(layout);
+            layout.addJavascriptInterface(new JInterface(mContext, mWindowManager, layout), "NativeAndroid");
+            layout.loadUrl("http://0.0.0.0:8500/apps.html");
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            int margin = max(width, height) / 10; //dpToPx(context, 30);
+            if (width > height)
+                layoutParams.setMargins(margin << 1, margin, margin << 1, margin);
+            else
+                layoutParams.setMargins(margin >> 1, margin << 1, margin >> 1, margin << 1);
+            layout.setLayoutParams(layoutParams);
+            params.width = width - margin;
+            params.height = height - margin >> 1;
+            params.gravity = Gravity.CENTER;
+            mWindowManager.addView(layout, params);
+        }
+
+        private WindowManager.LayoutParams getWindowManagerLayoutParams() {
+            return
+                    new WindowManager.LayoutParams(
+                            WindowManager.LayoutParams.MATCH_PARENT,
+                            WindowManager.LayoutParams.MATCH_PARENT,
+                            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                            PixelFormat.TRANSLUCENT);
+        }
+
     }
 
-    private class RecordingRunnable implements Runnable {
+    private static class JInterface {
+        private final WindowManager mWindowManager;
+        private final WebView mWebView;
+        private Context mContext;
 
-        private String getBufferReadFailureReason(int errorCode) {
-            switch (errorCode) {
-                case AudioRecord.ERROR_INVALID_OPERATION:
-                    return "ERROR_INVALID_OPERATION";
-                case AudioRecord.ERROR_BAD_VALUE:
-                    return "ERROR_BAD_VALUE";
-                case AudioRecord.ERROR_DEAD_OBJECT:
-                    return "ERROR_DEAD_OBJECT";
-                case AudioRecord.ERROR:
-                    return "ERROR";
-                default:
-                    return "Unknown (" + errorCode + ")";
-            }
+        public JInterface(Context context, WindowManager windowManager, WebView webView) {
+            mWindowManager = windowManager;
+            mWebView = webView;
+            mContext = context;
         }
 
-        @Override
-        public void run() {
-            int i = 1;
-            File file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".mp3"));
-            while (file.exists()) {
-                i++;
-                file = new File(Environment.getExternalStorageDirectory(), String.format("%03d%s", i, ".mp3"));
+        @android.webkit.JavascriptInterface
+        public void close() {
+            mWindowManager.removeView(mWebView);
+        }
 
-            }
-            int state = Mp3Encoder.native_encoder_init(SAMPLING_RATE_IN_HZ, SAMPLING_RATE_IN_HZ, 2, 196, 2);
-            short[] audioData = new short[BUFFER_SIZE];
-            int mp3BufferSize = (int) (1.25 * BUFFER_SIZE + 7200);
-            byte[] mp3Buffer = new byte[mp3BufferSize];
-            try (final FileOutputStream outStream = new FileOutputStream(file)) {
-                while (recordingInProgress.get()) {
-                    int result = recorder.read(audioData, 0, BUFFER_SIZE);
-                    if (result < 0) {
-                        throw new RuntimeException("Reading of audio buffer failed: " +
-                                getBufferReadFailureReason(result));
-                    }
-                    result = Mp3Encoder.native_encoder_process(audioData, BUFFER_SIZE, mp3Buffer, mp3BufferSize);
-                    // Mp3Encoder.native_encoder_flush(mp3Buffer);
-                    if (result > 0)
-                        outStream.write(mp3Buffer, 0, result);
+        @android.webkit.JavascriptInterface
+        public void volume(int value) {
+            AudioManager audioManager = mContext.getSystemService(AudioManager.class);
+            int v = value == -1 ? 0 : audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + value;
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, v, 0);
+        }
+
+        @android.webkit.JavascriptInterface
+        public void killApps() {
+            Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+            v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            mContext.startActivity(v);
+        }
+
+        @android.webkit.JavascriptInterface
+        public void accessibility() {
+            Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            mContext.startActivity(v);
+        }
+
+        @android.webkit.JavascriptInterface
+        public void launch(String name) {
+            PackageManager packageManager = mContext.getPackageManager();
+            Intent v = packageManager.getLaunchIntentForPackage(name);
+            if (v != null) {
+                File file = new File(Environment.getExternalStorageDirectory(), ".editor/apps");
+                if (!file.exists()) {
+                    file.mkdirs();
                 }
-                Mp3Encoder.native_encoder_close();
-            } catch (IOException e) {
-                throw new RuntimeException("Writing of recorded audio failed", e);
+                file = new File(file, name+".png");
+                if (!file.exists()) {
+                    try {
+                        Drawable pd = packageManager.getApplicationIcon(name);
+                        Bitmap bm = Bitmap.createBitmap(pd.getIntrinsicWidth(), pd.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bm);
+                        pd.draw(canvas);
+                        FileOutputStream fos = null;
+                        fos = new FileOutputStream(file);
+                        bm.compress(CompressFormat.PNG, 100, fos);
+                        fos.close();
+                    } catch (Exception e) {
+                    }
+
+                }
+                v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                mContext.startActivity(v);
             }
         }
     }
 
     native void cameraPreview();
+
 }

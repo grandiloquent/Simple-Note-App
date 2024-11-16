@@ -2066,13 +2066,13 @@ in vec4 a_position;
                [](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    static const char query[] =
-                           R"(SELECT name FROM app ORDER BY views DESC)";
+                           R"(SELECT name,title FROM app ORDER BY views DESC)";
                    db::QueryResult fetch_row = db::query<query>();
-                   std::string_view name;
+                   std::string_view name,title;
                    nlohmann::json doc = nlohmann::json::array();
-                   while (fetch_row(name)) {
+                   while (fetch_row(name,title)) {
                        nlohmann::json j = {
-                               {"name", name}};
+                               {"name", name},{"title",title}};
                        doc.push_back(j);
                    }
                    res.set_content(doc.dump(), "application/json");

@@ -230,6 +230,9 @@ public class WebAppInterface {
             }
             return stringBuilder.toString();
         }
+        if(text.equals("程序")){
+            return getActiveApps(mContext);
+        }
         if (Pattern.compile("^短信[0-9]+$").matcher(text).find()) {
             Matcher matcher = Pattern.compile("\\d+").matcher(text);
             if (matcher.find()) {
@@ -253,39 +256,76 @@ public class WebAppInterface {
         pushApp(text);
         return null;
     }
+    public static String getActiveApps(Context context) {
 
-    private void pushApp(String text) {
-        PackageManager packageManager = mContext.getPackageManager();
-        try {
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(text, 0);
-            String name = text;
-            String title = packageManager.getApplicationLabel(applicationInfo).toString();
-            HttpURLConnection c = (HttpURLConnection) new URL("http://0.0.0.0:8500/app").openConnection();
-            c.setRequestMethod("POST");
-            OutputStream outputStream = c.getOutputStream();
-            JSONObject object = new JSONObject();
-            object.put("name", name);
-            object.put("title", title);
-            outputStream.write(object.toString().getBytes(StandardCharsets.UTF_8));
-            outputStream.close();
-            c.getResponseCode();
-        } catch (Exception e) {
+        PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        String value = ""; // basic date stamp
+        value += "---------------------------------\n";
+        value += "Active Apps\n";
+        value += "=================================\n";
+
+        for (ApplicationInfo packageInfo : packages) {
+
+            //system apps! get out
+            if (!isSTOPPED(packageInfo) && !isSYSTEM(packageInfo)) {
+
+                value += getApplicationLabel(context, packageInfo.packageName) + "\n" + packageInfo.packageName  + "\n-----------------------\n";
+
+            }
         }
 
-    }
+        return value;
 
-    // sendMessage
-    @JavascriptInterface
-    public void sendMessage(String message) {
-        Pattern pattern = Pattern.compile("^\\d+");
-        Matcher matcher = pattern.matcher(message);
-        if (matcher.find()) {
-            Utils.sendSMS(matcher.group(),
-                    Shared.substringAfter(message, "\n")
-            );
+        //result on my emulator
+
+    /* 2 Ekim 2017 Pazartesi 14:35:17
+    ---------------------------------
+    Active Apps
+    =================================
+    SystemSetting
+    com.xyz.systemsetting
+    -----------------------
+    myMail
+    com.my.mail
+    -----------------------
+    X-plore
+    com.lonelycatgames.Xplore
+    -----------------------
+    Renotify
+    com.liamlang.renotify
+    -----------------------
+    Mail Box
+    com.mailbox.email
+    -----------------------   */
+
+
+    }
+    private static boolean isSTOPPED(ApplicationInfo pkgInfo) {
+
+        return ((pkgInfo.flags & ApplicationInfo.FLAG_STOPPED) != 0);
+    }
+    private static boolean isSYSTEM(ApplicationInfo pkgInfo) {
+
+        return ((pkgInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
+    }
+    public static String getApplicationLabel(Context context, String packageName) {
+
+        PackageManager        packageManager = context.getPackageManager();
+        List<ApplicationInfo> packages       = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+        String                label          = null;
+
+        for (int i = 0; i < packages.size(); i++) {
+
+            ApplicationInfo temp = packages.get(i);
+
+            if (temp.packageName.equals(packageName))
+                label = packageManager.getApplicationLabel(temp).toString();
         }
-    }
 
+        return label;
+    }
     @JavascriptInterface
     public String listAllPackages() {
         // get list of all the apps installed
@@ -333,6 +373,18 @@ public class WebAppInterface {
             public void onScanCompleted(String s, Uri uri) {
             }
         });
+    }
+
+    // sendMessage
+    @JavascriptInterface
+    public void sendMessage(String message) {
+        Pattern pattern = Pattern.compile("^\\d+");
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find()) {
+            Utils.sendSMS(matcher.group(),
+                    Shared.substringAfter(message, "\n")
+            );
+        }
     }
 
     @JavascriptInterface
@@ -501,6 +553,26 @@ public class WebAppInterface {
         launchIntent.setData(Uri.parse("http://" +
                 Shared.getDeviceIP(context) + ":8500" + path));
         context.startActivity(launchIntent);
+    }
+
+    private void pushApp(String text) {
+        PackageManager packageManager = mContext.getPackageManager();
+        try {
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(text, 0);
+            String name = text;
+            String title = packageManager.getApplicationLabel(applicationInfo).toString();
+            HttpURLConnection c = (HttpURLConnection) new URL("http://0.0.0.0:8500/app").openConnection();
+            c.setRequestMethod("POST");
+            OutputStream outputStream = c.getOutputStream();
+            JSONObject object = new JSONObject();
+            object.put("name", name);
+            object.put("title", title);
+            outputStream.write(object.toString().getBytes(StandardCharsets.UTF_8));
+            outputStream.close();
+            c.getResponseCode();
+        } catch (Exception e) {
+        }
+
     }
 
 }

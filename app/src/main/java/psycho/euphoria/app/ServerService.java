@@ -16,11 +16,13 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -54,9 +56,13 @@ import android.provider.Settings;
 import android.telecom.VideoProfile;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
@@ -167,6 +173,46 @@ public class ServerService extends Service {
         }).start();
         createNotification(this);
         launchActivity();
+        showFloatingButton();
+    }
+
+    private void showFloatingButton() {
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+//        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wm = getSystemService(WindowManager.class);
+        //wm.getDefaultDisplay().getRealMetrics(dm);
+        float dip = 56;
+        Resources r = getResources();
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                r.getDisplayMetrics()
+        );
+        int width = px;
+        int height = px;
+        params.format = PixelFormat.RGBA_8888;
+        FrameLayout layout = new FrameLayout(this);
+        layout.setBackground(new ColorDrawable(0x00000000));
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layout.setLayoutParams(layoutParams);
+        params.width = width;
+        params.height = height;
+        //params.verticalMargin=dm.heightPixels-height;
+        params.gravity = Gravity.LEFT|Gravity.TOP ;
+
+        params.x=width;
+        wm.addView(layout, params);
+        layout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AppDialog(ServerService.this).show();
+            }
+        });
     }
 
     @Override
@@ -271,7 +317,7 @@ public class ServerService extends Service {
                 if (!file.exists()) {
                     file.mkdirs();
                 }
-                file = new File(file, name+".png");
+                file = new File(file, name + ".png");
                 if (!file.exists()) {
                     try {
                         Drawable pd = packageManager.getApplicationIcon(name);

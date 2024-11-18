@@ -34,6 +34,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
@@ -173,8 +174,11 @@ public class ServerService extends Service {
         }).start();
         createNotification(this);
         launchActivity();
+        mHandler = new Handler();
         showFloatingButton();
     }
+
+    private View mView;
 
     private void showFloatingButton() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -203,9 +207,9 @@ public class ServerService extends Service {
         params.width = width;
         params.height = height;
         //params.verticalMargin=dm.heightPixels-height;
-        params.gravity = Gravity.LEFT|Gravity.TOP ;
-
-        params.x=width;
+        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.x = width;
+        mView = layout;
         wm.addView(layout, params);
         layout.setOnClickListener(new OnClickListener() {
             @Override
@@ -295,6 +299,11 @@ public class ServerService extends Service {
         }
 
         @android.webkit.JavascriptInterface
+        public void switcher() {
+            ((ServerService) mContext).switcher();
+        }
+
+        @android.webkit.JavascriptInterface
         public void killApps() {
             Intent v = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
             v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -338,6 +347,25 @@ public class ServerService extends Service {
                 mContext.startActivity(v);
             }
         }
+
+
+    }
+
+    private Handler mHandler;
+
+    private void switcher() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mView != null) {
+                    WindowManager wm = getSystemService(WindowManager.class);
+                    wm.removeView(mView);
+                    mView = null;
+                } else {
+                    showFloatingButton();
+                }
+            }
+        });
     }
 
     native void cameraPreview();

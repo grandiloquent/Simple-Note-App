@@ -1,8 +1,11 @@
 package psycho.euphoria.app;
 
+import android.app.ActivityManager;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
 import android.app.Presentation;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -19,6 +22,7 @@ import android.os.BatteryManager;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.service.autofill.FieldClassification.Match;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
@@ -56,8 +60,11 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,8 +237,31 @@ public class WebAppInterface {
             }
             return stringBuilder.toString();
         }
-        if(text.equals("程序")){
-            return getActiveApps(mContext);
+        if (text.equals("程序")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            UsageStatsManager usm = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
+            long time = System.currentTimeMillis();
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            long start = calendar.getTimeInMillis();
+            long end = System.currentTimeMillis();
+            List<UsageStats> appList = usm.queryUsageStats(UsageStatsManager.INTERVAL_WEEKLY, start, end);
+            if (appList != null && appList.size() == 0) {
+            }
+            if (appList != null && appList.size() > 0) {
+                SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
+                for (UsageStats usageStats : appList) {
+                    //Log.d("Executed app", "usage stats executed : " + usageStats.getPackageName() + "\t\t ID: ");
+                    stringBuilder.append(usageStats.getPackageName()).append('\n');
+                    mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+                }
+                if (mySortedMap != null && !mySortedMap.isEmpty()) {
+                    mySortedMap.forEach((x, z) -> {
+                        stringBuilder.append(z.getPackageName()).append('\n');
+                    });
+                }
+            }
+            return stringBuilder.toString();
         }
         if (Pattern.compile("^短信[0-9]+$").matcher(text).find()) {
             Matcher matcher = Pattern.compile("\\d+").matcher(text);
@@ -256,28 +286,22 @@ public class WebAppInterface {
         pushApp(text);
         return null;
     }
-    public static String getActiveApps(Context context) {
 
+    public static String getActiveApps(Context context) {
         PackageManager pm = context.getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-
         String value = ""; // basic date stamp
         value += "---------------------------------\n";
         value += "Active Apps\n";
         value += "=================================\n";
-
         for (ApplicationInfo packageInfo : packages) {
-
             //system apps! get out
             if (!isSTOPPED(packageInfo) && !isSYSTEM(packageInfo)) {
-
-                value += getApplicationLabel(context, packageInfo.packageName) + "\n" + packageInfo.packageName  + "\n-----------------------\n";
+                value += getApplicationLabel(context, packageInfo.packageName) + "\n" + packageInfo.packageName + "\n-----------------------\n";
 
             }
         }
-
         return value;
-
         //result on my emulator
 
     /* 2 Ekim 2017 Pazartesi 14:35:17
@@ -299,33 +323,28 @@ public class WebAppInterface {
     Mail Box
     com.mailbox.email
     -----------------------   */
-
-
     }
-    private static boolean isSTOPPED(ApplicationInfo pkgInfo) {
 
+    private static boolean isSTOPPED(ApplicationInfo pkgInfo) {
         return ((pkgInfo.flags & ApplicationInfo.FLAG_STOPPED) != 0);
     }
-    private static boolean isSYSTEM(ApplicationInfo pkgInfo) {
 
+    private static boolean isSYSTEM(ApplicationInfo pkgInfo) {
         return ((pkgInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
     }
+
     public static String getApplicationLabel(Context context, String packageName) {
-
-        PackageManager        packageManager = context.getPackageManager();
-        List<ApplicationInfo> packages       = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-        String                label          = null;
-
+        PackageManager packageManager = context.getPackageManager();
+        List<ApplicationInfo> packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+        String label = null;
         for (int i = 0; i < packages.size(); i++) {
-
             ApplicationInfo temp = packages.get(i);
-
             if (temp.packageName.equals(packageName))
                 label = packageManager.getApplicationLabel(temp).toString();
         }
-
         return label;
     }
+
     @JavascriptInterface
     public String listAllPackages() {
         // get list of all the apps installed

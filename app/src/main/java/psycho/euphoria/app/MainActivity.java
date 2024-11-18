@@ -3,6 +3,7 @@ package psycho.euphoria.app;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.NotificationManager;
 import android.app.role.RoleManager;
 import android.content.ClipData;
@@ -317,6 +318,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+//        int mode = appOps.checkOpNoThrow("android:get_usage_stats",
+//                android.os.Process.myUid(), getPackageName());
+//        boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+//        if (!granted)
+//            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         initialize();
         //getDatabasePath("app.db").delete();
 //        Intent intent=new Intent(this,ImageViewerActivity.class);

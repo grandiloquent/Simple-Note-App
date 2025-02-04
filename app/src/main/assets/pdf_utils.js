@@ -6,7 +6,7 @@ async function extractText(pdfDocument, pdfViewer) {
         if (currentPage + 1 < pdfDocument.numPages)
             buf.push(await extractPage(pdfDocument, currentPage + i));
     }
-    writeText(buf.join("\n"));
+    writeText(buf.join("\n").replaceAll(/- /g,''));
 }
 
 async function extractPage(pdfDocument, pageNumber) {

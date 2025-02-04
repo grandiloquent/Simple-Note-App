@@ -10,9 +10,10 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
+const audioRe = new RegExp(/\.(?:mp3|wav|m4a|flac)$/);
 async function render() {
     const files = (await loadMusicFiles())
-        .filter(x => !x.is_directory && x.path.endsWith(".mp3"))
+        .filter(x => !x.is_directory && audioRe.test(x.path))
         .sort((x, y) => x.path.localeCompare(y.path));
     window.files = files;
     const buf = [];

@@ -42,10 +42,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
@@ -345,6 +347,14 @@ public class ServerService extends Service {
                 }
                 v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 mContext.startActivity(v);
+            } else {
+                try {
+                    HttpURLConnection c = (HttpURLConnection) new URL("http://0.0.0.0:8500/app?name=" + name).openConnection();
+                    c.setRequestMethod("DELETE");
+                    c.getResponseCode();
+                } catch (Exception e) {
+                }
+
             }
         }
 

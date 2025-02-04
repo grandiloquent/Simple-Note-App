@@ -45,10 +45,10 @@ public class CustomWebViewClient extends WebViewClient {
                 "" +
                 "" +
                 "" +
-                "deleteRedundantItems();\n" +
-                "        window.addEventListener('scroll', evt => {\n" +
-                "            deleteRedundantItems()\n" +
-                "        })\n" +
+                "//deleteRedundantItems();\n" +
+                "        //window.addEventListener('scroll', evt => {\n" +
+                "            //deleteRedundantItems()\n" +
+                "       // })\n" +
                 "    }\n" +
                 "})();", null);
     }

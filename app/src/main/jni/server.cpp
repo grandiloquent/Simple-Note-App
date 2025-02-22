@@ -10,31 +10,43 @@ void serveFile(const std::filesystem::path &p, httplib::Response &res,
 
     if (p.extension().string() == ".html" || p.extension().string() == ".xhtml") {
         auto s = ReadAllText(p);
-        s = ReplaceFirst(
-                s, "</head>",
-                R"(<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>)");
-        s = ReplaceFirst(s, "</body>", R"(<script>
-(() => {
-    const headers = [...document.querySelectorAll('h1,h2,h3')];
-    const buffers = [];
-    let index = 0;
-    headers.forEach(h => {
-        const id = `header_id_${index++}`;
-        h.id = id;
-        buffers.push(`<a href="#${id}">${h.textContent}</a>`)
-    });
+        //s = Substring(s, "</head>", "</body>");
+        s= ReplaceFirst(s,"<title/>","");
 
-    document.body.insertAdjacentHTML('afterbegin', `<div style="display:flex;flex-direction:column">${buffers.join('\n')}</div>`);
-document.body.addEventListener('click', function (event) {
-  // filter out clicks on any other elements
-  if ((event.target.nodeName == 'A'||event.target.parentNode.nodeName == 'A'||event.target.parentNode.parentNode.nodeName == 'A') && (!event.target.getAttribute('href')||!event.target.getAttribute('href').startsWith("#header"))  ) {
-//console.log(event.target.getAttribute('href'),);
-    event.preventDefault();
-  }
-});
-})()
-</script>)");
-        res.set_content(s, "text/html");
+        s = ReplaceFirst(s, "</head>", R"(    <style>
+        body {
+            color: #777 !important;
+            background: #000 !important;
+            margin: 12px !important;
+        }
+:link{
+color: #666 !important;
+}
+    </style>
+</head>)");
+        s= ReplaceFirst(s,"</body>",R"(    <script>
+        (() => {
+            const headers = [...document.querySelectorAll('h1,h2,h3')];
+            const buffers = [];
+            let index = 0;
+            headers.forEach(h => {
+                const id = `header_id_${index++}`;
+                h.id = id;
+                buffers.push(`<a href="#${id}">${h.textContent}</a>`)
+            });
+
+            document.body.insertAdjacentHTML('afterbegin', `<div style="display:flex;flex-direction:column">${buffers.join('\n')}</div>`);
+            document.body.addEventListener('click', function (event) {
+                // filter out clicks on any other elements
+                if ((event.target.nodeName == 'A' || event.target.parentNode.nodeName == 'A' || event.target.parentNode.parentNode.nodeName == 'A') && (!event.target.getAttribute('href') || !event.target.getAttribute('href').startsWith("#header"))) {
+                    //console.log(event.target.getAttribute('href'),);
+                    event.preventDefault();
+                }
+            });
+        })()
+    </script>
+</body>)");
+        res.set_content(s, "text/html; charset=utf-8");
         return;
     }
     if (p.filename().string().ends_with("style.css")) {
@@ -539,6 +551,7 @@ void StartServer(JNIEnv *env, jobject assetManager, const std::string &host,
                 auto p = req.path == "/" ? "index.html" : req.path.substr(1);
                 if (!p.ends_with(".html")) {
                     auto file = FindFile(req);
+
                     if (is_regular_file(file)) {
                         serveFile(file, res, t);
                         return;
@@ -2058,7 +2071,7 @@ in vec4 a_position;
         static const char query[] =
                 R"(INSERT INTO app (name,title,create_at,update_at) VALUES(?1,?2,?3,?4))";
         db::QueryResult fetch_row = db::query<query>(
-                name,title, GetTimeStamp(), GetTimeStamp());
+                name, title, GetTimeStamp(), GetTimeStamp());
         res.set_content(std::to_string(fetch_row.resultCode()),
                         "text/plain; charset=UTF-8");
     });
@@ -2068,11 +2081,12 @@ in vec4 a_position;
                    static const char query[] =
                            R"(SELECT name,title FROM app ORDER BY views DESC)";
                    db::QueryResult fetch_row = db::query<query>();
-                   std::string_view name,title;
+                   std::string_view name, title;
                    nlohmann::json doc = nlohmann::json::array();
-                   while (fetch_row(name,title)) {
+                   while (fetch_row(name, title)) {
                        nlohmann::json j = {
-                               {"name", name},{"title",title}};
+                               {"name",  name},
+                               {"title", title}};
                        doc.push_back(j);
                    }
                    res.set_content(doc.dump(), "application/json");

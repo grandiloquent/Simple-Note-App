@@ -37,6 +37,7 @@ void ReplaceAll(std::string& in_out, const std::string& search, const std::strin
 std::string ReplaceFirst(std::string str, std::string_view token, std::string_view to);
 std::vector<std::string> ReadAllLines(const std::string &filepath);
 std::string ReadAllText(const std::string& filepath);
+std::string SubstringAfter(const std::string &s, const std::string &start);
 #endif
 /*
 add_library(shared SHARED shared.cpp)

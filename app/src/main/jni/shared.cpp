@@ -55,7 +55,13 @@ std::string SubstringAfterLast(const std::string &s, const std::string &start) {
     }
     return s.substr(startPos + start.length());
 }
-
+std::string SubstringAfter(const std::string &s, const std::string &start) {
+    auto startPos = s.find(start);
+    if (startPos == std::string::npos) {
+        return s;
+    }
+    return s.substr(startPos + start.length());
+}
 std::string SubstringBeforeLast(const std::string &s, const std::string &start) {
     auto startPos = s.rfind(start);
     if (startPos == std::string::npos) {

@@ -138,7 +138,7 @@ function queryElementByPath(path) {
     return document.querySelector(`[data-path="${path}"]`);
 }
 function renameFile(path, guess) {
-
+    
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
     const input = document.createElement('textarea');
@@ -164,6 +164,7 @@ function renameFile(path, guess) {
         if (guess) {
             filename = filename + "." + substringAfterLast(path, ".");
         }
+        
         const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(path);
         item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);
@@ -207,7 +208,7 @@ async function render(path) {
             }
         })
         .map(x => {
-            return `<div class="item" data-path="${x.path}" data-isdirectory=${x.isDirectory}>
+            return `<div class="item" data-path="${encodeURIComponent(x.path)}" data-isdirectory=${x.isDirectory}>
             <div class="item-icon ${x.isDirectory ? 'item-directory' : 'item-file'}" 
             ${imageRe.test(x.path) ? `style="background-repeat:no-repeat;background-size:contain;background-position:50% 50%;background-image:url(${baseUri}/file?path=${x.path})"` : ''}
             ></div>
@@ -265,12 +266,12 @@ function selectSameType(path, isDirectory) {
         const isdirectory = item.dataset.isdirectory === 'true';
         if (isDirectory) {
             if (isdirectory) {
-                buf.push(item.dataset.path);
+                buf.push(decodeURIComponent(item.dataset.path));
             }
         } else {
             if (!isdirectory) {
                 if (extension === getExtension(item.dataset.path)) {
-                    buf.push(item.dataset.path);
+                    buf.push(decodeURIComponent(item.dataset.path));
                 }
             }
         }
@@ -285,7 +286,8 @@ function setDocumentTitle(path) {
 function showContextMenu(evt) {
     evt.stopPropagation();
     const dataset = evt.currentTarget.parentNode.dataset;
-    const path = dataset.path;
+    const path = decodeURIComponent(dataset.path);
+    
     const isDirectory = dataset.isdirectory === 'true';
     const bottomSheet = document.createElement('custom-bottom-sheet');
     addContextMenuItem(bottomSheet, '复制路径', () => {
@@ -395,7 +397,7 @@ function onMove() {
     let path = new URL(window.location).searchParams.get("path")
         || '/storage/emulated/0';
     dialog.addEventListener('submit', async () => {
-        const res = await fetch(`${baseUri}/file/move?dst=${encodeURIComponent(path)}`, {
+        const res = await fetch(`${baseUri}/file/move?dst=${path}`, {
             method: 'POST',
             body: JSON.stringify(obj)
         });

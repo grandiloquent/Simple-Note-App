@@ -15,7 +15,7 @@ function onItemClick(evt) {
 
     if (evt.currentTarget.dataset.isdirectory === "true") {
 
-        window.history.pushState({}, '', `?path=${encodeURIComponent(path)}`);
+        window.history.pushState({}, '', `?path=${path}`);
         render(path);
         return;
     }
@@ -25,25 +25,25 @@ function onItemClick(evt) {
     }
     if (audioRe.test(path)) {
         if (path.indexOf("音乐") !== -1) {
-            window.location = `/audio.html?path=${encodeURIComponent(path)}`
+            window.location = `/audio.html?path=${path}`
         } else
-            window.location = `/music.html?path=${encodeURIComponent(path)}`
+            window.location = `/music.html?path=${path}`
         return;
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/video.html?path=${encodeURIComponent(path)}`
+        window.location = `/video.html?path=${path}`
         return;
     }
     if (txtRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/code/editor.html?path=${encodeURIComponent(path)}`
+        window.location = `/code/editor.html?path=${path}`
         return;
     }
     if (path.endsWith(".pdf")) {
-        window.location = `/viewer.html?path=${encodeURIComponent(path)}`
+        window.location = `/viewer.html?path=${path}`
         return;
     }
     if (path.endsWith(".srt")) {
-        window.location = `/subtitle.html?path=${encodeURIComponent(substringBeforeLast(path, ".") + ".mp4")}`
+        window.location = `/subtitle.html?path=${substringBeforeLast(path, ".") + ".mp4"}`
 
     }
     // else if (evt.detail.path.endsWith(".md")) {

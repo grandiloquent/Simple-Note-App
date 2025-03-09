@@ -10,7 +10,7 @@ function addContextMenuItem(bottomSheet, title, handler) {
 function deleteFile(path) {
     const dialog = document.createElement('custom-dialog');
     const div = document.createElement('div');
-    div.textContent = `您确定要删除 ${substringAfterLast(path, "/")} 吗？`;
+    div.textContent = `您确定要删除 ${substringAfterLast(decodeURIComponent(path), "/")} 吗？`;
     dialog.appendChild(div);
     dialog.addEventListener('submit', async () => {
         const res = await fetch(`${baseUri}/file/delete`, {
@@ -142,7 +142,7 @@ function renameFile(path, guess) {
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
     const input = document.createElement('textarea');
-    input.value = substringAfterLast(path, pathSeperator);
+    input.value = substringAfterLast(decodeURIComponent(path), pathSeperator);
     const re = /[(（]/;
     if (re.test(input.value)
     ) {
@@ -156,16 +156,16 @@ function renameFile(path, guess) {
 
     }
     if (guess) {
-        input.value = substringBeforeLast(substringAfterLast(document.querySelector('[data-path]:nth-child(2)').dataset.path, "/"), ".").replace(/\d+$/, '');
+        input.value = substringBeforeLast(substringAfterLast(decodeURIComponent(document.querySelector('[data-path]:nth-child(2)').dataset.path), "/"), ".").replace(/\d+$/, '');
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-        let filename = substringBeforeLast(path, pathSeperator) + pathSeperator + input.value.trim();
+        let filename = substringBeforeLast(decodeURIComponent(path), pathSeperator) + pathSeperator + input.value.trim();
         if (guess) {
             filename = filename + "." + substringAfterLast(path, ".");
         }
         
-        const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
+        const res = await fetch(`${baseUri}/file/rename?path=${path}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(path);
         item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);
         item.dataset.path = filename;

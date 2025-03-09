@@ -61,7 +61,7 @@ function onItemClick(evt) {
                 //const apk = path.endsWith("epub") ? "com.duokan.readex/com.duokan.readex.DkReaderActivity" : "com.adobe.reader/com.adobe.reader.AdobeReader"
                 const apk = "org.readera/org.readera.read.ReadActivity"
 
-                fetch(`/su?cmd="${`am start -n ${apk} -d 'file://${encodeURI(path)}'"`}`)
+                fetch(`/su?cmd="${`am start -n ${apk} -d 'file://${path}'"`}`)
                 //      window.open(`/su?cmd="${`am start -n org.readera/org.readera.read.ReadActivity -d 'file://${encodeURI(path)}'"`}`,'_blank')
 
                 //`intent://${encodeURIComponent(path)}#Intent;package=org.readera;component=org.readera.read.ReadActivity;category=android.intent.category.BROWSABLE;scheme=file;end;`
@@ -69,7 +69,7 @@ function onItemClick(evt) {
             }
             return
         }
-        window.location = `${baseUri}/file?path=${encodeURIComponent(path)}`
+        window.location = `${baseUri}/file?path=${path}`
     }
 
 

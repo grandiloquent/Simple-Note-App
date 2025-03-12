@@ -15,7 +15,7 @@ function deleteFile(path) {
     dialog.addEventListener('submit', async () => {
         const res = await fetch(`${baseUri}/file/delete`, {
             method: 'POST',
-            body: JSON.stringify([path])
+            body: JSON.stringify([decodeURIComponent(path)])
         });
         queryElementByPath(path).remove();
     });
@@ -350,7 +350,7 @@ function showContextMenu(evt) {
         addContextMenuItem(bottomSheet, '分享', () => {
             bottomSheet.remove();
             if (typeof NativeAndroid !== 'undefined') {
-                NativeAndroid.share(path);
+                NativeAndroid.share(decodeURIComponent(path));
             } else {
                 let mimetype = "application/*"
                 if (imageRe.test(path)) {

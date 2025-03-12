@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Video Touch Scale</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 48
+        }
+
+        .bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            display: flex;
+        }
+
+        .bar>div {
+            color: #999;
+            width: 48px;
+        }
+
+        .bar .material-symbols-outlined {
+            font-size: 48px;
+        }
+    </style>
+</head>
+
+<body>
+    <video id="video"></video>
+    <div class="bar">
+        <div id="play-pause">
+            <span class="material-symbols-outlined">
+                play_arrow
+            </span>
+        </div>
+        <div id="arrow_forward_ios">
+            <span class="material-symbols-outlined">
+                arrow_forward_ios
+            </span>
+        </div>
+
+        <div id="forward_10">
+            <span class="material-symbols-outlined">
+                forward_10
+            </span>
+        </div>
+        <div id="forward_5">
+            <span class="material-symbols-outlined">
+                forward_5
+            </span>
+        </div>
+        <div id="fast_forward">
+            <span class="material-symbols-outlined">
+                fast_forward
+            </span>
+        </div>
+    </div>
+    <script>
+
+        const video = document.getElementById('video');
+        let baseUri = (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
+        const path = new URL(window.location).searchParams.get('path');
+
+        function play() {
+            video.load();
+            video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
+            video.play();
+            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
+            const d = parseFloat(obj[path]);
+            if (d)
+                video.currentTime = d;
+        }
+        var last_media_time, last_frame_num, fps;
+        var fps_rounder = [];
+        var frame_not_seeked = true;
+        function get_fps_average() {
+            return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
+        }
+        function ticker(useless, metadata) {
+            var media_time_diff = Math.abs(metadata.mediaTime - last_media_time);
+            var frame_num_diff = Math.abs(metadata.presentedFrames - last_frame_num);
+            var diff = media_time_diff / frame_num_diff;
+            if (
+                diff &&
+                diff < 1 &&
+                frame_not_seeked &&
+                fps_rounder.length < 50 &&
+                video.playbackRate === 1 &&
+                document.hasFocus()
+            ) {
+                fps_rounder.push(diff);
+                fps = Math.round(1 / get_fps_average());
+            }
+            frame_not_seeked = true;
+            last_media_time = metadata.mediaTime;
+            last_frame_num = metadata.presentedFrames;
+            if (fps_rounder.length < 50)
+                video.requestVideoFrameCallback(ticker);
+        }
+        video.requestVideoFrameCallback(ticker);
+        function adjustSize(video) {
+            if (video.videoWidth > 0) {
+                const w = Math.min(window.outerWidth, window.innerWidth);
+                const h = Math.min(window.outerHeight, window.innerHeight);
+                let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
+                let height = video.videoHeight * ratio
+                let width = video.videoWidth * ratio;
+                video.style.width = `${width}px`;
+                video.style.height = `${height}px`;
+                video.style.left = `${(w - width) / 2}px`;
+                video.style.top = `${(h - height) / 2}px`
+            }
+        }
+        video.addEventListener('durationchange', evt => {
+            if (video.duration) {
+                //timeSecond.textContent = formatDuration(video.duration);
+            }
+            adjustSize(video);
+        });
+
+        document.body.addEventListener('click', async evt => {
+
+            if (video.paused) {
+                play();
+            }
+            else {
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen();
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+                adjustSize(video);
+            }
+
+
+
+        })
+        window.addEventListener("resize", evt => {
+            const w = Math.min(window.outerWidth, window.innerWidth);
+            const h = Math.min(window.outerHeight, window.innerHeight);
+            adjustSize(video);
+        });
+        let isZoomed = false;
+        let zoomFactor = 3; // Adjust the zoom level as needed
+
+        video.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (isZoomed) {
+                // Reset to original size
+                video.style.transform = 'scale(1)';
+                video.style.transformOrigin = '0 0'; // Reset origin
+                isZoomed = false;
+            } else {
+                // Calculate click coordinates relative to the video
+                const rect = video.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                // Calculate transform-origin in percentage
+                const originX = (x / rect.width) * 100;
+                const originY = (y / rect.height) * 100;
+
+                // Apply zoom and transform-origin
+                video.style.transformOrigin = `${originX}% ${originY}%`;
+                video.style.transform = `scale(${zoomFactor})`;
+                isZoomed = true;
+            }
+        });
+        const playPause = document.getElementById('play-pause');
+
+        playPause.addEventListener('click', evt => {
+            evt.stopPropagation();
+            if (video.paused) {
+                video.play();
+                playPause.querySelector('span').textContent = 'play_arrow';
+            } else {
+                video.pause();
+                playPause.querySelector('span').textContent = 'pause';
+
+            }
+        })
+        document.addEventListener('visibilitychange', evt => {
+            saveBookmark();
+        })
+        function saveBookmark() {
+            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
+            obj[path] = video.currentTime;
+            localStorage.setItem('bookmark', JSON.stringify(obj));
+        }
+        document.getElementById('fast_forward')
+            .addEventListener('click', evt => {
+                evt.stopPropagation();
+                if (isForward)
+                    video.currentTime += 1 / fps;
+                else
+                    video.currentTime -= 1 / fps;
+
+            })
+        document.getElementById('forward_5').addEventListener('click', evt => {
+            evt.stopPropagation();
+            if (isForward)
+                video.currentTime += 1;
+            else
+                video.currentTime -= 1;
+
+        })
+        document.getElementById('forward_10').addEventListener('click', evt => {
+            evt.stopPropagation();
+            if (isForward)
+                video.currentTime += 10;
+            else
+                video.currentTime -= 10;
+        })
+        let isForward = true;
+        document.getElementById('arrow_forward_ios').addEventListener('click', evt => {
+            evt.stopPropagation();
+            isForward = !isForward;
+            if (isForward)
+                document.querySelector('#arrow_forward_ios span').textContent = 'arrow_forward_ios'
+            else
+                document.querySelector('#arrow_forward_ios span').textContent = 'arrow_back_ios'
+
+        })
+
+    </script>
+</body>
+
+</html>

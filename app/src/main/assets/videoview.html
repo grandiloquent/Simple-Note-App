@@ -3,98 +3,506 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML5 Video Touch Scale</title>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <title>视频</title>
     <style>
+        html {
+            font-size: 10px;
+            font-family: Roboto, Arial, sans-serif;
+            word-wrap: break-word;
+            color: #0f0f0f;
+            -webkit-text-size-adjust: 100%;
+            background-color: #fff;
+        }
+
         body {
-            height: 100vh;
             margin: 0;
-            background-color: #000;
-            overflow: hidden;
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            font-size: 1.2rem;
+            overflow-x: hidden;
         }
 
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 48
+        svg {
+            width: 100%;
+            height: 100%;
         }
 
-        .bar {
+        path {
+            fill: #fff;
+        }
+
+        .wrapper {
             position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
             bottom: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-direction: column;
+        }
+
+        #video {
+            position: absolute;
+        }
+
+        #play-pause {
+            margin: 0 60px;
+            width: 56px;
+            height: 56px;
+        }
+
+        #middle-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        #next {
+            width: 36px;
+            height: 36px;
+        }
+
+        #previous {
+            width: 36px;
+            height: 36px;
+        }
+
+        #time-first {
+            color: #fff;
+        }
+
+        #time-delimiter {
+
+            margin: 0 4px;
+        }
+
+        #time-second,
+        #time-delimiter {
+            opacity: .7;
+            color: #fff;
+        }
+
+        #bottom-wrapper {
+            padding: 0 28px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        #progress-bar-background {
+            height: 3px;
+            background: #fff;
+            opacity: .3;
+            position: absolute;
             left: 0;
             right: 0;
-            height: 48px;
-            display: flex;
         }
 
-        .bar>div {
-            color: #999;
-            width: 48px;
+        /* #progress-bar-played {
+    height: 3px;
+    background: #f00;
+    position: absolute;
+    left: 0;
+    width: 1%;
+} */
+
+        #progress-bar-playhead-wrapper {
+            background-color: #f00;
+            width: 12px;
+            height: 12px;
+            position: absolute;
+            border-radius: 50%;
         }
 
-        .bar .material-symbols-outlined {
-            font-size: 48px;
+
+        #fullscreen {
+            width: 24px;
+            height: 24px;
+        }
+
+        video::cue {
+            font-size: 2.8rem;
         }
     </style>
 </head>
 
 <body>
-    <video id="video"></video>
-    <div class="bar">
-        <div id="play-pause">
-            <span class="material-symbols-outlined">
-                play_arrow
-            </span>
-        </div>
-        <div id="arrow_forward_ios">
-            <span class="material-symbols-outlined">
-                arrow_forward_ios
-            </span>
-        </div>
 
-        <div id="forward_10">
-            <span class="material-symbols-outlined">
-                forward_10
-            </span>
+    <div class="wrapper">
+        <video id="video"></video>
+        <div id="top-wrapper"></div>
+        <div id="middle-wrapper">
+            <div id="previous">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="M19 6 9 12l10 6V6zM7 6H5v12h2V6z"></path>
+                </svg>
+            </div>
+            <div id="play-pause">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="m7 4 12 8-12 8V4z"></path>
+                </svg>
+            </div>
+            <div id="next">
+                <svg height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                    style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                    <path d="m5 18 10-6L5 6v12zM19 6h-2v12h2V6z"></path>
+                </svg>
+            </div>
         </div>
-        <div id="forward_5">
-            <span class="material-symbols-outlined">
-                forward_5
-            </span>
-        </div>
-        <div id="fast_forward">
-            <span class="material-symbols-outlined">
-                fast_forward
-            </span>
+        <div id="bottom-wrapper">
+            <div style="display: flex;align-items: center;user-select: none;">
+                <div id="time-first">00:00</div>
+                <div id="time-delimiter">/</div>
+                <div id="time-second">00:00</div>
+                <div style="flex-grow: 1;"></div>
+                <div id="video-list">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="m11 7 6 3.5-6 3.5V7zm7 13H4V6H3v15h15v-1zm3-2H6V3h15v15zM7 17h13V4H7v13z"></path>
+                    </svg>
+                </div>
+                <div id="fullscreen">
+                    <svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                        style="pointer-events: none; display: block; width: 100%; height: 100%;">
+                        <path d="M7,11H6V6h5v1H7V11z M18,6h-5v1h4v4h1V6z M18,13h-1v4h-4v1h5V13z M11,17H7v-4H6v5h5V17z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+            <custom-seekbar id="custom-seekbar"></custom-seekbar>
         </div>
     </div>
-    <script>
+    <custom-toast id="toast"></custom-toast>
+    <script type="module">
+        import { transformSrtTracks } from './main.js';
 
-        const video = document.getElementById('video');
-        let baseUri = (window.location.host === "127.0.0.1:5500" ? "http://192.168.8.55:8500" : "");
-        const path = new URL(window.location).searchParams.get('path');
+        // ==============================================================================
 
-        function play() {
+        async function playVideo(video, path) {
+            document.title = substringAfterLast(path, "/");
+            toast.setAttribute('message', document.title);
             video.load();
-            video.src = `${baseUri}/file?path=${encodeURIComponent(path)}`;
-            video.play();
-            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
-            const d = parseFloat(obj[path]);
-            if (d)
-                video.currentTime = d;
+            video.src = `/file?path=${encodeURIComponent(path)}`;
+            appendSubtitle(video);
+            await transformSrtTracks(video);
+            try {
+                await video.play();
+            } catch (e) {
+
+            }
         }
+
+        function substringAfterLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(index + delimiter.length);
+            }
+        }
+
+        function appendSubtitle(video) {
+            document.querySelectorAll('track').forEach(x => x.remove())
+            const track = document.createElement('track');
+            var tracks = video.textTracks;
+            var numTracks = tracks.length;
+            for (var i = numTracks - 1; i >= 0; i--)
+                video.textTracks[i].mode = "disabled";
+            track.src = substringBeforeLast(video.src, ".") + ".srt";
+            track.default = true;
+            video.appendChild(track);
+        }
+
+        function substringBeforeLast(string, delimiter, missingDelimiterValue) {
+            const index = string.lastIndexOf(delimiter);
+            if (index === -1) {
+                return missingDelimiterValue || string;
+            } else {
+                return string.substring(0, index);
+            }
+        }
+
+        function jumpToSpecificTime(video) {
+            const searchParams = new URL(window.location).searchParams;
+            let t = searchParams.get('t');
+            if (t) {
+                const m = /(\d+)m(\d+)s/.exec(t);
+                if (m) {
+                    video.currentTime = parseFloat(m[1]) * 60 + parseFloat(m[2]);
+                }
+            }
+        }
+
+        function saveBookmark(video, path) {
+            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
+            obj[path] = video.currentTime;
+            localStorage.setItem('bookmark', JSON.stringify(obj));
+        }
+
+        function formatDuration(ms) {
+            if (isNaN(ms)) return '0:00';
+            if (ms < 0) ms = -ms;
+            const time = {
+                hour: Math.floor(ms / 3600) % 24,
+                minute: Math.floor(ms / 60) % 60,
+                second: Math.floor(ms) % 60,
+            };
+            return Object.entries(time)
+                .filter((val, index) => index || val[1])
+                .map(val => (val[1] + '').padStart(2, '0'))
+                .join(':');
+        }
+
+        function adjustSize(video) {
+            if (video.videoWidth > 0) {
+                const w = Math.min(window.outerWidth, window.innerWidth);
+                const h = Math.min(window.outerHeight, window.innerHeight);
+                let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
+                let height = video.videoHeight * ratio
+                let width = video.videoWidth * ratio
+                video.style.width = `${width}px`;
+                video.style.height = `${height}px`;
+                video.style.left = `${(w - width) / 2}px`;
+                video.style.top = `${(h - height) / 2}px`
+            }
+        }
+
+        function zoomIn(video, evt) {
+            const b = video.getBoundingClientRect();
+            const x = evt.clientX;
+            const y = evt.clientY;
+
+            const ratio = 2;
+            const width = (x - b.left) / b.width * (video.videoWidth * ratio);
+            const height = (y - b.top) / b.height * (video.videoHeight * ratio);
+
+
+            video.style.width = (video.videoWidth * ratio) + 'px';
+            video.style.height = (video.videoHeight * ratio) + 'px';
+            video.style.left = (window.innerWidth / 2 - width) + 'px';
+            video.style.top = (window.innerHeight / 2 - height) + 'px';
+        }
+
+        function originalSize(video) {
+            let height = video.videoHeight * 1
+            let width = video.videoWidth * 1
+            video.style.width = `${width}px`;
+            video.style.height = `${height}px`;
+        }
+
+        // ==============================================================================
+
+        const file = "How to Make a padlock.mp4";
+        const searchParams = new URL(window.location).searchParams;
+        const path = searchParams.get('path') || file;
+
+
+        let timer;
+        const topWrapper = document.querySelector('#top-wrapper');
+        const middleWrapper = document.querySelector('#middle-wrapper');
+        const bottomWrapper = document.querySelector('#bottom-wrapper');
+        const timeFirst = document.querySelector('#time-first');
+        const timeSecond = document.querySelector('#time-second');
+        const video = document.querySelector('#video');
+        const progressBarPlayed = document.querySelector('#progress-bar-played');
+        const toast = document.getElementById('toast');
+        let videos;
+
+        async function loadVideoList() {
+            const res = await fetch(`/files?path=${pa}`);
+            videos = (await res.json())
+                .filter(video => {
+                    return !video.isDirectory && (
+                        video.name.endsWith(".mp4") ||
+                        video.name.endsWith(".v") ||
+                        video.name.endsWith(".MP4") ||
+                        video.name.endsWith(".MOV") ||
+                        video.name.endsWith(".mov")
+                    )
+                });
+            videos = videos.sort((v1, v2) => {
+                return v2.length - v1.length
+            })
+        }
+
+        try {
+            await loadVideoList();
+
+        } catch (e) {
+
+        }
+        async function showVideoList(path, video) {
+            const dialog = document.createElement('custom-dialog');
+            dialog.setAttribute('title', '视频列表');
+            const d = document.createElement('div');
+            videos.forEach(v => {
+                const div = document.createElement('div');
+                div.style.alignItems = "center";
+                div.style.boxSizing = "border-box";
+                div.style.minHeight = "43px";
+                div.style.display = "flex";
+                div.style.padding = "8px 0";
+                div.style.borderTop = "1px solid rgb(218,220,224)";
+                div.setAttribute("data-src", v.parent + "\\" + v.name);
+                d.appendChild(div);
+                div.textContent = v.name;
+                div.addEventListener('click', evt => {
+                    playVideo(baseUri, video, evt.currentTarget.dataset.src);
+                    video.play();
+                    jumpToBookmark(video);
+                    dialog.remove();
+                });
+            })
+            dialog.appendChild(d);
+            document.body.appendChild(dialog);
+        }
+
+        const fullscreen = document.querySelector('#fullscreen');
+        fullscreen.addEventListener('click', async evt => {
+            if (fullscreen.dataset.state === '1') {
+                adjustSize(video);
+                fullscreen.dataset.state = '0'
+            } else {
+                originalSize(video);
+                fullscreen.dataset.state = '1'
+            }
+        });
+
+        playVideo(video, path);
+        jumpToSpecificTime(video)
+
+        video.addEventListener('durationchange', evt => {
+            if (video.duration) {
+                timeSecond.textContent = formatDuration(video.duration);
+            }
+            adjustSize(video);
+        });
+
+        video.addEventListener('timeupdate', evt => {
+            if (video.currentTime) {
+                timeFirst.textContent = formatDuration(video.currentTime);
+                customSeekbar.value = (100 / video.duration) * video.currentTime;
+            }
+        });
+
+
+        const customSeekbar = document.querySelector('#custom-seekbar');
+        customSeekbar.addEventListener("seekbarClicked", function () {
+            scheduleHide();
+            video.pause();
+        });
+        customSeekbar.addEventListener("seekbarInput", evt => {
+            console.log(evt.detail);
+            scheduleHide();
+            var time = video.duration * evt.detail;
+            video.currentTime = time;
+        });
+        //video.muted = true;
+        video.addEventListener('play', evt => {
+            scheduleHide();
+            playPause.querySelector('path').setAttribute('d', 'M9 19H7V5h2Zm8-14h-2v14h2Z');
+        });
+        video.addEventListener('pause', evt => {
+            playPause.querySelector('path').setAttribute('d', 'm7 4 12 8-12 8V4z');
+        });
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        let seeking = false;
+        video.addEventListener('seeked', evt => {
+            seeking = false;
+        });
+        video.addEventListener('seeking', evt => {
+            seeking = true;
+        });
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        video.addEventListener('ended', evt => {
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            if (next + 1 < videos.length) {
+                next = next + 1;
+            } else {
+                next = 0;
+            }
+            let v = videos[next];
+            playVideo(video, v.parent + "\\" + v.name);
+        });
+        const playPause = document.querySelector('#play-pause');
+        playPause.addEventListener('click', evt => {
+            if (video.paused) {
+                video.play();
+
+            } else {
+                video.pause();
+
+            }
+        });
+
+        function scheduleHide() {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                topWrapper.style.display = 'none';
+                middleWrapper.style.display = 'none';
+                bottomWrapper.style.display = 'none';
+            }, 5000);
+        }
+
+        video.addEventListener('click', evt => {
+            evt.stopPropagation();
+            /*
+            if (video.getBoundingClientRect().left === 0) {
+                zoomIn(video, evt);
+            } else {
+                adjustSize(video);
+            }*/
+            zoomIn(video, evt);
+        });
+        document.querySelector('.wrapper').addEventListener('click', evt => {
+            topWrapper.style.display = 'flex';
+            middleWrapper.style.display = 'flex';
+            bottomWrapper.style.display = 'block';
+            scheduleHide();
+        })
+
+        const videoList = document.querySelector('#video-list');
+        videoList.addEventListener('click', evt => {
+            showVideoList(path, video);
+        });
+
+        window.addEventListener("resize", evt => {
+            const w = Math.min(window.outerWidth, window.innerWidth);
+            const h = Math.min(window.outerHeight, window.innerHeight);
+            toast.setAttribute('message', `${w}x${h}`);
+            adjustSize(video);
+        });
+        document.addEventListener('visibilitychange', evt => {
+            saveBookmark(video, path);
+        })
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
         var last_media_time, last_frame_num, fps;
         var fps_rounder = [];
         var frame_not_seeked = true;
-        function get_fps_average() {
-            return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
-        }
+
         function ticker(useless, metadata) {
+            if (fps) {
+                return;
+            }
             var media_time_diff = Math.abs(metadata.mediaTime - last_media_time);
             var frame_num_diff = Math.abs(metadata.presentedFrames - last_frame_num);
             var diff = media_time_diff / frame_num_diff;
@@ -115,132 +523,116 @@
             if (fps_rounder.length < 50)
                 video.requestVideoFrameCallback(ticker);
         }
+
+        function get_fps_average() {
+            return fps_rounder.reduce((a, b) => a + b) / fps_rounder.length;
+        }
+
         video.requestVideoFrameCallback(ticker);
-        function adjustSize(video) {
-            if (video.videoWidth > 0) {
-                const w = Math.min(window.outerWidth, window.innerWidth);
-                const h = Math.min(window.outerHeight, window.innerHeight);
-                let ratio = Math.min(w / video.videoWidth, h / video.videoHeight);
-                let height = video.videoHeight * ratio
-                let width = video.videoWidth * ratio;
-                video.style.width = `${width}px`;
-                video.style.height = `${height}px`;
-                video.style.left = `${(w - width) / 2}px`;
-                video.style.top = `${(h - height) / 2}px`
-            }
-        }
-        video.addEventListener('durationchange', evt => {
-            if (video.duration) {
-                //timeSecond.textContent = formatDuration(video.duration);
-            }
-            adjustSize(video);
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        video.addEventListener("seeked", function () {
+            fps_rounder.pop();
+            frame_not_seeked = false;
         });
 
-        document.body.addEventListener('click', async evt => {
+        const next = document.querySelector('#next');
+        next.addEventListener('click', evt => {
+            scheduleHide();
+            video.currentTime += 1 / fps;
+        });
+        const previous = document.querySelector('#previous');
+        previous.addEventListener('click', evt => {
+            scheduleHide();
+            video.currentTime -= 1 / fps;
+        });
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
-            if (video.paused) {
-                play();
-            }
-            else {
-                if (!document.fullscreenElement) {
-                    await document.documentElement.requestFullscreen();
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
+        window.addEventListener('keydown', async evt => {
+
+            if (evt.key === 'n') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime -= 1;
                 }
-                adjustSize(video);
-            }
-
-
-
-        })
-        window.addEventListener("resize", evt => {
-            const w = Math.min(window.outerWidth, window.innerWidth);
-            const h = Math.min(window.outerHeight, window.innerHeight);
-            adjustSize(video);
-        });
-        let isZoomed = false;
-        let zoomFactor = 3; // Adjust the zoom level as needed
-
-        video.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (isZoomed) {
-                // Reset to original size
-                video.style.transform = 'scale(1)';
-                video.style.transformOrigin = '0 0'; // Reset origin
-                isZoomed = false;
-            } else {
-                // Calculate click coordinates relative to the video
-                const rect = video.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-
-                // Calculate transform-origin in percentage
-                const originX = (x / rect.width) * 100;
-                const originY = (y / rect.height) * 100;
-
-                // Apply zoom and transform-origin
-                video.style.transformOrigin = `${originX}% ${originY}%`;
-                video.style.transform = `scale(${zoomFactor})`;
-                isZoomed = true;
-            }
-        });
-        const playPause = document.getElementById('play-pause');
-
-        playPause.addEventListener('click', evt => {
-            evt.stopPropagation();
-            if (video.paused) {
-                video.play();
-                playPause.querySelector('span').textContent = 'play_arrow';
-            } else {
-                video.pause();
-                playPause.querySelector('span').textContent = 'pause';
-
-            }
-        })
-        document.addEventListener('visibilitychange', evt => {
-            saveBookmark();
-        })
-        function saveBookmark() {
-            const obj = JSON.parse(localStorage.getItem('bookmark') || '{}');
-            obj[path] = video.currentTime;
-            localStorage.setItem('bookmark', JSON.stringify(obj));
-        }
-        document.getElementById('fast_forward')
-            .addEventListener('click', evt => {
-                evt.stopPropagation();
-                if (isForward)
-                    video.currentTime += 1 / fps;
-                else
+            } else if (evt.key === 'm') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime += 1;
+                }
+            } else if (evt.key === 'v') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime -= 5;
+                }
+            } else if (evt.key === 'b') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime += 5;
+                }
+            } else if (evt.key === 'j') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime -= 5 / fps;
+                }
+            } else if (evt.key === 'l') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime += 5 / fps;
+                }
+            } else if (evt.key === 'i') {
+                evt.preventDefault();
+                if (!seeking) {
                     video.currentTime -= 1 / fps;
+                }
+            } else if (evt.key === 'p') {
+                evt.preventDefault();
+                if (!seeking) {
+                    video.currentTime += 1 / fps;
+                }
+            } else if (evt.key === 'k') {
+                evt.preventDefault();
+                if (fullscreen.dataset.state === '1') {
+                    adjustSize(video);
+                    fullscreen.dataset.state = '0'
+                } else {
+                    originalSize(video);
+                    fullscreen.dataset.state = '1'
+                }
+            } else if (evt.key === ' ') {
+                evt.preventDefault();
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            }
+        });
 
-            })
-        document.getElementById('forward_5').addEventListener('click', evt => {
-            evt.stopPropagation();
-            if (isForward)
-                video.currentTime += 1;
-            else
-                video.currentTime -= 1;
 
-        })
-        document.getElementById('forward_10').addEventListener('click', evt => {
-            evt.stopPropagation();
-            if (isForward)
-                video.currentTime += 10;
-            else
-                video.currentTime -= 10;
-        })
-        let isForward = true;
-        document.getElementById('arrow_forward_ios').addEventListener('click', evt => {
-            evt.stopPropagation();
-            isForward = !isForward;
-            if (isForward)
-                document.querySelector('#arrow_forward_ios span').textContent = 'arrow_forward_ios'
-            else
-                document.querySelector('#arrow_forward_ios span').textContent = 'arrow_back_ios'
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        var isDown = false;
+        video.addEventListener('mousedown', function (e) {
+            isDown = true;
+        }, true);
 
-        })
+        video.addEventListener('mouseup', function () {
+            isDown = false;
+        }, true);
+
+        video.addEventListener('mousemove', function (event) {
+            event.preventDefault();
+            if (isDown) {
+                var deltaX = event.movementX;
+                var deltaY = event.movementY;
+                var rect = video.getBoundingClientRect();
+                video.style.left = rect.x + deltaX + 'px';
+                video.style.top = rect.y + deltaY + 'px';
+            }
+        }, true);
 
     </script>
 </body>

@@ -83,6 +83,7 @@ path {
     padding: 0 28px;
     width: 100%;
     box-sizing: border-box;
+    z-index: 1;
 }
 
 #progress-bar-background {

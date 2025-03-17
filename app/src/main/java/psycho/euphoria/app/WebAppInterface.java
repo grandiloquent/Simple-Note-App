@@ -414,6 +414,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void share(String path) {
+        Log.e("B5aOx2", String.format("share, %s", path));
         try {
             mContext.startActivity(buildSharedIntent(mContext, new File(path)));
         } catch (Exception ignored) {

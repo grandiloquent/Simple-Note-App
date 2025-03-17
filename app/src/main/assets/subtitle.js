@@ -119,12 +119,42 @@ async function initialize() {
     const previous = document.querySelector('#previous');
     previous.addEventListener('click', evt => {
         scheduleHide();
-        video.currentTime -= 1;
+        // video.currentTime -= 1;
+        const url = new URL(video.src);
+        const vpath = url.searchParams.get('path');
+        let next = 0;
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].path === vpath) {
+                next = i;
+            }
+        }
+        if (next - 1 > -1) {
+            next = next - 1;
+        } else {
+            next = videos.length - 1;
+        }
+        path = videos[next].path;
+        playVideo(baseUri, video, path);
     });
     const next = document.querySelector('#next');
     next.addEventListener('click', evt => {
         scheduleHide();
-        video.currentTime += 1;
+        //video.currentTime += 1;
+        const url = new URL(video.src);
+        const vpath = url.searchParams.get('path');
+        let next = 0;
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].path === vpath) {
+                next = i;
+            }
+        }
+        if (next + 1 < videos.length) {
+            next = next + 1;
+        } else {
+            next = 0;
+        }
+        path = videos[next].path;
+        playVideo(baseUri, video, path);
     });
 
 
@@ -150,6 +180,8 @@ async function initialize() {
                 video.path.endsWith(".v")
             )
         });
+    //videos = 
+    videos.sort((a, b) => a.path.localeCompare(b.path));
     playVideo(baseUri, video, path);
     if (t) {
         const m = /(\d+)m(\d+)s/.exec(t);
@@ -220,6 +252,7 @@ async function initialize() {
         topWrapper.style.display = 'flex';
         middleWrapper.style.display = 'flex';
         bottomWrapper.style.display = 'block';
+        toast.setAttribute('message', document.title);
         scheduleHide();
     });
     const videoList = document.querySelector('#video-list');

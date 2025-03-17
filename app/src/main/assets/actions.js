@@ -350,7 +350,7 @@ function showContextMenu(evt) {
         addContextMenuItem(bottomSheet, '分享', () => {
             bottomSheet.remove();
             if (typeof NativeAndroid !== 'undefined') {
-                NativeAndroid.share(decodeURIComponent(path));
+                NativeAndroid.share(path);
             } else {
                 let mimetype = "application/*"
                 if (imageRe.test(path)) {
@@ -358,7 +358,7 @@ function showContextMenu(evt) {
                 } else if (videoRe.test(path)) {
                     mimetype = "video/*";
                 }
-                fetch(`/su?cmd="${`am start -a android.intent.action.SEND -t ${mimetype} --eu android.intent.extra.STREAM 'file://${encodeURI(path)}' --grant-read-uri-permission"`}`)
+                fetch(`/su?cmd="${`am start -a android.intent.action.SEND -t ${mimetype} --eu android.intent.extra.STREAM 'file://${path}' --grant-read-uri-permission"`}`)
             }
         });
         addContextMenuItem(bottomSheet, '扫描', () => {

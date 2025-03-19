@@ -3,6 +3,7 @@ package psycho.euphoria.app;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.widget.FrameLayout;
@@ -50,7 +51,14 @@ public class CustomWebChromeClient extends WebChromeClient {
         ((FrameLayout) mMainActivity.getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
         mMainActivity.getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         mMainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+        mMainActivity.getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0){
+                    mMainActivity.getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                }
+            }
+        });
     }
 
 

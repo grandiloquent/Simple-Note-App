@@ -377,6 +377,7 @@ public class MainActivity extends Activity {
         menu.add(0, 9, 0, "图片");
         menu.add(0, 10, 0, "输入法");
         menu.add(0, 5, 0, "媒体");
+        menu.add(0, 17, 0, "锁屏");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -414,7 +415,14 @@ public class MainActivity extends Activity {
             case 13:
                 Utils.killProcesses(mUrl);
                 break;
-
+            case 17:
+                LockScreenManager lockScreenManager = new LockScreenManager(this);
+                if (!lockScreenManager.isAdminActive()) {
+                    lockScreenManager.requestAdminPermission();
+                } else {
+                    TaskSchedulerWM.scheduleTask(this, 0, 30);
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

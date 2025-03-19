@@ -296,7 +296,8 @@ public class ServerService extends Service {
         @android.webkit.JavascriptInterface
         public void volume(int value) {
             AudioManager audioManager = mContext.getSystemService(AudioManager.class);
-            int v = value == 0 ? 0 : audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + value;
+            int v = value == 0 ? 0 : (int) (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) +
+                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * (value / 100.0));
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, v, 0);
         }
 

@@ -46,4 +46,5 @@ android {
 dependencies {
     implementation libs.isoparser
     implementation("com.itextpdf:itextpdf:5.5.13.3")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }

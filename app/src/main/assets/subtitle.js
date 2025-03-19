@@ -213,21 +213,21 @@ async function initialize() {
         saveBookmark();
     });
     video.addEventListener('ended', evt => {
-        const url = new URL(video.src);
-        const vpath = url.searchParams.get('path');
-        let next = 0;
-        for (let i = 0; i < videos.length; i++) {
-            if (videos[i].path === vpath) {
-                next = i;
-            }
-        }
-        if (next + 1 < videos.length) {
-            next = next + 1;
-        } else {
-            next = 0;
-        }
-        path = videos[next].path;
-        playVideo(baseUri, video, path);
+        // const url = new URL(video.src);
+        // const vpath = url.searchParams.get('path');
+        // let next = 0;
+        // for (let i = 0; i < videos.length; i++) {
+        //     if (videos[i].path === vpath) {
+        //         next = i;
+        //     }
+        // }
+        // if (next + 1 < videos.length) {
+        //     next = next + 1;
+        // } else {
+        //     next = 0;
+        // }
+        // path = videos[next].path;
+        // playVideo(baseUri, video, path);
     });
     const playPause = document.querySelector('#play-pause');
     playPause.addEventListener('click', evt => {

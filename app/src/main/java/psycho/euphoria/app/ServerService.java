@@ -324,7 +324,10 @@ public class ServerService extends Service {
             } else {
                 int time=10;
                 TaskSchedulerWM.scheduleTask(mContext, 0, time);
-                AlarmScheduler.scheduleAlarm(mContext, 8, time*2);
+                AlarmScheduler.scheduleAlarm(mContext, 0, time*2);
+                Toast.makeText(mContext.getApplicationContext(), "10 分钟后锁屏", Toast.LENGTH_SHORT).show();
+
+                
             }
         }
 

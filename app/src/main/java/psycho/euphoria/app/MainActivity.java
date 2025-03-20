@@ -422,7 +422,7 @@ public class MainActivity extends Activity {
                 } else {
                     int time=10;
                     TaskSchedulerWM.scheduleTask(this, 0, time);
-                    AlarmScheduler.scheduleAlarm(this, 8, time*2);
+                    AlarmScheduler.scheduleAlarm(this, 0, time*2);
                     Toast.makeText(this, "30 分钟后锁屏", Toast.LENGTH_SHORT).show();
                 }
                 break;

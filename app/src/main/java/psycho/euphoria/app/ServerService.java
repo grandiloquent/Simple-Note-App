@@ -314,10 +314,16 @@ public class ServerService extends Service {
         }
 
         @android.webkit.JavascriptInterface
-        public void accessibility() {
-            Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-            mContext.startActivity(v);
+        public void lockScreen() {
+//            Intent v = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//            v.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+//            mContext.startActivity(v);
+            LockScreenManager lockScreenManager = new LockScreenManager(mContext);
+            if (!lockScreenManager.isAdminActive()) {
+                lockScreenManager.requestAdminPermission();
+            } else {
+                TaskSchedulerWM.scheduleTask(mContext, 0, 30);
+            }
         }
 
         @android.webkit.JavascriptInterface

@@ -322,7 +322,9 @@ public class ServerService extends Service {
             if (!lockScreenManager.isAdminActive()) {
                 lockScreenManager.requestAdminPermission();
             } else {
-                TaskSchedulerWM.scheduleTask(mContext, 0, 30);
+                int time=10;
+                TaskSchedulerWM.scheduleTask(mContext, 0, time);
+                AlarmScheduler.scheduleAlarm(mContext, 8, time*2);
             }
         }
 

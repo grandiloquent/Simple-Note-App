@@ -13,9 +13,10 @@ public class TaskSchedulerWM {
     public static void scheduleTask(Context context, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
+//        calendar.set(Calendar.HOUR_OF_DAY, hour);
+//        calendar.set(Calendar.MINUTE, minute);
+//        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.MINUTE, minute);
 
         long delay = calendar.getTimeInMillis() - System.currentTimeMillis();
 

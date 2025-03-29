@@ -158,6 +158,19 @@ async function initialize() {
     });
 
 
+    document.querySelector('#backward')
+        .addEventListener('click', evt => {
+            video.currentTime -= 5
+        });
+
+    document.querySelector('#forward')
+        .addEventListener('click', evt => {
+            video.currentTime += 5
+        })
+    document.querySelector('#speed')
+        .addEventListener('click', evt => {
+            video.playbackRate += 1;
+        })
     const customSeekbar = document.querySelector('#custom-seekbar');
     customSeekbar.addEventListener("seekbarClicked", function () {
         scheduleHide();

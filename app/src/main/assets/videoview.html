@@ -133,7 +133,14 @@
 </head>
 
 <body>
+    <div style="position: fixed;right: 0;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;"
+        id="area-back">
 
+    </div>
+    <div style="position: fixed;left: 0;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;"
+        id="area-forward">
+
+    </div>
     <div class="wrapper">
         <video id="video"></video>
         <div id="top-wrapper"></div>
@@ -315,6 +322,32 @@
         const progressBarPlayed = document.querySelector('#progress-bar-played');
         const toast = document.getElementById('toast');
         let videos;
+
+
+        const areaBack = document.querySelector('#area-back');
+        const areaForward = document.querySelector('#area-forward');
+        let areaTimer;
+        areaBack.addEventListener('click', evt => {
+            if (areaTimer) {
+                clearInterval(areaTimer)
+                areaTimer = 0;
+            }
+            else
+                areaTimer = setInterval(() => {
+                    video.currentTime -= 1;
+                }, 1000)
+        })
+
+        areaForward.addEventListener('click', evt => {
+            if (areaTimer) {
+                clearInterval(areaTimer)
+                areaTimer = 0;
+            }
+            else
+                areaTimer = setInterval(() => {
+                    video.currentTime += 1;
+                }, 1000)
+        })
 
         async function loadVideoList() {
             const res = await fetch(`/files?path=${pa}`);

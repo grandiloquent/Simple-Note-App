@@ -335,7 +335,7 @@
             else
                 areaTimer = setInterval(() => {
                     video.currentTime -= 1;
-                }, 1000)
+                }, 100)
         })
 
         areaForward.addEventListener('click', evt => {
@@ -346,7 +346,7 @@
             else
                 areaTimer = setInterval(() => {
                     video.currentTime += 1;
-                }, 1000)
+                }, 100)
         })
 
         async function loadVideoList() {

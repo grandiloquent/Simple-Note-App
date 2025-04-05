@@ -130,14 +130,15 @@
             font-size: 2.8rem;
         }
     </style>
+    <script src="custom-dialog.js"></script>
 </head>
 
 <body>
-    <div style="position: fixed;right: 0;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;"
+    <div style="position: fixed;left: 56px;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;border-right: 1px solid #dadce0;"
         id="area-back">
 
     </div>
-    <div style="position: fixed;left: 0;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;"
+    <div style="position: fixed;left: 0;top: 0;width: 56px;height: 56px;background-color: transparent;z-index: 1;border-right: 1px solid #dadce0;"
         id="area-forward">
 
     </div>
@@ -323,6 +324,8 @@
         const toast = document.getElementById('toast');
         let videos;
 
+      
+
 
         const areaBack = document.querySelector('#area-back');
         const areaForward = document.querySelector('#area-forward');
@@ -350,19 +353,23 @@
         })
 
         async function loadVideoList() {
-            const res = await fetch(`/files?path=${pa}`);
+
+            const res = await fetch(`/files?path=${encodeURIComponent(
+
+                substringBeforeLast(path, "/")
+            )}`);
             videos = (await res.json())
                 .filter(video => {
                     return !video.isDirectory && (
-                        video.name.endsWith(".mp4") ||
-                        video.name.endsWith(".v") ||
-                        video.name.endsWith(".MP4") ||
-                        video.name.endsWith(".MOV") ||
-                        video.name.endsWith(".mov")
+                        video.path.endsWith(".mp4") ||
+                        video.path.endsWith(".v") ||
+                        video.path.endsWith(".MP4") ||
+                        video.path.endsWith(".MOV") ||
+                        video.path.endsWith(".mov")
                     )
                 });
             videos = videos.sort((v1, v2) => {
-                return v2.length - v1.length
+                return v1.path.localeCompare(v2.path)
             })
         }
 
@@ -370,7 +377,7 @@
             await loadVideoList();
 
         } catch (e) {
-
+            console.error(e)
         }
         async function showVideoList(path, video) {
             const dialog = document.createElement('custom-dialog');
@@ -384,9 +391,9 @@
                 div.style.display = "flex";
                 div.style.padding = "8px 0";
                 div.style.borderTop = "1px solid rgb(218,220,224)";
-                div.setAttribute("data-src", v.parent + "\\" + v.name);
+                div.setAttribute("data-src", v.path);
                 d.appendChild(div);
-                div.textContent = v.name;
+                div.textContent = substringAfterLast(v.path, '/');
                 div.addEventListener('click', evt => {
                     playVideo(baseUri, video, evt.currentTarget.dataset.src);
                     video.play();
@@ -458,21 +465,8 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////
         video.addEventListener('ended', evt => {
-            const url = new URL(video.src);
-            const path = url.searchParams.get('path');
-            let next = 0;
-            for (let i = 0; i < videos.length; i++) {
-                if (videos[i].path === path) {
-                    next = i;
-                }
-            }
-            if (next + 1 < videos.length) {
-                next = next + 1;
-            } else {
-                next = 0;
-            }
-            let v = videos[next];
-            playVideo(video, v.parent + "\\" + v.name);
+            video.currentTime = 0; // Reset the video to the beginning
+            video.play();         // Start playing again
         });
         const playPause = document.querySelector('#play-pause');
         playPause.addEventListener('click', evt => {
@@ -567,13 +561,43 @@
 
         video.addEventListener("seeked", function () {
             fps_rounder.pop();
-            frame_not_seeked = false;
+            //frame_not_seeked = false;
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            if (next - 1 > -1) {
+                next = next - 1;
+            } else {
+                next = 0;
+            }
+            let v = videos[next];
+            playVideo(video, v.path);
         });
 
         const next = document.querySelector('#next');
         next.addEventListener('click', evt => {
             scheduleHide();
-            video.currentTime += 1 / fps;
+            //video.currentTime += 1 / fps;
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            if (next + 1 < videos.length) {
+                next = next + 1;
+            } else {
+                next = 0;
+            }
+            let v = videos[next];
+            playVideo(video, v.path);
         });
         const previous = document.querySelector('#previous');
         previous.addEventListener('click', evt => {

@@ -31,7 +31,7 @@ function onItemClick(evt) {
         return;
     }
     if (videoRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {
-        window.location = `/videoview.html?path=${path}`
+        window.location = `/videoview.html?t=0m0s&path=${path}`
         return;
     }
     if (txtRe.test(path) || substringAfterLast(decodeURIComponent(path), "/").indexOf(".") === -1) {

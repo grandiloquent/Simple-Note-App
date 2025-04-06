@@ -562,21 +562,7 @@
         video.addEventListener("seeked", function () {
             fps_rounder.pop();
             //frame_not_seeked = false;
-            const url = new URL(video.src);
-            const path = url.searchParams.get('path');
-            let next = 0;
-            for (let i = 0; i < videos.length; i++) {
-                if (videos[i].path === path) {
-                    next = i;
-                }
-            }
-            if (next - 1 > -1) {
-                next = next - 1;
-            } else {
-                next = 0;
-            }
-            let v = videos[next];
-            playVideo(video, v.path);
+            
         });
 
         const next = document.querySelector('#next');
@@ -602,7 +588,21 @@
         const previous = document.querySelector('#previous');
         previous.addEventListener('click', evt => {
             scheduleHide();
-            video.currentTime -= 1 / fps;
+            const url = new URL(video.src);
+            const path = url.searchParams.get('path');
+            let next = 0;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].path === path) {
+                    next = i;
+                }
+            }
+            if (next - 1 > -1) {
+                next = next - 1;
+            } else {
+                next = 0;
+            }
+            let v = videos[next];
+            playVideo(video, v.path);
         });
         ////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////

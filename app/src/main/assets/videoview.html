@@ -199,6 +199,7 @@
             toast.setAttribute('message', document.title);
             video.load();
             video.src = `/file?path=${encodeURIComponent(path)}`;
+            history.pushState({},null,`/videoview.html?t=${new URL(location).searchParams.get('t')}&path=${encodeURIComponent(path)}`)
             appendSubtitle(video);
             await transformSrtTracks(video);
             try {

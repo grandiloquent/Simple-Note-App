@@ -69,7 +69,13 @@ std::string SubstringBeforeLast(const std::string &s, const std::string &start) 
     }
     return s.substr(0, startPos);
 }
-
+std::string SubstringBefore(const std::string &s, const std::string &start) {
+    auto startPos = s.find(start);
+    if (startPos == std::string::npos) {
+        return s;
+    }
+    return s.substr(0, startPos);
+}
 std::string GetLocalIp() {
     std::string ipAddress = "0.0.0.0";
     struct ifaddrs *interfaces = NULL;

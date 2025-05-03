@@ -17,6 +17,11 @@ std::filesystem::path FindFile(const httplib::Request &req) {
         if (exists(p)) {
             return p;
         }
+        p = d.parent_path().parent_path();
+        p = p.append(req.path.substr(1));
+        if (exists(p)) {
+            return p;
+        }
         auto dir = d.parent_path().parent_path();
         p = dir.append(req.path.substr(1));
 

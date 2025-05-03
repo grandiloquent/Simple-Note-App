@@ -52,7 +52,7 @@ class CustomToast extends HTMLElement {
                     this.showing = false;
                     this.showMessage();
                 }, 195);
-            }, 3000);
+            }, 1000);
         }
     }
 

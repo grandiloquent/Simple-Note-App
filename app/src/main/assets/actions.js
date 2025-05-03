@@ -251,7 +251,12 @@ async function render(path) {
                     deleteFile(item.parentNode.dataset.path);
                     const buf = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
                 } else {
-                    renameFile(item.parentNode.dataset.path);
+                    //renameFile(item.parentNode.dataset.path);
+                    let array = (localStorage.getItem("paths") && JSON.parse(localStorage.getItem("paths"))) || [];
+                    array.push(decodeURIComponent(item.parentNode.dataset.path))
+                    array = [...new Set(array)];
+                    localStorage.setItem("paths", JSON.stringify(array));
+                    toast.setAttribute('message', '已成功写入剪切板');
                 }
             }
         });

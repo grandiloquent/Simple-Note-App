@@ -30,6 +30,7 @@ std::string Substring(const std::string &s, const std::string &start, const std:
 std::string SubstringAfterLast(const std::string &s, const std::string &start);
 
 std::string SubstringBeforeLast(const std::string &s, const std::string &start);
+std::string SubstringBefore(const std::string &s, const std::string &start);
 
 std::string GetLocalIp();
 std::string EncodeUrl(const std::string &s);

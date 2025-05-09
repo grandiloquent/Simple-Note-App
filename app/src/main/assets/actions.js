@@ -165,8 +165,8 @@ function renameFile(path, guess) {
             filename = filename + "." + substringAfterLast(path, ".");
         }
         
-        const res = await fetch(`${baseUri}/file/rename?path=${path}&dst=${encodeURIComponent(filename)}`);
-        let item = queryElementByPath(path);
+        const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
+        let item = queryElementByPath(encodeURIComponent(path));
         item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);
         item.dataset.path = filename;
         //window.location.reload();

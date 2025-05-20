@@ -68,7 +68,7 @@ function initializeDropZone() {
     });
 }
 async function loadData(path, size) {
-    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(path || '')}&size=${size || 'false'}`, {cache: "no-cache"});
+    const res = await fetch(`${baseUri}/files?path=${encodeURIComponent(path || '')}&size=${size || 'false'}`, { cache: "no-cache" });
     return res.json();
 }
 function newFile() {
@@ -138,7 +138,7 @@ function queryElementByPath(path) {
     return document.querySelector(`[data-path="${path}"]`);
 }
 function renameFile(path, guess) {
-    
+
     const dialog = document.createElement('custom-dialog');
     dialog.setAttribute('title', "重命名")
     const input = document.createElement('textarea');
@@ -160,11 +160,17 @@ function renameFile(path, guess) {
     }
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
-        let filename = substringBeforeLast(decodeURIComponent(path), pathSeperator) + pathSeperator + input.value.trim();
+        let textFileName = input.value;
+        if(input.selectionStart<textFileName.length){
+            textFileName=textFileName.substring(0,input.selectionStart).trim()+
+            "."+substringAfterLast(textFileName,".");
+        }
+
+        let filename = substringBeforeLast(decodeURIComponent(path), pathSeperator) + pathSeperator + textFileName;
         if (guess) {
             filename = filename + "." + substringAfterLast(path, ".");
         }
-        
+
         const res = await fetch(`${baseUri}/file/rename?path=${encodeURIComponent(path)}&dst=${encodeURIComponent(filename)}`);
         let item = queryElementByPath(encodeURIComponent(path));
         item.querySelector('.item-title div').textContent = substringAfterLast(filename, pathSeperator);
@@ -292,7 +298,7 @@ function showContextMenu(evt) {
     evt.stopPropagation();
     const dataset = evt.currentTarget.parentNode.dataset;
     const path = decodeURIComponent(dataset.path);
-    
+
     const isDirectory = dataset.isdirectory === 'true';
     const bottomSheet = document.createElement('custom-bottom-sheet');
     addContextMenuItem(bottomSheet, '复制路径', () => {

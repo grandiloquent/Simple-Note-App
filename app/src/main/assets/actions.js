@@ -161,9 +161,11 @@ function renameFile(path, guess) {
     dialog.appendChild(input);
     dialog.addEventListener('submit', async () => {
         let textFileName = input.value;
-        if(input.selectionStart<textFileName.length){
-            textFileName=textFileName.substring(0,input.selectionStart).trim()+
-            "."+substringAfterLast(textFileName,".");
+        if (input.selectionStart < textFileName.length) {
+            textFileName = textFileName.substring(0, input.selectionStart).trim();
+            if (input.value.indexOf('.') !== -1)
+                textFileName = textFileName +
+                    "." + substringAfterLast(input.value, ".");
         }
 
         let filename = substringBeforeLast(decodeURIComponent(path), pathSeperator) + pathSeperator + textFileName;

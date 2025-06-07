@@ -2167,11 +2167,20 @@ function webViewerPrint() {
 function webViewerDownload() {
   PDFViewerApplication.downloadOrSave();
 }
-function webViewerOpenInExternalApp() {
-  PDFViewerApplication.openInExternalApp();
+ function webViewerOpenInExternalApp() {
+ 
+
+   PDFViewerApplication.openInExternalApp();
 }
-function webViewerFirstPage() {
-  PDFViewerApplication.page = 1;
+async function webViewerFirstPage() {
+  //PDFViewerApplication.page = 1;
+  if (!document.fullscreenElement) {
+    await document.documentElement.requestFullscreen();
+} else {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+}
 }
 function webViewerLastPage() {
   PDFViewerApplication.page = PDFViewerApplication.pagesCount;

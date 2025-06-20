@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>播放器</title>
+   
+    <link href="./player.css" rel="stylesheet">
+    <script src="https://fastly.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js"></script>
+
+</head>
+
+<body>
+
+    <video loop playsinline></video>
+
+    <div id="play-center" style="position:fixed;top: 50%;left: 50%;transform: translate(-50%,-50%);width: fit-content;">
+        <div id="play-pause" style="color: #fff;width: 40px;height: 40px;fill: currentColor;">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false"
+                aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
+                <path d="m7 4 12 8-12 8V4z"></path>
+            </svg>
+        </div>
+    </div>
+    <div id="player-bottom"
+        style="display: flex;justify-content: space-between;position: absolute;bottom: 30px;z-index: 2;height: 44px;left:12px;right: 12px;">
+        <div style=" display: flex;align-items: center;margin-left: 16px;font-weight: 500;overflow: hidden;">
+            <span id="time-played" style="color: #fff;font-size: 12px;font-weight: 500;">0:00</span>
+            <span style="color: #fff;font-size: 12px;font-weight: 500;margin: 0 4px;opacity: .7;">/</span>
+            <span id="time-duration" style="color: #fff;font-size: 12px;font-weight: 500;opacity: .7;">0:00</span>
+
+        </div>
+        <div id="fullscreen" style="color: #fff;fill: currentColor;padding: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24"
+                width="24" focusable="false" aria-hidden="true"
+                style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
+                <path d="M7,11H6V6h5v1H7V11z M18,6h-5v1h4v4h1V6z M18,13h-1v4h-4v1h5V13z M11,17H7v-4H6v5h5V17z"></path>
+            </svg>
+        </div>
+    </div>
+    <div id="progress-bar"
+        style="bottom: 0;left: 30px;right: 30px;bottom: 22px;;position: fixed;display: flex;align-items: center;">
+        <div style="position: relative;height: 3px;width: 100%;">
+            <div style="position: absolute;top: 0;bottom: 0;background-color: #fff;opacity: .3;width: 100%;">
+            </div>
+            <div id="progress-bar-loaded"
+                style="position: absolute;top: 0;bottom: 0;background-color: #fff;opacity: .6;">
+            </div>
+            <div id="progress-bar-played"
+                style="position: absolute;top: 0;bottom: 0;background: -webkit-gradient(linear,left top,right top,color-stop(80%,#f03),to(#ff2791));background: -webkit-linear-gradient(left,#f03 80%,#ff2791 100%);background: linear-gradient(to right,#f03 80%,#ff2791 100%);">
+            </div>
+        </div>
+        <div id="progress-bar-playhead" style="display: block;position: absolute; ">
+            <div
+                style="height: 12px;width: 12px;border-radius: 50%;background-color: #f03;-webkit-transform: scale(1);transform: scale(1);-webkit-transition: -webkit-transform .1s ease;transition: -webkit-transform .1s ease;transition: transform .1s ease;transition: transform .1s ease,-webkit-transform .1s ease;transform-origin: 0.192674px center;">
+            </div>
+
+        </div>
+    </div>
+
+</body>
+<script src="player.js"></script>
+
+</html>

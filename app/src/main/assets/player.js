@@ -234,9 +234,9 @@ function zoomIn(video, evt) {
     video.style.top = (window.innerHeight / 2 - height) + 'px';
 }
 //-----------------------------
-window.baseUri = "http://localhost:5233";
+window.baseUri = "";
 
-video.src = `${baseUri}/admin/file?path=${decodeURIComponent(new URL(location.href).searchParams.get('path'))}`;
+video.src = `${baseUri}/file?path=${decodeURIComponent(new URL(location.href).searchParams.get('path'))}`;
 window.addEventListener('resize', adjustSize)
 
 playPause.addEventListener('click', evt => {
@@ -250,14 +250,26 @@ playPause.addEventListener('click', evt => {
 
     }
 })
+// fullscreen.addEventListener('click', async evt => {
+//     if (fullscreen.dataset.state === '1') {
+//         adjustSize();
+//         fullscreen.dataset.state = '0'
+//     } else {
+//         resetZoom();
+//         fullscreen.dataset.state = '1'
+//     }
+// });
+
 fullscreen.addEventListener('click', async evt => {
-    if (fullscreen.dataset.state === '1') {
-        adjustSize();
-        fullscreen.dataset.state = '0'
+    if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
     } else {
-        resetZoom();
-        fullscreen.dataset.state = '1'
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
     }
+    resetZoom();
+
 });
 let isDragging = false;
 progressBarPlayhead.addEventListener('mousedown', () => {
@@ -353,3 +365,29 @@ window.addEventListener('keydown', async evt => {
         }
     }
 });
+video.addEventListener('touchstart', function (e) {
+    console.log("touchstart -------------->")
+    isDown = true;
+    const touch = e.touches[0];
+    _x=touch .clientX;
+    _y=touch .clientY;
+}, true);
+
+video.addEventListener('touchend', function () {
+    console.log("touchend -------------->")
+    isDown = false;
+}, true);
+let _x,_y;
+video.addEventListener('touchmove', function (event) {
+    event.preventDefault();
+    if (isDown) {
+        const touch = event.touches[0];
+        var deltaX = touch.clientX-_x;
+        var deltaY = touch.clientY-_y;
+        _x=touch .clientX;
+        _y=touch .clientY;
+        var rect = video.getBoundingClientRect();
+        video.style.left = rect.x + deltaX + 'px';
+        video.style.top = rect.y + deltaY + 'px';
+    }
+}, true);

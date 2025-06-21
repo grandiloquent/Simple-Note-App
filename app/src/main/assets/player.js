@@ -275,6 +275,9 @@ let isDragging = false;
 progressBarPlayhead.addEventListener('mousedown', () => {
     isDragging = true;
 });
+progressBarPlayhead.addEventListener('touchstart', () => {
+    isDragging = true;
+});
 document.addEventListener('mousemove', (event) => {
     if (isDragging) {
         const rect = progressBar.getBoundingClientRect();
@@ -284,6 +287,19 @@ document.addEventListener('mousemove', (event) => {
         //slider.style.left = `${percentage * 100}%`;
         video.currentTime = percentage * video.duration;
     }
+});
+document.addEventListener('touchmove', (event) => {
+    if (isDragging) {
+        const rect = progressBar.getBoundingClientRect();
+        const offsetX = Math.max(0, Math.min(event.touches[0].clientX - rect.left, rect.width));
+        const percentage = offsetX / rect.width;
+        //progress.style.width = `${percentage * 100}%`;
+        //slider.style.left = `${percentage * 100}%`;
+        video.currentTime = percentage * video.duration;
+    }
+});
+document.addEventListener('mouseup', () => {
+    isDragging = false;
 });
 document.addEventListener('mouseup', () => {
     isDragging = false;
@@ -366,7 +382,6 @@ window.addEventListener('keydown', async evt => {
     }
 });
 video.addEventListener('touchstart', function (e) {
-    console.log("touchstart -------------->")
     isDown = true;
     const touch = e.touches[0];
     _x=touch .clientX;

@@ -8,6 +8,7 @@ const timePlayed = document.querySelector('#time-played');
 const timeDuration = document.querySelector('#time-duration');
 const playPause = document.querySelector('#play-pause');
 const fullscreen = document.querySelector('#fullscreen');
+const playbackRate = document.querySelector('#playback-rate');
 const playerBottom = document.querySelector('#player-bottom');
 const playCenter = document.querySelector('#play-center');
 
@@ -68,11 +69,11 @@ video.addEventListener('suspend', evt => {
 });
 video.addEventListener('timeupdate', evt => {
     //console.log('timeupdate fired');
-     if (!isDragging) {
-    const percentage = (video.currentTime / video.duration) * 100;
-    progressBarPlayed.style.width = `${percentage}%`;
-    progressBarPlayhead.style.left = `${percentage}%`;
-    timePlayed.textContent = formatDuration(video.currentTime);
+    if (!isDragging) {
+        const percentage = (video.currentTime / video.duration) * 100;
+        progressBarPlayed.style.width = `${percentage}%`;
+        progressBarPlayhead.style.left = `${percentage}%`;
+        timePlayed.textContent = formatDuration(video.currentTime);
     }
 });
 video.addEventListener('volumechange', evt => { console.log('volumechange fired') });
@@ -273,6 +274,29 @@ fullscreen.addEventListener('click', async evt => {
     resetZoom();
 
 });
+playbackRate.addEventListener('click', async evt => {
+    playbackRate.querySelector('#playback-rate-group').removeAttribute('hidden');
+});
+
+playbackRate.querySelectorAll('#playback-rate-group div')
+    .forEach(x => {
+        x.addEventListener('click', evt => {
+            evt.stopPropagation();
+            playbackRate.querySelector('#playback-rate-group').setAttribute('hidden', '');
+            const text = evt.currentTarget.textContent;
+            if (text === '-')
+                video.playbackRate -= .25;
+            else if (text === '+')
+                video.playbackRate += .25;
+            else {
+                video.playbackRate = parseFloat(text);
+            }
+        })
+    })
+
+
+
+
 let isDragging = false;
 progressBarPlayhead.addEventListener('mousedown', () => {
     isDragging = true;
@@ -294,14 +318,14 @@ document.addEventListener('mousemove', (event) => {
 document.addEventListener('touchmove', (event) => {
     if (isDragging) {
         const rect = progressBar.getBoundingClientRect();
-        const offsetX = Math.max(0, Math.min(event.touches[0].clientX , rect.width));
+        const offsetX = Math.max(0, Math.min(event.touches[0].clientX, rect.width));
         const percentage = offsetX / rect.width;
-        console.log(rect,offsetX,percentage)
+        console.log(rect, offsetX, percentage)
         //progress.style.width = `${percentage * 100}%`;
         //slider.style.left = `${percentage * 100}%`;
-            progressBarPlayed.style.width = `${percentage * 100}%`;
-            progressBarPlayhead.style.left = `${percentage * 100}%`;
-            timePlayed.textContent = formatDuration(percentage * video.duration);
+        progressBarPlayed.style.width = `${percentage * 100}%`;
+        progressBarPlayhead.style.left = `${percentage * 100}%`;
+        timePlayed.textContent = formatDuration(percentage * video.duration);
         video.currentTime = percentage * video.duration;
     }
 });
@@ -391,23 +415,23 @@ window.addEventListener('keydown', async evt => {
 video.addEventListener('touchstart', function (e) {
     isDown = true;
     const touch = e.touches[0];
-    _x=touch .clientX;
-    _y=touch .clientY;
+    _x = touch.clientX;
+    _y = touch.clientY;
 }, true);
 
 video.addEventListener('touchend', function () {
     console.log("touchend -------------->")
     isDown = false;
 }, true);
-let _x,_y;
+let _x, _y;
 video.addEventListener('touchmove', function (event) {
     event.preventDefault();
     if (isDown) {
         const touch = event.touches[0];
-        var deltaX = touch.clientX-_x;
-        var deltaY = touch.clientY-_y;
-        _x=touch .clientX;
-        _y=touch .clientY;
+        var deltaX = touch.clientX - _x;
+        var deltaY = touch.clientY - _y;
+        _x = touch.clientX;
+        _y = touch.clientY;
         var rect = video.getBoundingClientRect();
         video.style.left = rect.x + deltaX + 'px';
         video.style.top = rect.y + deltaY + 'px';

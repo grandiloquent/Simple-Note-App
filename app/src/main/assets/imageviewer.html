@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Scale Image Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #imageContainer {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            touch-action: none;
+            /* Prevents default browser touch behaviors */
+        }
+
+        #viewerImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            user-select: none;
+            pointer-events: none;
+            /* Prevent image from intercepting touch events */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="imageContainer">
+        <img id="viewerImage" src="https://via.placeholder.com/800x600" alt="Sample Image">
+    </div>
+    <script>
+        const container = document.getElementById('imageContainer');
+        const img = document.getElementById('viewerImage');
+        img.src = `./file?path=${new URLSearchParams(window.location.search).get('path')}`
+
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX, startY, startDistance;
+
+        // Apply transform to image
+        function updateTransform() {
+            img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        // Calculate distance between two touch points for pinch-to-zoom
+        function getDistance(touch1, touch2) {
+            return Math.hypot(touch2.pageX - touch1.pageX, touch2.pageY - touch1.pageY);
+        }
+
+        // Get midpoint between two touch points
+        function getMidpoint(touch1, touch2) {
+            return {
+                x: (touch1.pageX + touch2.pageX) / 2,
+                y: (touch1.pageY + touch2.pageY) / 2
+            };
+        }
+
+        // Handle touch start
+        container.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                // Single touch: start dragging
+                isDragging = true;
+                startX = e.touches[0].pageX - translateX;
+                startY = e.touches[0].pageY - translateY;
+            } else if (e.touches.length === 2) {
+                // Two touches: start pinch-to-zoom
+                isDragging = false;
+                startDistance = getDistance(e.touches[0], e.touches[1]);
+            }
+        });
+
+        // Handle touch move
+        container.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging) {
+                // Single touch: drag
+                translateX = e.touches[0].pageX - startX;
+                translateY = e.touches[0].pageY - startY;
+                updateTransform();
+            } else if (e.touches.length === 2) {
+                // Two touches: pinch-to-zoom
+                const newDistance = getDistance(e.touches[0], e.touches[1]);
+                const newScale = scale * (newDistance / startDistance);
+                scale = Math.max(0.5, Math.min(newScale, 5)); // Limit scale between 0.5x and 5x
+
+                // Adjust translation to zoom around pinch center
+                const midpoint = getMidpoint(e.touches[0], e.touches[1]);
+                translateX = midpoint.x - (midpoint.x - translateX) * (newDistance / startDistance);
+                translateY = midpoint.y - (midpoint.y - translateY) * (newDistance / startDistance);
+                startDistance = newDistance;
+                updateTransform();
+            }
+        });
+
+        // Handle touch end
+        container.addEventListener('touchend', (e) => {
+            isDragging = false;
+        });
+
+        // Handle mouse events for desktop testing
+        let isMouseDragging = false;
+        container.addEventListener('mousedown', (e) => {
+            isMouseDragging = true;
+            startX = e.pageX - translateX;
+            startY = e.pageY - translateY;
+        });
+        container.addEventListener('mousemove', (e) => {
+            if (isMouseDragging) {
+                translateX = e.pageX - startX;
+                translateY = e.pageY - startY;
+                updateTransform();
+            }
+        });
+        container.addEventListener('mouseup', () => {
+            isMouseDragging = false;
+        });
+
+        // Handle mouse wheel for zooming
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            const newScale = scale * zoomFactor;
+            scale = Math.max(0.5, Math.min(newScale, 5));
+
+            // Zoom around mouse position
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            translateX = mouseX - (mouseX - translateX) * zoomFactor;
+            translateY = mouseY - (mouseY - translateY) * zoomFactor;
+            updateTransform();
+        });
+    </script>
+</body>
+
+</html>

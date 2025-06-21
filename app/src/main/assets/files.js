@@ -20,7 +20,8 @@ function onItemClick(evt) {
         return;
     }
     if (imageRe.test(path)) {
-        showImage(path);
+        //showImage(path);
+        window.location = `/imageviewer.html?path=${path}`
         return;
     }
     if (audioRe.test(path)) {

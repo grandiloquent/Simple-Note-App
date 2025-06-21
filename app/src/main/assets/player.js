@@ -68,10 +68,12 @@ video.addEventListener('suspend', evt => {
 });
 video.addEventListener('timeupdate', evt => {
     //console.log('timeupdate fired');
+     if (!isDragging) {
     const percentage = (video.currentTime / video.duration) * 100;
     progressBarPlayed.style.width = `${percentage}%`;
     progressBarPlayhead.style.left = `${percentage}%`;
     timePlayed.textContent = formatDuration(video.currentTime);
+    }
 });
 video.addEventListener('volumechange', evt => { console.log('volumechange fired') });
 video.addEventListener('waiting', evt => { console.log('waiting fired') });
@@ -288,13 +290,18 @@ document.addEventListener('mousemove', (event) => {
         video.currentTime = percentage * video.duration;
     }
 });
+
 document.addEventListener('touchmove', (event) => {
     if (isDragging) {
         const rect = progressBar.getBoundingClientRect();
-        const offsetX = Math.max(0, Math.min(event.touches[0].clientX - rect.left, rect.width));
+        const offsetX = Math.max(0, Math.min(event.touches[0].clientX , rect.width));
         const percentage = offsetX / rect.width;
+        console.log(rect,offsetX,percentage)
         //progress.style.width = `${percentage * 100}%`;
         //slider.style.left = `${percentage * 100}%`;
+            progressBarPlayed.style.width = `${percentage * 100}%`;
+            progressBarPlayhead.style.left = `${percentage * 100}%`;
+            timePlayed.textContent = formatDuration(percentage * video.duration);
         video.currentTime = percentage * video.duration;
     }
 });

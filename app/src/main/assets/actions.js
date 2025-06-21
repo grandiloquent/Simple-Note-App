@@ -218,8 +218,8 @@ async function render(path) {
         .map(x => {
             return `<div class="item" data-path="${encodeURIComponent(x.path)}" data-isdirectory=${x.isDirectory}>
             <div class="item-icon ${x.isDirectory ? 'item-directory' : 'item-file'}" 
-            ${imageRe.test(x.path) ? `style="background-image:none;display:flex;overflow:hidden;align-item:center"` : ''}
-            >${imageRe.test(x.path)?`<img style="max-width:100%" data-src="${baseUri}/file?path=${x.path}">`:''}</div>
+            ${imageRe.test(x.path) ? `style="background-image:none;display:flex;overflow:hidden;align-item:center;justify-content:center;"` : ''}
+            >${imageRe.test(x.path)?`<img style="max-width:100%" data-src="${baseUri}/file?path=${encodeURIComponent(x.path)}">`:''}</div>
           <div class="item-title">
           <div>${substringAfterLast(x.path, "/")}</div>
           <div class="item-subtitle" style="${x.length === 0 ? 'display:none' : ''}">${humanFileSize(x.length)}</div>

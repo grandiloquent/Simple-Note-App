@@ -40,7 +40,14 @@
 </head>
 
 <body>
-    <button
+    <button id="auto"
+        style="position: fixed;left: 0;top: 0;height: 48px;width: 48px;background-color: transparent;border: none;padding: 0;z-index: 1;">
+
+    </button>
+    <button id="previous"
+        style="position: fixed;right: 48px;top: 0;height: 48px;width: 48px;background-color: transparent;border: none;padding: 0;z-index: 1;">
+    </button>
+    <button id="next"
         style="position: fixed;right: 0;top: 0;height: 48px;width: 48px;background-color: transparent;border: none;padding: 0;z-index: 1;">
 
     </button>
@@ -62,6 +69,7 @@
         }
         let images;
         let index;
+        let timeout;
         const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp|v)$/);
         async function render() {
             images = (await load())
@@ -69,8 +77,38 @@
                 .map(x => x.path);
             index = images.indexOf(path);
             img.src = `./file?path=${encodeURIComponent(images[index])}`
+            document.querySelector('#auto')
+                .addEventListener('click', evt => {
+                    if (timeout) {
+                        clearInterval(timeout);
+                        timeout = 0;
+                    }
+                    else {
+                        timeout = setInterval(() => {
+                            if (index + 1 < images.length) {
+                                index++;
+                            } else {
+                                index = 0;
+                            }
+                            img.src = `./file?path=${encodeURIComponent(images[index])}`
+                            img.style.transform = 'none';
+                        }, 1000);
+                    }
 
-            document.querySelector('button')
+                })
+
+            document.querySelector('#previous')
+                .addEventListener('click', evt => {
+                    if (index - 1 > -1) {
+                        index--;
+                    } else {
+                        index = images.length - 1;
+                    }
+                    img.src = `./file?path=${encodeURIComponent(images[index])}`
+                    img.style.transform = 'none';
+
+                })
+            document.querySelector('#next')
                 .addEventListener('click', evt => {
                     if (index + 1 < images.length) {
                         index++;

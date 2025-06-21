@@ -270,7 +270,7 @@ async function render(path) {
         });
     })
     
-    document.querySelectorAll('img')
+    document.querySelectorAll('.item img')
     .forEach(img=>{
         observer.observe(img);
     })

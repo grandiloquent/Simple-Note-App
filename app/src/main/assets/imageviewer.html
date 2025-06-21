@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Touch Scale Image Viewer</title>
     <style>
+        html,
         body {
             margin: 0;
             overflow: hidden;
+            height: 100%;
+            width: 100%;
         }
 
         #imageContainer {
@@ -29,17 +32,60 @@
             pointer-events: none;
             /* Prevent image from intercepting touch events */
         }
+
+        img {
+            max-width: 100%;
+        }
     </style>
 </head>
 
 <body>
+    <button
+        style="position: fixed;right: 0;top: 0;height: 48px;width: 48px;background-color: transparent;border: none;padding: 0;z-index: 1;">
+
+    </button>
     <div id="imageContainer">
         <img id="viewerImage" src="https://via.placeholder.com/800x600" alt="Sample Image">
     </div>
     <script>
         const container = document.getElementById('imageContainer');
         const img = document.getElementById('viewerImage');
-        img.src = `./file?path=${new URLSearchParams(window.location.search).get('path')}`
+        const path = new URLSearchParams(window.location.search).get('path');
+
+
+        let uri = "https://xpsycho.oss-cn-beijing.aliyuncs.com";
+        async function load() {
+            const lastSlashIndex = path.lastIndexOf('/');
+
+            const res = await fetch(`/files?path=${encodeURIComponent(path.substring(0, lastSlashIndex))}`);
+            return res.json();
+        }
+        let images;
+        let index;
+        const imageRe = new RegExp(/\.(?:jpeg|jpg|webp|gif|png|bmp|v)$/);
+        async function render() {
+            images = (await load())
+                .filter(x => imageRe.test(x.path))
+                .map(x => x.path);
+            index = images.indexOf(path);
+            img.src = `./file?path=${encodeURIComponent(images[index])}`
+
+            document.querySelector('button')
+                .addEventListener('click', evt => {
+                    if (index + 1 < images.length) {
+                        index++;
+                    } else {
+                        index = 0;
+                    }
+                    img.src = `./file?path=${encodeURIComponent(images[index])}`
+                    img.style.transform = 'none';
+
+                })
+        }
+        async function initialize() {
+            await render();
+        }
+        initialize();
 
         let scale = 1;
         let translateX = 0;

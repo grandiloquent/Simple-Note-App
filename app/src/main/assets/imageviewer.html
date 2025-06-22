@@ -87,11 +87,12 @@
                         timeout = setInterval(() => {
                             if (index + 1 < images.length) {
                                 index++;
+                                img.src = `./file?path=${encodeURIComponent(images[index])}`
+                                img.style.transform = 'none';
                             } else {
-                                index = 0;
+                                clearInterval(timeout)
                             }
-                            img.src = `./file?path=${encodeURIComponent(images[index])}`
-                            img.style.transform = 'none';
+                           
                         }, 500);
                     }
 

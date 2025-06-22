@@ -236,10 +236,53 @@ function zoomIn(video, evt) {
     video.style.left = (window.innerWidth / 2 - width) + 'px';
     video.style.top = (window.innerHeight / 2 - height) + 'px';
 }
+async function loadSRTAsVTT(srtFile) {
+    
+        const response = await fetch(srtFile);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`); // Handle 404 or other HTTP errors
+        }
+        const srtText = await response.text();
+        const vttText = convertSRTtoVTT(srtText);
+        loadVTT(vttText);
+    
+}
+// Convert SRT to VTT format
+function convertSRTtoVTT(srtText) {
+    // Replace commas with periods for milliseconds and add WEBVTT header
+    const vttText = 'WEBVTT\n\n' + srtText.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+    return vttText;
+}
+function loadVTT(vttText) {
+    const blob = new Blob([vttText], { type: 'text/vtt' });
+    const vttURL = URL.createObjectURL(blob);
+    const track = document.createElement('track');
+    track.src = vttURL;
+    track.kind = 'subtitles';
+    track.srclang = 'en';
+    track.label = 'English';
+    track.default = true;
+    video.appendChild(track);
+}
+function changeExtension(filename, newExtension) {
+    return filename.replace(/\.[^/.]+$/, `.${newExtension}`);
+}
+async function loadSubtitle(){
+    try {
+        await loadSRTAsVTT(changeExtension(video.src,"srt"));
+     
+    } catch (error) {
+        const response = await fetch(changeExtension(video.src,"vtt"));
+        const srtText = await response.text();
+        loadVTT(srtText);
+    }
+}
 //-----------------------------
 window.baseUri = "";
 
-video.src = `${baseUri}/file?path=${decodeURIComponent(new URL(location.href).searchParams.get('path'))}`;
+video.src = `${baseUri}/file?path=${encodeURIComponent(new URL(location.href).searchParams.get('path'))}`;
+
+loadSubtitle()
 window.addEventListener('resize', adjustSize)
 
 playPause.addEventListener('click', evt => {

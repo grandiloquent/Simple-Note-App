@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>播放器</title>
-   
+
     <link href="./player.css" rel="stylesheet">
     <script src="https://fastly.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js"></script>
 
@@ -24,8 +24,9 @@
         </div>
     </div>
     <div id="player-bottom"
-        style="display: flex;position: absolute;bottom: 30px;z-index: 2;height: 44px;left:12px;right: 12px;">
-        <div style=" display: flex;align-items: center;margin-left: 16px;font-weight: 500;overflow: hidden;flex:0 0 auto;">
+        style="display: flex;position: absolute;bottom: 30px;z-index: 2;height: 44px;left:12px;right: 12px;user-select: none;">
+        <div
+            style=" display: flex;align-items: center;margin-left: 16px;font-weight: 500;overflow: hidden;flex:0 0 auto;">
             <span id="time-played" style="color: #fff;font-size: 12px;font-weight: 500;">0:00</span>
             <span style="color: #fff;font-size: 12px;font-weight: 500;margin: 0 4px;opacity: .7;">/</span>
             <span id="time-duration" style="color: #fff;font-size: 12px;font-weight: 500;opacity: .7;">0:00</span>
@@ -33,7 +34,8 @@
         </div>
         <div style="flex-grow: 1;"></div>
         <div id="playback-rate" style="color: #fff;fill: currentColor;padding: 10px;flex:0 0 auto;position: relative;">
-            <div id="playback-rate-group" style="position: absolute;bottom: 100%;width: 44px;left: 0px;background-color: #0f0f0f;" hidden>
+            <div id="playback-rate-group"
+                style="position: absolute;bottom: 100%;width: 44px;left: 0px;background-color: #0f0f0f;" hidden>
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">-</div>
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">.5</div>
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">1</div>
@@ -44,9 +46,16 @@
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">3.5</div>
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">4</div>
                 <div style="height: 44px;display: flex;align-items: center;justify-content: center;">+</div>
-                
+
             </div>
-            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M10,8v8l6-4L10,8L10,8z M6.3,5L5.7,4.2C7.2,3,9,2.2,11,2l0.1,1C9.3,3.2,7.7,3.9,6.3,5z            M5,6.3L4.2,5.7C3,7.2,2.2,9,2,11 l1,.1C3.2,9.3,3.9,7.7,5,6.3z            M5,17.7c-1.1-1.4-1.8-3.1-2-4.8L2,13c0.2,2,1,3.8,2.2,5.4L5,17.7z            M11.1,21c-1.8-0.2-3.4-0.9-4.8-2 l-0.6,.8C7.2,21,9,21.8,11,22L11.1,21z            M22,12c0-5.2-3.9-9.4-9-10l-0.1,1c4.6,.5,8.1,4.3,8.1,9s-3.5,8.5-8.1,9l0.1,1 C18.2,21.5,22,17.2,22,12z" fill="white"></path></svg>
+            <svg height="24" viewBox="0 0 24 24" width="24">
+                <path
+                    d="M10,8v8l6-4L10,8L10,8z M6.3,5L5.7,4.2C7.2,3,9,2.2,11,2l0.1,1C9.3,3.2,7.7,3.9,6.3,5z            M5,6.3L4.2,5.7C3,7.2,2.2,9,2,11 l1,.1C3.2,9.3,3.9,7.7,5,6.3z            M5,17.7c-1.1-1.4-1.8-3.1-2-4.8L2,13c0.2,2,1,3.8,2.2,5.4L5,17.7z            M11.1,21c-1.8-0.2-3.4-0.9-4.8-2 l-0.6,.8C7.2,21,9,21.8,11,22L11.1,21z            M22,12c0-5.2-3.9-9.4-9-10l-0.1,1c4.6,.5,8.1,4.3,8.1,9s-3.5,8.5-8.1,9l0.1,1 C18.2,21.5,22,17.2,22,12z"
+                    fill="white"></path>
+            </svg>
+        </div>
+        <div id="list" style="color: #fff;fill: currentColor;padding: 10px;flex:0 0 auto;">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M360-200v-80h480v80H360Zm0-240v-80h480v80H360Zm0-240v-80h480v80H360ZM200-160q-33 0-56.5-23.5T120-240q0-33 23.5-56.5T200-320q33 0 56.5 23.5T280-240q0 33-23.5 56.5T200-160Zm0-240q-33 0-56.5-23.5T120-480q0-33 23.5-56.5T200-560q33 0 56.5 23.5T280-480q0 33-23.5 56.5T200-400Zm0-240q-33 0-56.5-23.5T120-720q0-33 23.5-56.5T200-800q33 0 56.5 23.5T280-720q0 33-23.5 56.5T200-640Z"/></svg>
         </div>
         <div id="fullscreen" style="color: #fff;fill: currentColor;padding: 10px;flex:0 0 auto;">
             <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24"
@@ -57,7 +66,7 @@
         </div>
     </div>
     <div id="progress-bar"
-        style="bottom: 0;left: 30px;right: 30px;bottom: 22px;;position: fixed;display: flex;align-items: center;">
+        style="bottom: 0;left: 30px;right: 30px;padding-bottom: 22px;;position: fixed;display: flex;align-items: center;">
         <div style="position: relative;height: 3px;width: 100%;">
             <div style="position: absolute;top: 0;bottom: 0;background-color: #fff;opacity: .3;width: 100%;">
             </div>
@@ -75,7 +84,35 @@
 
         </div>
     </div>
+    <div hidden id="bottom-sheet" style="position: fixed;z-index: 15;">
+        <div
+            style="position: fixed;top: 0;bottom: 0;left: 0;right: 0;z-index: 1;cursor: pointer;background-color: rgba(0,0,0,0.6);">
+        </div>
+        <div
+            style="border-radius: 12px;background-color: #fff;display: block;overflow: hidden;position: fixed;margin: 0 8px 24px;bottom: 0;left: 0;right: 0;z-index: 100;">
+            <div
+                style="overflow: hidden;-webkit-box-flex: 0;-webkit-flex: none;flex: none;border-bottom: 1px solid #fff;">
+                <div
+                    style="background: #0f0f0f;opacity: .15;border-radius: 4px;height: 4px;margin: 0 auto;width: 40px;margin-top: 8px;">
+                </div>
+                <div
+                    style="-webkit-box-pack: justify;-webkit-justify-content: space-between;justify-content: space-between;display: -webkit-box;display: -webkit-flex;display: flex;margin-top: 8px;">
+                </div>
+            </div>
 
+            <div
+                style="-webkit-box-flex: 1;-webkit-flex: 1;flex: 1;-webkit-overflow-scrolling: touch;overflow-y: scroll;max-height: 50vh;">
+                <div id="bottom-sheet-items"
+                    style="display: -webkit-box;display: -webkit-flex;display: flex;-webkit-box-orient: vertical;-webkit-box-direction: normal;-webkit-flex-direction: column;flex-direction: column;color: #0f0f0f;">
+                    <div style="padding:0 8px;height: 48px;display: flex;align-items: center;">
+                        <span>123</span>
+                    </div>
+                  
+                </div>
+            </div>
+
+        </div>
+    </div>
 </body>
 <script src="player.js"></script>
 

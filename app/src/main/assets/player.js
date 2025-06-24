@@ -11,7 +11,9 @@ const fullscreen = document.querySelector('#fullscreen');
 const playbackRate = document.querySelector('#playback-rate');
 const playerBottom = document.querySelector('#player-bottom');
 const playCenter = document.querySelector('#play-center');
-
+const bottomSheet = document.querySelector('#bottom-sheet');
+const bottomSheetItems = document.querySelector('#bottom-sheet-items');
+const list = document.querySelector('#list');
 //-----------------------------
 
 
@@ -237,15 +239,15 @@ function zoomIn(video, evt) {
     video.style.top = (window.innerHeight / 2 - height) + 'px';
 }
 async function loadSRTAsVTT(srtFile) {
-    
-        const response = await fetch(srtFile);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`); // Handle 404 or other HTTP errors
-        }
-        const srtText = await response.text();
-        const vttText = convertSRTtoVTT(srtText);
-        loadVTT(vttText);
-    
+
+    const response = await fetch(srtFile);
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`); // Handle 404 or other HTTP errors
+    }
+    const srtText = await response.text();
+    const vttText = convertSRTtoVTT(srtText);
+    loadVTT(vttText);
+
 }
 // Convert SRT to VTT format
 function convertSRTtoVTT(srtText) {
@@ -267,22 +269,57 @@ function loadVTT(vttText) {
 function changeExtension(filename, newExtension) {
     return filename.replace(/\.[^/.]+$/, `.${newExtension}`);
 }
-async function loadSubtitle(){
+async function loadSubtitle() {
     try {
-        await loadSRTAsVTT(changeExtension(video.src,"srt"));
-     
+        await loadSRTAsVTT(changeExtension(video.src, "srt"));
+
     } catch (error) {
-        const response = await fetch(changeExtension(video.src,"vtt"));
+        const response = await fetch(changeExtension(video.src, "vtt"));
         const srtText = await response.text();
         loadVTT(srtText);
     }
 }
+function getFileName(path) {
+    let index = path.lastIndexOf('/');
+    if (index === -1)
+        index = path.lastIndexOf('\\')
+    return path.substring(index + 1);
+}
+function getBaseUri() {
+    return "";
+}
+async function loadFiles() {
+
+    let index = path.lastIndexOf('/');
+    if (index === -1)
+        index = path.lastIndexOf('\\')
+    let src = path.substring(0, index)
+    const res = await fetch(`${baseUri}${getBaseUri()}/files?path=${encodeURIComponent(src)}`);
+    bottomSheetItems.innerHTML = (await res.json())
+        .filter(x => (x.path || x.fullName).endsWith('.mp4'))
+        .map(x => {
+            return `<div data-src="${encodeURIComponent(x.path || x.fullName)}" style="padding:0 8px;height: 48px;display: flex;align-items: center;overflow:hidden">
+                        <span>${getFileName(x.path || x.fullName)}</span>
+                    </div>`
+        }).join('');
+
+    bottomSheetItems.querySelectorAll('[data-src]')
+        .forEach(x => {
+            x.addEventListener('click', evt => {
+                video.src = `${baseUri}${getBaseUri()}/file?path=${evt.currentTarget.dataset.src
+                    }`;
+                bottomSheet.setAttribute('hidden', '')
+            })
+        })
+
+}
 //-----------------------------
 window.baseUri = "";
-
-video.src = `${baseUri}/file?path=${encodeURIComponent(new URL(location.href).searchParams.get('path'))}`;
+const path = new URL(location.href).searchParams.get('path');
+video.src = `${baseUri}${getBaseUri()}/file?path=${encodeURIComponent(path)}`;
 
 loadSubtitle()
+loadFiles();
 window.addEventListener('resize', adjustSize)
 
 playPause.addEventListener('click', evt => {
@@ -320,6 +357,9 @@ fullscreen.addEventListener('click', async evt => {
 playbackRate.addEventListener('click', async evt => {
     playbackRate.querySelector('#playback-rate-group').removeAttribute('hidden');
 });
+list.addEventListener('click', async evt => {
+    bottomSheet.removeAttribute('hidden');
+});
 
 playbackRate.querySelectorAll('#playback-rate-group div')
     .forEach(x => {
@@ -341,10 +381,10 @@ playbackRate.querySelectorAll('#playback-rate-group div')
 
 
 let isDragging = false;
-progressBarPlayhead.addEventListener('mousedown', () => {
+progressBar.addEventListener('mousedown', () => {
     isDragging = true;
 });
-progressBarPlayhead.addEventListener('touchstart', () => {
+progressBar.addEventListener('touchstart', () => {
     isDragging = true;
 });
 document.addEventListener('mousemove', (event) => {

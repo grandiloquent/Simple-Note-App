@@ -306,8 +306,21 @@ async function loadFiles() {
     bottomSheetItems.querySelectorAll('[data-src]')
         .forEach(x => {
             x.addEventListener('click', evt => {
+                for (const track of video.textTracks) {
+                    track.mode = "disabled";
+                }
+                // .setAttribute('hidden', '')
+                document.querySelectorAll('track')
+                    .forEach(x => x.remove());
+                video.load();
+               
+                
+                playPause.querySelector('path')
+                    .setAttribute('d', 'm7 4 12 8-12 8V4z');
+                clearTimeout(timeout);
                 video.src = `${baseUri}${getBaseUri()}/file?path=${evt.currentTarget.dataset.src
                     }`;
+                loadSubtitle();
                 bottomSheet.setAttribute('hidden', '')
             })
         })
